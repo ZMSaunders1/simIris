@@ -14,7 +14,7 @@ void loadELoss(TString filename, Double_t e[100], Double_t dedx[100], Double_t m
 {
 	Double_t buffer[2];
 	
-	ifstream infile;
+	std::ifstream infile;
 	Char_t line[2000];
 			
 	infile.open(filename); 

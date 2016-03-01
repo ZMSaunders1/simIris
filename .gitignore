@@ -8,8 +8,8 @@ core
 *.swp
 *.root
 *.sh
-bin/
+bin/*
 config/
-obj/
+obj/*
 plots/
 rootfiles/
