@@ -10,16 +10,16 @@
 #include <TRandom3.h>
 #include <TMath.h>
 
-void loadELoss(TString filename, Double_t e[100], Double_t dedx[100], Double_t m)
+void loadELoss(std::string filename, Double_t e[100], Double_t dedx[100], Double_t m)
 {
 	Double_t buffer[2];
 	
 	std::ifstream infile;
 	Char_t line[2000];
 			
-	infile.open(filename); 
+	infile.open(filename.data()); 
 	if(!infile.is_open()){
-		printf("Cannot open the file %s!!\n",filename.Data());
+		printf("Cannot open the file %s!!\n",filename.data());
 		exit(0);
 	}
 
