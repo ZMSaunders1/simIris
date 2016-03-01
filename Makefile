@@ -75,5 +75,6 @@ clean::
 	rm -f $(BINARYDIR)/simIris
 	rm -f $(SOURCEDIR)/*Dict.cxx
 	rm -f $(SOURCEDIR)/*Dict.h
+	rm -f $(SOURCEDIR)/*.pcm
 
 # end 

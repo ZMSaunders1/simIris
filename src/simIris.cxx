@@ -418,8 +418,9 @@ int main(int argc, char *argv[])
 	}
 // *******************************************************************
 
-	if(!seqdec) loadAllELoss(dedxpath,A,B,b);
-	else loadAllELoss(dedxpath,A,decB,b);
+	std::string dedxstr = dedxpath;
+	if(!seqdec) loadAllELoss(dedxstr,A,B,b);
+	else loadAllELoss(dedxstr,A,decB,b);
 
 	Double_t targetTh=prm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
 	Double_t BeamSpot=prm.Bs/2.355; // FWHM->sigma 
