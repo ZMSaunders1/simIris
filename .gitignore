@@ -8,8 +8,7 @@ core
 *.swp
 *.root
 *.sh
-bin/*
+bin/simIris
 config/
-obj/*
 plots/
 rootfiles/
