@@ -71,50 +71,50 @@ void clearEvt()
 	return;
 }
 
-void loadAllELoss(nucleus A, nucleus B, nucleus b)
+void loadAllELoss(std::string path, nucleus A, nucleus B, nucleus b)
 {
-	printf("\nLoading ../dedx/lise_%s_in_H.txt\n",A.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_H.txt",A.name.data()),eAH,dedxAH,A.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_C4H10.txt\n",A.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_C4H10.txt",A.name.data()),eAC4H10,dedxAC4H10,A.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_Si3N4.txt\n",A.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_Si3N4.txt",A.name.data()),eASi3N4,dedxASi3N4,A.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_Ag.txt\n",A.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_Ag.txt",A.name.data()),eAAg,dedxAAg,A.mass/1000.);	
+	printf("\nLoading %s/lise_%s_in_H.txt\n",path.data(),A.name.data());	
+	loadELoss(Form("%s/lise_%s_in_H.txt",path.data(),A.name.data()),eAH,dedxAH,A.mass/1000.);	
+	printf("Loading %s/lise_%s_in_C4H10.txt\n",path.data(),A.name.data());	
+	loadELoss(Form("%s/lise_%s_in_C4H10.txt",path.data(),A.name.data()),eAC4H10,dedxAC4H10,A.mass/1000.);	
+	printf("Loading %s/lise_%s_in_Si3N4.txt\n",path.data(),A.name.data());	
+	loadELoss(Form("%s/lise_%s_in_Si3N4.txt",path.data(),A.name.data()),eASi3N4,dedxASi3N4,A.mass/1000.);	
+	printf("Loading %s/lise_%s_in_Ag.txt\n",path.data(),A.name.data());	
+	loadELoss(Form("%s/lise_%s_in_Ag.txt",path.data(),A.name.data()),eAAg,dedxAAg,A.mass/1000.);	
 	
-	printf("Loading ../dedx/lise_%s_in_Si.txt\n",B.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_Si.txt",B.name.data()),eBSi,dedxBSi,B.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_H.txt\n",B.name.data());
-	loadELoss(Form("../dedx/lise_%s_in_H.txt",B.name.data()),eBH,dedxBH,B.mass/1000.);
-	printf("Loading ../dedx/lise_%s_in_SiO2.txt\n",B.name.data());
-	loadELoss(Form("../dedx/lise_%s_in_SiO2.txt",B.name.data()),eBSiO2,dedxBSiO2,B.mass/1000.);
-	printf("Loading ../dedx/lise_%s_in_Al.txt\n",B.name.data());
-	loadELoss(Form("../dedx/lise_%s_in_Al.txt",B.name.data()),eBAl,dedxBAl,B.mass/1000.);
-	printf("Loading ../dedx/lise_%s_in_B.txt\n",B.name.data());
-	loadELoss(Form("../dedx/lise_%s_in_B.txt",B.name.data()),eBB,dedxBB,B.mass/1000.);
-	printf("Loading ../dedx/lise_%s_in_P.txt\n",B.name.data());
-	loadELoss(Form("../dedx/lise_%s_in_P.txt",B.name.data()),eBP,dedxBP,B.mass/1000.);
-	printf("Loading ../dedx/lise_%s_in_My.txt\n",B.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_My.txt",B.name.data()),eBMy,dedxBMy,B.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_CsI.txt\n\n",B.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_CsI.txt",B.name.data()),eBCsI,dedxBCsI,B.mass/1000.);	
+	printf("Loading %s/lise_%s_in_Si.txt\n",path.data(),B.name.data());	
+	loadELoss(Form("%s/lise_%s_in_Si.txt",path.data(),B.name.data()),eBSi,dedxBSi,B.mass/1000.);	
+	printf("Loading %s/lise_%s_in_H.txt\n",path.data(),B.name.data());
+	loadELoss(Form("%s/lise_%s_in_H.txt",path.data(),B.name.data()),eBH,dedxBH,B.mass/1000.);
+	printf("Loading %s/lise_%s_in_SiO2.txt\n",path.data(),B.name.data());
+	loadELoss(Form("%s/lise_%s_in_SiO2.txt",path.data(),B.name.data()),eBSiO2,dedxBSiO2,B.mass/1000.);
+	printf("Loading %s/lise_%s_in_Al.txt\n",path.data(),B.name.data());
+	loadELoss(Form("%s/lise_%s_in_Al.txt",path.data(),B.name.data()),eBAl,dedxBAl,B.mass/1000.);
+	printf("Loading %s/lise_%s_in_B.txt\n",path.data(),B.name.data());
+	loadELoss(Form("%s/lise_%s_in_B.txt",path.data(),B.name.data()),eBB,dedxBB,B.mass/1000.);
+	printf("Loading %s/lise_%s_in_P.txt\n",path.data(),B.name.data());
+	loadELoss(Form("%s/lise_%s_in_P.txt",path.data(),B.name.data()),eBP,dedxBP,B.mass/1000.);
+	printf("Loading %s/lise_%s_in_My.txt\n",path.data(),B.name.data());	
+	loadELoss(Form("%s/lise_%s_in_My.txt",path.data(),B.name.data()),eBMy,dedxBMy,B.mass/1000.);	
+	printf("Loading %s/lise_%s_in_CsI.txt\n\n",path.data(),B.name.data());	
+	loadELoss(Form("%s/lise_%s_in_CsI.txt",path.data(),B.name.data()),eBCsI,dedxBCsI,B.mass/1000.);	
 
-	printf("Loading ../dedx/lise_%s_in_Si.txt\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_Si.txt",b.name.data()),ebSi,dedxbSi,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_H.txt\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_H.txt",b.name.data()),ebH,dedxbH,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_Al.txt\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_Al.txt",b.name.data()),ebAl,dedxbAl,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_B.txt\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_B.txt",b.name.data()),ebB,dedxbB,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_My.txt\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_My.txt",b.name.data()),ebMy,dedxbMy,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_P.txt\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_P.txt",b.name.data()),ebP,dedxbP,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_CsI.txt\n\n",b.name.data());	
-	loadELoss(Form("../dedx/lise_%s_in_CsI.txt",b.name.data()),ebCsI,dedxbCsI,b.mass/1000.);	
-	printf("Loading ../dedx/lise_%s_in_SiO2.txt\n",b.name.data());
-	loadELoss(Form("../dedx/lise_%s_in_SiO2.txt",b.name.data()),ebSiO2,dedxbSiO2,b.mass/1000.);
+	printf("Loading %s/lise_%s_in_Si.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_Si.txt",path.data(),b.name.data()),ebSi,dedxbSi,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_H.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_H.txt",path.data(),b.name.data()),ebH,dedxbH,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_Al.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_Al.txt",path.data(),b.name.data()),ebAl,dedxbAl,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_B.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_B.txt",path.data(),b.name.data()),ebB,dedxbB,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_My.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_My.txt",path.data(),b.name.data()),ebMy,dedxbMy,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_P.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_P.txt",path.data(),b.name.data()),ebP,dedxbP,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_CsI.txt\n",path.data(),b.name.data());	
+	loadELoss(Form("%s/lise_%s_in_CsI.txt",path.data(),b.name.data()),ebCsI,dedxbCsI,b.mass/1000.);	
+	printf("Loading %s/lise_%s_in_SiO2.txt\n\n",path.data(),b.name.data());
+	loadELoss(Form("%s/lise_%s_in_SiO2.txt",path.data(),b.name.data()),ebSiO2,dedxbSiO2,b.mass/1000.);
 	return;
 }
 
@@ -243,12 +243,16 @@ int main(int argc, char *argv[])
 	char *endptr;
 	Int_t nsim = 1E6;
 	char *paramsname =NULL;
+	char *dedxpath =NULL;
 	char *outputname =NULL;
 	
 	if (argc > 1){
 		for(int i=0; i<argc; i++){
 			if(strncmp(argv[i],"--output=",9)==0){
 				outputname = argv[i]+9;
+			}
+			else if(strncmp(argv[i],"--dedx_dir=",11)==0){
+				dedxpath = argv[i]+11;
 			}
 			else if(strncmp(argv[i],"--params=",9)==0){
 				load_params_from_file=kTRUE;
@@ -414,8 +418,8 @@ int main(int argc, char *argv[])
 	}
 // *******************************************************************
 
-	if(!seqdec) loadAllELoss(A,B,b);
-	else loadAllELoss(A,decB,b);
+	if(!seqdec) loadAllELoss(dedxpath,A,B,b);
+	else loadAllELoss(dedxpath,A,decB,b);
 
 	Double_t targetTh=prm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
 	Double_t BeamSpot=prm.Bs/2.355; // FWHM->sigma 
