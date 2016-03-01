@@ -72,7 +72,7 @@ $(SOURCEDIR)/S3HitDict.cxx: $(SOURCEDIR)/S3Hit.cxx $(INCLUDEDIR)/S3HitLinkDef.h
 
 clean::
 	rm -f $(OBJECTDIR)/*.o
-	rm -f simIris
+	rm -f $(BINARYDIR)/simIris
 	rm -f $(SOURCEDIR)/*Dict.cxx
 	rm -f $(SOURCEDIR)/*Dict.h
 
