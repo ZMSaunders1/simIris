@@ -12,8 +12,6 @@
 
 void loadELoss(std::string filename, Double_t e[100], Double_t dedx[100], Double_t m)
 {
-	Double_t buffer[2];
-	
 	std::ifstream infile;
 	Char_t line[2000];
 			
@@ -26,7 +24,7 @@ void loadELoss(std::string filename, Double_t e[100], Double_t dedx[100], Double
   	infile.getline(line,2000);
 	for(UInt_t i=0; i<100; i++){
     	infile.getline(line,2000);
-    	sscanf(line,"%lf %lf %lf %lf",&buffer[1],&buffer[2],&e[i],&dedx[i]);
+    	sscanf(line,"%*f\t%*f\t%lf\t%lf\t%*f\t%*f\t%*f\t%*f\t%*f\t%*f\t%*f\t%*f\t\n",&e[i],&dedx[i]);
   		e[i] *= m/0.931494061; //stopping power for this mass
    	}    
 	infile.close();
