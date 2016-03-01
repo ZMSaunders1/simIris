@@ -5,10 +5,10 @@
 core 
 *~ 
 *.so
+*.swo
 *.swp
 *.root
 *.sh
-bin/simIris
 config/
 plots/
 rootfiles/
