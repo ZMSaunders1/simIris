@@ -318,7 +318,8 @@ int main(int argc, char *argv[])
 	Int_t Evnt=0; 
 	Double_t chck, chck2;
 	Double_t wght, wght2;
-	
+
+	Double_t ICdE;	
 	YYHit *ipyd = &yd; 
 	CsIHit *ipcsi = &csi; 
 	S3Hit *ipsd1 = &sd1; 
@@ -418,6 +419,32 @@ int main(int argc, char *argv[])
 	}
 // *******************************************************************
 
+	// Set up output file and tree
+	TFile *f = new TFile(outputname,"RECREATE");
+	TTree *iris = new TTree("iris","iris simulation");
+	
+	iris->Branch("Evnt",&Evnt,"Evnt/I"); 
+	iris->Branch("E",Etree,"Etree[2]/D"); 
+	iris->Branch("E2",En,"En[2]/D"); 
+	iris->Branch("Ecm",Ecm,"Ecm[2]/D"); 
+	iris->Branch("Theta",Td,"Td[2]/D"); 
+	iris->Branch("Theta2",Td2,"Td2[2]/D"); 
+	iris->Branch("Thetacm",Tcm,"Tcm[2]/D"); 
+	iris->Branch("Phi",Pd,"Pd[2]/D"); 
+	iris->Branch("Phi2",Pd2,"Pd2[2]/D"); 
+	iris->Branch("TargdE",TargdE,"TargdE[2]/D"); 
+	//iris->Branch("csi.dE",&csi.dE,"csi.dE/D"); 
+	iris->Branch("wght",&wght,"wght/D"); 
+	iris->Branch("Qgen",&Qgen,"Qgen/D"); 
+	iris->Branch("Qdet",&Qdet,"Qdet/D"); 
+	iris->Branch("mBR",&mBR,"mBR/D"); 
+	iris->Branch("ICdE",&ICdE,"ICdE/D"); 
+	iris->Branch("yd",&ipyd,32000,99); 
+	iris->Branch("csi",&ipcsi,32000,99); 
+	iris->Branch("sd1",&ipsd1,32000,99); 
+	iris->Branch("sd2",&ipsd2,32000,99); 
+
+
 	std::string dedxstr = dedxpath;
 	if(!seqdec) loadAllELoss(dedxstr,A,B,b);
 	else loadAllELoss(dedxstr,A,decB,b);
@@ -434,7 +461,8 @@ int main(int argc, char *argv[])
 	// Calculate energy loss up to center of the target
 	Double_t EA = prm.E;	
    	EA -= simEloss(A,0.5,EA,ICWindow1,eASi3N4, dedxASi3N4);
-   	EA -= simEloss(A,0.586,EA,ICLength,eAC4H10, dedxAC4H10);
+   	ICdE = simEloss(A,0.586,EA,ICLength,eAC4H10, dedxAC4H10);
+   	EA -= ICdE;
    	EA -= simEloss(A,0.5,EA,ICWindow2,eASi3N4, dedxASi3N4);
    	EA -= simEloss(A,47./108.,EA,AgFoil,eAAg, dedxAAg);
    	EA -= simEloss(A,1.,EA,targetTh/2.,eAH, dedxAH);
@@ -462,30 +490,6 @@ int main(int argc, char *argv[])
 		printf("Exiting...\n");
 		exit(0);
 	}
-
-	// Set up output file and tree
-	TFile *f = new TFile(outputname,"RECREATE");
-	TTree *iris = new TTree("iris","iris simulation");
-	
-	iris->Branch("Evnt",&Evnt,"Evnt/I"); 
-	iris->Branch("E",Etree,"Etree[2]/D"); 
-	iris->Branch("E2",En,"En[2]/D"); 
-	iris->Branch("Ecm",Ecm,"Ecm[2]/D"); 
-	iris->Branch("Theta",Td,"Td[2]/D"); 
-	iris->Branch("Theta2",Td2,"Td2[2]/D"); 
-	iris->Branch("Thetacm",Tcm,"Tcm[2]/D"); 
-	iris->Branch("Phi",Pd,"Pd[2]/D"); 
-	iris->Branch("Phi2",Pd2,"Pd2[2]/D"); 
-	iris->Branch("TargdE",TargdE,"TargdE[2]/D"); 
-	//iris->Branch("csi.dE",&csi.dE,"csi.dE/D"); 
-	iris->Branch("wght",&wght,"wght/D"); 
-	iris->Branch("Qgen",&Qgen,"Qgen/D"); 
-	iris->Branch("Qdet",&Qdet,"Qdet/D"); 
-	iris->Branch("mBR",&mBR,"mBR/D"); 
-	iris->Branch("yd",&ipyd,32000,99); 
-	iris->Branch("csi",&ipcsi,32000,99); 
-	iris->Branch("sd1",&ipsd1,32000,99); 
-	iris->Branch("sd2",&ipsd2,32000,99); 
 
 	Double_t wght_max=PS0.GetWtMax();
 	printf("%lf\n",wght_max);

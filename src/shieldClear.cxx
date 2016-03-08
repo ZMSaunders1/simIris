@@ -23,10 +23,11 @@ Bool_t shieldClear(Double_t theta, Double_t phi)
 	Double_t cyCurve = 20;	//mm  
 
 	Double_t polRad = cylRad/(sqrt(sin(theta)*cos(phi)*sin(theta)*cos(phi)+cos(theta)*cos(theta))); //polar radius, i.e. distance from the reaction point
- 	if(cos(phi)!=0) alphaR = acos(polRad*cos(theta)/cylRad)*fabs(cos(phi))/cos(phi); //alpha in cylindrical coordinates.
-
-	alphaR = asin(polRad*sin(theta)*cos(phi)/cylRad);	//alpha in cylindrical coordinates.
-	Double_t xOnShield = cylRad*alphaR;	//distance on the cylinder from 0.
+// 	if(cos(phi)!=0) alphaR = acos(polRad*cos(theta)/cylRad)*fabs(cos(phi))/cos(phi); //alpha in cylindrical coordinates.
+//
+//	alphaR = asin(polRad*sin(theta)*cos(phi)/cylRad);	//alpha in cylindrical coordinates.
+//	Double_t xOnShield = cylRad*alphaR;	//distance on the cylinder from 0.
+	Double_t xOnShield = polRad*sin(theta)*cos(phi);	//distance on the cylinder from 0.
 	Double_t yOnShield = polRad*sin(theta)*sin(phi);	//distance on the cylinder from 0.
 	clearRect = ((fabs(xOnShield)<horSide/2) && (fabs(yOnShield)<verSide/2));
 	clearCirc = pow((fabs(xOnShield)-horSide/2+cyCurve),2)+ pow((fabs(yOnShield)-verSide/2+cyCurve),2) < cyCurve*cyCurve;
