@@ -14,7 +14,7 @@ Bool_t shieldClear(Double_t theta, Double_t phi)
 	const Double_t horSide = 2*67.4;	//horizontal side
 	const Double_t verSide = 2*50.0;	//vertical side
 	const Double_t cylRad = 129.0/2;	//cylinder radius
-	Double_t alphaR = 0;
+	//Double_t alphaR = 0;
 
 	Bool_t clear = 0;	// does the particle clear the shield?
 	Bool_t clearRect = 0;	// does the particle clear the rectangular shield (without the curves)?

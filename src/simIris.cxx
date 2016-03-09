@@ -144,7 +144,7 @@ Bool_t LE_ELoss(nucleus b, Double_t targetTh, TVector3 targetPos) // Calculate e
   		ETmp[0] -= simEloss(b,5./10.,ETmp[0],0.05*2.3502*0.1/Cos(T[0]),ebB, dedxbB);
   		yd.dE[mul] = simEloss(b,14./28.,ETmp[0],YYThickness[yd.Seg[mul]]/Cos(T[0]),ebSi, dedxbSi);
 		ETmp[0] = ETmp[0]-yd.dE[mul];
-  		yd.dE[mul] = rndm->Gaus(yd.dE[mul],0.004*yd.dE[mul]);
+  		yd.dE[mul] = rndm->Gaus(yd.dE[mul],0.00225*5.73*Sqrt(5.73/yd.dE[mul]));
 	}
 	if(mask && shield && CsIHit){
 		mul = csi.mul-1;
@@ -152,7 +152,7 @@ Bool_t LE_ELoss(nucleus b, Double_t targetTh, TVector3 targetPos) // Calculate e
   		ETmp[0] -= simEloss(b,13./27.,ETmp[0],0.3*2.702*0.1/Cos(T[0]),ebAl, dedxbAl);
   		ETmp[0] -= simEloss(b,100./192.,ETmp[0],6.*1.4*0.1/Cos(T[0]),ebMy, dedxbMy);
 		csi.dE[mul] = simEloss(b,108./260.,ETmp[0],CsIThickness/Cos(T[0]),ebCsI, dedxbCsI);
-		csi.dE[mul] = rndm->Gaus(csi.dE[mul],0.03*csi.dE[mul]);
+		csi.dE[mul] = rndm->Gaus(csi.dE[mul],0.031*14.1*Sqrt(14.1/csi.dE[mul]));
 	}
 	if(shield && mask && Sd1Hit){
 		mul = sd1.mul-1;
@@ -203,7 +203,7 @@ Bool_t HE_ELoss(nucleus B, Double_t targetTh, TVector3 targetPos) // Calculate e
   		ETmp[1] -= simEloss(B,5./10.,ETmp[1],0.05*2.3502*0.1/Cos(T[1]),eBB, dedxBB);
   		yd.dE[mul] = simEloss(B,14./28.,ETmp[1],YYThickness[yd.Seg[mul]]/Cos(T[1]),eBSi, dedxBSi);
 		ETmp[1] = ETmp[1]-yd.dE[mul];
-  		yd.dE[mul] = rndm->Gaus(yd.dE[mul],0.004*yd.dE[mul]);
+  		yd.dE[mul] = rndm->Gaus(yd.dE[mul],0.00225*5.73*Sqrt(5.73/yd.dE[mul]));
 	}
 	if(mask && shield && CsIHit){
 		mul = csi.mul-1;
@@ -211,7 +211,7 @@ Bool_t HE_ELoss(nucleus B, Double_t targetTh, TVector3 targetPos) // Calculate e
   		ETmp[1] -= simEloss(B,13./27.,ETmp[1],0.3*2.702*0.1/Cos(T[1]),eBAl, dedxBAl);
   		ETmp[1] -= simEloss(B,100./192.,ETmp[1],6.*1.4*0.1/Cos(T[1]),eBMy, dedxBMy);
 		csi.dE[mul] = simEloss(B,108./260.,ETmp[1],CsIThickness/Cos(T[1]),eBCsI, dedxBCsI);
-		csi.dE[mul] = rndm->Gaus(csi.dE[mul],0.03*csi.dE[mul]);
+		csi.dE[mul] = rndm->Gaus(csi.dE[mul],0.031*14.1*Sqrt(14.1/csi.dE[mul]));
 	}
 	if(shield && mask && Sd1Hit){
 		mul = sd1.mul-1;
