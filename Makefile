@@ -22,7 +22,7 @@ LDFLAGS = -O2
 
 all:  $(BINARYDIR)/simIris
 
-$(BINARYDIR)/simIris: $(OBJECTDIR)/simIris.o $(OBJECTDIR)/nucleus.o $(OBJECTDIR)/params.o $(OBJECTDIR)/eloss.o $(OBJECTDIR)/shieldClear.o $(OBJECTDIR)/YYHitDict.o $(OBJECTDIR)/CsIHitDict.o $(OBJECTDIR)/S3HitDict.o
+$(BINARYDIR)/simIris: $(OBJECTDIR)/simIris.o $(OBJECTDIR)/nucleus.o $(OBJECTDIR)/params.o $(OBJECTDIR)/eloss.o $(OBJECTDIR)/shieldClear.o $(OBJECTDIR)/YYHitDict.o $(OBJECTDIR)/CsIHitDict.o $(OBJECTDIR)/S3HitDict.o $(OBJECTDIR)/PTrackDict.o
 	$(LD) -o $@ $(LDFLAGS) $(ROOTGLIBS) $^ #-lm -lz -lutil 
 
 $(OBJECTDIR)/simIris.o: $(SOURCEDIR)/simIris.cxx
@@ -67,6 +67,16 @@ $(OBJECTDIR)/S3HitDict.o: $(SOURCEDIR)/S3HitDict.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(SOURCEDIR)/S3HitDict.cxx: $(SOURCEDIR)/S3Hit.cxx $(INCLUDEDIR)/S3HitLinkDef.h
+	@echo "Generating dictionary $@..."
+	@rootcint -f $@ -c $(HEADER) $^
+
+$(OBJECTDIR)/PTrack.o: $(SOURCEDIR)/PTrack.cxx
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJECTDIR)/PTrackDict.o: $(SOURCEDIR)/PTrackDict.cxx
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(SOURCEDIR)/PTrackDict.cxx: $(SOURCEDIR)/PTrack.cxx $(INCLUDEDIR)/PTrackLinkDef.h
 	@echo "Generating dictionary $@..."
 	@rootcint -f $@ -c $(HEADER) $^
 
