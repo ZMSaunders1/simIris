@@ -305,12 +305,12 @@ int main(int argc, char *argv[])
 
 	// Calculate energy loss up to center of the target
 	Double_t EA = prm.E;	
-   	EA -= simEloss(A,0.5,EA,ICWindow1,A.EL.eSi3N4, A.EL.dedxSi3N4);
-   	ICdE = simEloss(A,0.586,EA,ICLength,A.EL.eC4H10, A.EL.dedxC4H10);
+   	EA -= eloss(A,0.5,EA,ICWindow1,A.EL.eSi3N4, A.EL.dedxSi3N4);
+   	ICdE = eloss(A,0.586,EA,ICLength,A.EL.eC4H10, A.EL.dedxC4H10);
    	EA -= ICdE;
-   	EA -= simEloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
-   	EA -= simEloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
-   	EA -= simEloss(A,1.,EA,targetTh/2.,A.EL.eH, A.EL.dedxH);
+   	EA -= eloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
+   	EA -= eloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
+   	EA -= eloss(A,1.,EA,targetTh/2.,A.EL.eH, A.EL.dedxH);
  
 	EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 	Double_t PA = sqrt(EA*EA+2*EA*mA);
@@ -404,18 +404,18 @@ int main(int argc, char *argv[])
 		Double_t targetPosY = BeamSpot*rndm->Gaus();
 		TVector3 targetPos(targetPosX,targetPosY,0);
 		
-		lP.TrgtdE = simEloss(b,1.,lP.E,targetTh/2./Cos(lP.T),b.EL.eH,b.EL.dedxH);	
+		lP.TrgtdE = eloss(b,1.,lP.E,targetTh/2./Cos(lP.T),b.EL.eH,b.EL.dedxH);	
 		lP.Ebt = lP.E-lP.TrgtdE;
 		
 		LEHit = detHits(lP, b, targetTh, targetPos);
 		
 		if(!seqdec){
-			hP.TrgtdE = simEloss(B,1.,hP.E,targetTh/2./Cos(hP.T),B.EL.eH,B.EL.dedxH);	
+			hP.TrgtdE = eloss(B,1.,hP.E,targetTh/2./Cos(hP.T),B.EL.eH,B.EL.dedxH);	
 			hP.Ebt = hP.E-hP.TrgtdE;
 			HEHit = detHits(hP, B, targetTh, targetPos);	
 		}
 		else{ 
-			decP.TrgtdE = simEloss(B,1.,decP.E,targetTh/2./Cos(decP.T),decB.EL.eH,decB.EL.dedxH);	
+			decP.TrgtdE = eloss(B,1.,decP.E,targetTh/2./Cos(decP.T),decB.EL.eH,decB.EL.dedxH);	
 			decP.Ebt = decP.E-decP.TrgtdE;
 			HEHit = detHits(decP, decB, targetTh, targetPos);
 		}

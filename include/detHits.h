@@ -21,37 +21,37 @@ Bool_t detHits(PTrack tr, nucleus ncl, Double_t targetTh, TVector3 targetPos) //
 
 	if(mask && shield && YYHit){
 		mul = yd.mul-1;
-  		ETmp -= simEloss(ncl,13./27.,ETmp,0.1*2.702*0.1/Cos(tr.T),ncl.EL.eAl, ncl.EL.dedxAl);
-  		ETmp -= simEloss(ncl,5./10.,ETmp,0.05*2.3502*0.1/Cos(tr.T),ncl.EL.eB, ncl.EL.dedxB);
-  		yd.dE[mul] = simEloss(ncl,14./28.,ETmp,YYThickness[yd.Seg[mul]]/Cos(tr.T),ncl.EL.eSi, ncl.EL.dedxSi);
+  		ETmp -= eloss(ncl,13./27.,ETmp,0.1*2.702*0.1/Cos(tr.T),ncl.EL.eAl, ncl.EL.dedxAl);
+  		ETmp -= eloss(ncl,5./10.,ETmp,0.05*2.3502*0.1/Cos(tr.T),ncl.EL.eB, ncl.EL.dedxB);
+  		yd.dE[mul] = eloss(ncl,14./28.,ETmp,YYThickness[yd.Seg[mul]]/Cos(tr.T),ncl.EL.eSi, ncl.EL.dedxSi);
 		ETmp = ETmp-yd.dE[mul];
   		yd.dE[mul] = rndm->Gaus(yd.dE[mul],0.00225*5.73*Sqrt(5.73/yd.dE[mul]));
 	}
 	if(mask && shield && CsIHit){
 		mul = csi.mul-1;
-  		ETmp -= simEloss(ncl,15./31.,ETmp,0.1*1.8219*0.1/Cos(tr.T),ncl.EL.eP, ncl.EL.dedxP);
-  		ETmp -= simEloss(ncl,13./27.,ETmp,0.3*2.702*0.1/Cos(tr.T),ncl.EL.eAl, ncl.EL.dedxAl);
-  		ETmp -= simEloss(ncl,100./192.,ETmp,6.*1.4*0.1/Cos(tr.T),ncl.EL.eMy, ncl.EL.dedxMy);
-		csi.dE[mul] = simEloss(ncl,108./260.,ETmp,CsIThickness/Cos(tr.T),ncl.EL.eCsI, ncl.EL.dedxCsI);
+  		ETmp -= eloss(ncl,15./31.,ETmp,0.1*1.8219*0.1/Cos(tr.T),ncl.EL.eP, ncl.EL.dedxP);
+  		ETmp -= eloss(ncl,13./27.,ETmp,0.3*2.702*0.1/Cos(tr.T),ncl.EL.eAl, ncl.EL.dedxAl);
+  		ETmp -= eloss(ncl,100./192.,ETmp,6.*1.4*0.1/Cos(tr.T),ncl.EL.eMy, ncl.EL.dedxMy);
+		csi.dE[mul] = eloss(ncl,108./260.,ETmp,CsIThickness/Cos(tr.T),ncl.EL.eCsI, ncl.EL.dedxCsI);
 		csi.dE[mul] = rndm->Gaus(csi.dE[mul],0.031*14.1*Sqrt(14.1/csi.dE[mul]));
 	}
 	if(shield && mask && Sd1Hit){
 		mul = sd1.mul-1;
-		ETmp = ETmp - simEloss(ncl,13./27.,ETmp,0.1*2.702*1.5/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //first metal
-		ETmp = ETmp - simEloss(ncl,30./60.,ETmp,0.1*2.65*3.5/Cos(tr.T),ncl.EL.eSiO2,ncl.EL.dedxSiO2); //SiO2
-		ETmp = ETmp - simEloss(ncl,13./27.,ETmp,0.1*2.702*0.3/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //second metal
-		ETmp = ETmp - simEloss(ncl,5./10.,ETmp,0.1*2.3502*0.5/Cos(tr.T),ncl.EL.eB,ncl.EL.dedxB); //boron junction implant 		
-		sd1.dE[mul] = simEloss(ncl,14./28.,ETmp,SdThickness1/Cos(tr.T),ncl.EL.eSi,ncl.EL.dedxSi);
+		ETmp = ETmp - eloss(ncl,13./27.,ETmp,0.1*2.702*1.5/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //first metal
+		ETmp = ETmp - eloss(ncl,30./60.,ETmp,0.1*2.65*3.5/Cos(tr.T),ncl.EL.eSiO2,ncl.EL.dedxSiO2); //SiO2
+		ETmp = ETmp - eloss(ncl,13./27.,ETmp,0.1*2.702*0.3/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //second metal
+		ETmp = ETmp - eloss(ncl,5./10.,ETmp,0.1*2.3502*0.5/Cos(tr.T),ncl.EL.eB,ncl.EL.dedxB); //boron junction implant 		
+		sd1.dE[mul] = eloss(ncl,14./28.,ETmp,SdThickness1/Cos(tr.T),ncl.EL.eSi,ncl.EL.dedxSi);
    		ETmp = ETmp - sd1.dE[mul];
 		sd1.dE[mul] = rndm->Gaus(sd1.dE[mul],0.01*sd1.dE[mul]);
 	}
 	if(shield && mask && Sd2Hit){
 		mul = sd2.mul-1;
-		ETmp = ETmp - simEloss(ncl,15./31.,ETmp,0.1*1.8219*0.5/Cos(tr.T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
-		ETmp = ETmp - simEloss(ncl,13./27.,ETmp,0.1*2.702*0.3/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
-		ETmp = ETmp - simEloss(ncl,13./27.,ETmp,0.1*2.702*0.3/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
-		ETmp = ETmp - simEloss(ncl,15./31.,ETmp,0.1*1.822*0.5/Cos(tr.T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
-		sd2.dE[mul] = simEloss(ncl,14./28.,ETmp,SdThickness2/Cos(tr.T),ncl.EL.eSi,ncl.EL.dedxSi);
+		ETmp = ETmp - eloss(ncl,15./31.,ETmp,0.1*1.8219*0.5/Cos(tr.T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
+		ETmp = ETmp - eloss(ncl,13./27.,ETmp,0.1*2.702*0.3/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
+		ETmp = ETmp - eloss(ncl,13./27.,ETmp,0.1*2.702*0.3/Cos(tr.T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
+		ETmp = ETmp - eloss(ncl,15./31.,ETmp,0.1*1.822*0.5/Cos(tr.T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
+		sd2.dE[mul] = eloss(ncl,14./28.,ETmp,SdThickness2/Cos(tr.T),ncl.EL.eSi,ncl.EL.dedxSi);
 		sd2.dE[mul] = rndm->Gaus(sd2.dE[mul],0.01*sd2.dE[mul]);
 	}
 
