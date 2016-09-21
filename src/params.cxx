@@ -143,5 +143,25 @@ void params::Print(){
 	printf("Distance target-S3: %.1lf mm\n",DS3);
 	printf("********************************\n\n");
 }
+
 void params::Clear(){
+
+	A.clear(); 
+	a.clear();
+	B.clear();
+	b.clear();
+	c.clear();
+	d.clear();
+
+	E=0.;
+	R=0.;
+	W=0.;
+	Tt= 0.; 
+	Bs=0.; 
+	
+	DYY=0.; 
+	DS3=0.; 
+
+	N=0;
+
 }

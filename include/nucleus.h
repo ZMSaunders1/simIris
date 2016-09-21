@@ -4,6 +4,7 @@
 #include <TObject.h>
 #include <TClass.h>
 #include <string>
+#include "dedx.h"
 
 class nucleus : public TObject {
 	public:
@@ -19,7 +20,8 @@ class nucleus : public TObject {
 		Double_t Sn; 
 		Double_t S2p; 
 		Double_t S2n; 
-		
+		dedx EL; 
+
 		//virtual void ReadCalibPar(char* line);
 		virtual void getInfo(std::string);
 		virtual void getInfo(Int_t, Int_t);

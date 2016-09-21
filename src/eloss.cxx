@@ -2,33 +2,10 @@
 //Energy loss calculator using Bethe formula
 //-dE/dx = 4PI/(m_e c^2) (nz^2)/beta^2 (e^2/4PI(epsilon_0)^2) [ln(2m_e c^2 beta^2/I (1-beta^2))-beta^2] 
 //void EneLoss(char* filename, Double_t & th, Double_t & en); //Stopping power file, target thickness, intial energy
-
-#include <iostream>
-#include <fstream>
-#include "../include/eloss.h"
+#include "eloss.h"
 #include <stdlib.h>
 #include <TRandom3.h>
 #include <TMath.h>
-
-void loadELoss(std::string filename, Double_t e[100], Double_t dedx[100], Double_t m)
-{
-	std::ifstream infile;
-	Char_t line[2000];
-			
-	infile.open(filename.data()); 
-	if(!infile.is_open()){
-		printf("Cannot open the file %s!!\n",filename.data());
-		exit(0);
-	}
-
-  	infile.getline(line,2000);
-	for(UInt_t i=0; i<100; i++){
-    	infile.getline(line,2000);
-    	sscanf(line,"%*f\t%*f\t%lf\t%lf\t%*f\t%*f\t%*f\t%*f\t%*f\t%*f\t%*f\t%*f\t\n",&e[i],&dedx[i]);
-  		e[i] *= m/0.931494061; //stopping power for this mass
-   	}    
-	infile.close();
-}
 
 Double_t straggling(nucleus P, Double_t TZoverA, Double_t ein,  Double_t th)
 {

@@ -18,6 +18,7 @@ params prm, prm_inp;
 YYHit yd;
 CsIHit csi;
 S3Hit sd1, sd2;
+PTrack hP, lP, decP;
 
 Double_t mA;	
 Double_t ma;	
@@ -27,14 +28,13 @@ Double_t mb;
 Double_t mc;
 Double_t md;
 
-PTrack hP, lP, decP;
-
 Double_t Qgen, Qdet;
 Double_t beamE, beamBeta, beamGamma, beamEcm;
+Double_t tdE;
 
 void clearEvt()
 {
-	TargdE[0]=0.; TargdE[1]=0.;
+	//TargdE[0]=0.; TargdE[1]=0.;
 	Qgen=0.; Qdet=0.;
 	mBR=0.;
 	lP.Clear();
@@ -73,46 +73,46 @@ int main(int argc, char *argv[])
 	  			nsim = strtol(argv[i]+9,&endptr,10);//converting string to number
 			}
 			else if(strncmp(argv[i],"--N=",4)==0){
-	  			prm.N = strtol(argv[i]+4,&endptr,10);//converting string to number
+	  			prm_inp.N = strtol(argv[i]+4,&endptr,10);//converting string to number
 			}
 			else if(strncmp(argv[i],"--A=",4)==0){
-	  			prm.A = argv[i]+4;
+	  			prm_inp.A = argv[i]+4;
 			}
 			else if(strncmp(argv[i],"--a=",4)==0){
-	  			prm.a = argv[i]+4;
+	  			prm_inp.a = argv[i]+4;
 			}
 			else if(strncmp(argv[i],"--b=",4)==0){
-	  			prm.b = argv[i]+4;
+	  			prm_inp.b = argv[i]+4;
 			}
 			else if(strncmp(argv[i],"--c=",4)==0){
-	  			prm.c = argv[i]+4;
+	  			prm_inp.c = argv[i]+4;
 			}
 			else if(strncmp(argv[i],"--d=",4)==0){
-	  			prm.d = argv[i]+4;
+	  			prm_inp.d = argv[i]+4;
 			}
 			else if(strncmp(argv[i],"--B=",4)==0){
-	  			prm.B = argv[i]+4;
+	  			prm_inp.B = argv[i]+4;
 			}
 			else if(strncmp(argv[i],"--E=",4)==0){
-	  			prm.E  = strtod(argv[i]+4,&endptr);//converting string to number
+	  			prm_inp.E  = strtod(argv[i]+4,&endptr);//converting string to number
 			}
 			else if(strncmp(argv[i],"--R=",4)==0){
-	  			prm.R = strtod(argv[i]+4,&endptr);//converting string to number
+	  			prm_inp.R = strtod(argv[i]+4,&endptr);//converting string to number
 			}
 			else if(strncmp(argv[i],"--W=",4)==0){
-	  			prm.W = strtod(argv[i]+4,&endptr);//converting string to number
+	  			prm_inp.W = strtod(argv[i]+4,&endptr);//converting string to number
 			}
 			else if(strncmp(argv[i],"--Tt=",5)==0){
-	  			prm.Tt = strtod(argv[i]+5,&endptr);//converting string to number
+	  			prm_inp.Tt = strtod(argv[i]+5,&endptr);//converting string to number
 			}
 			else if(strncmp(argv[i],"--Bs=",5)==0){
-	  			prm.Bs = strtod(argv[i]+5,&endptr);//converting string to number
+	  			prm_inp.Bs = strtod(argv[i]+5,&endptr);//converting string to number
 			}
 			else if(strncmp(argv[i],"--DYY=",6)==0){
-	  			prm.DYY = strtod(argv[i]+6,&endptr);//converting string to number
+	  			prm_inp.DYY = strtod(argv[i]+6,&endptr);//converting string to number
 			}
 			else if(strncmp(argv[i],"--DS3=",6)==0){
-	  			prm.DS3 = strtod(argv[i]+6,&endptr);//converting string to number
+	  			prm_inp.DS3 = strtod(argv[i]+6,&endptr);//converting string to number
 			}
 		}
 	}
@@ -122,7 +122,39 @@ int main(int argc, char *argv[])
 	if(load_params_from_file==kTRUE){
 		printf("Loading parameters from file %s.\n",paramsname);
 		prm.Load(paramsname);
+
+		if(!prm_inp.A.empty()) prm.A=prm_inp.A; 
+		if(!prm_inp.a.empty()) prm.a=prm_inp.a;
+		if(!prm_inp.B.empty()) prm.B=prm_inp.B;
+		if(!prm_inp.b.empty()) prm.b=prm_inp.b;
+		if(!prm_inp.c.empty()) prm.c=prm_inp.c;
+		if(!prm_inp.d.empty()) prm.d=prm_inp.d;
+		if(prm_inp.E>0.) prm.E=prm_inp.E;
+		if(prm_inp.R>0.) prm.R=prm_inp.R;
+		if(prm_inp.W>0.) prm.W=prm_inp.W;
+		if(prm_inp.Tt>0.) prm.Tt=prm_inp.Tt; 
+		if(prm_inp.Bs>0.) prm.Bs=prm_inp.Bs; 
+		if(prm_inp.DYY>0.) prm.DYY=prm_inp.DYY; 
+		if(prm_inp.DS3>0.) prm.DS3=prm_inp.DS3; 
+		if(prm_inp.N>0) prm.N=prm_inp.N;
 	}
+	else{
+		prm.A=prm_inp.A; 
+		prm.a=prm_inp.a;
+		prm.B=prm_inp.B;
+		prm.b=prm_inp.b;
+		prm.c=prm_inp.c;
+		prm.d=prm_inp.d;
+		prm.E=prm_inp.E;
+		prm.R=prm_inp.R;
+		prm.W=prm_inp.W;
+		prm.Tt=prm_inp.Tt; 
+		prm.Bs=prm_inp.Bs; 
+		prm.DYY=prm_inp.DYY; 
+		prm.DS3=prm_inp.DS3; 
+		prm.N=prm_inp.N;
+	}
+	prm_inp.Print();
 	prm.Print();
 
 	TRandom3 *rndm = new TRandom3(0);
@@ -245,15 +277,6 @@ int main(int argc, char *argv[])
 	iris->Branch("lP",&iplP,32000,99); 
 	iris->Branch("hP",&iphP,32000,99); 
 	iris->Branch("decP",&ipdecP,32000,99); 
-	// iris->Branch("E",Etree,"Etree[2]/D"); 
-	// iris->Branch("E2",En,"En[2]/D"); 
-	// iris->Branch("Ecm",Ecm,"Ecm[2]/D"); 
-	// iris->Branch("Theta",Td,"Td[2]/D"); 
-	// iris->Branch("Theta2",Td2,"Td2[2]/D"); 
-	// iris->Branch("Thetacm",Tcm,"Tcm[2]/D"); 
-	// iris->Branch("Phi",Pd,"Pd[2]/D"); 
-	// iris->Branch("Phi2",Pd2,"Pd2[2]/D"); 
-	iris->Branch("TargdE",TargdE,"TargdE[2]/D"); 
 	iris->Branch("wght",&wght,"wght/D"); 
 	iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	iris->Branch("Qdet",&Qdet,"Qdet/D"); 
@@ -264,10 +287,11 @@ int main(int argc, char *argv[])
 	iris->Branch("sd1",&ipsd1,32000,99); 
 	iris->Branch("sd2",&ipsd2,32000,99); 
 
-
 	std::string dedxstr = dedxpath;
-	if(!seqdec) loadAllELoss(dedxstr,A,B,b);
-	else loadAllELoss(dedxstr,A,decB,b);
+	A.EL.loadIncomingELoss(dedxstr,A.name.data(),A.mass);
+	b.EL.loadOutgoingELoss(dedxstr,b.name.data(),b.mass);
+	if(!seqdec) B.EL.loadOutgoingELoss(dedxstr,B.name.data(),B.mass);
+	else decB.EL.loadOutgoingELoss(dedxstr,decB.name.data(),decB.mass);
 
 	Double_t targetTh=prm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
 	Double_t BeamSpot=prm.Bs/2.355; // FWHM->sigma 
@@ -281,12 +305,12 @@ int main(int argc, char *argv[])
 
 	// Calculate energy loss up to center of the target
 	Double_t EA = prm.E;	
-   	EA -= simEloss(A,0.5,EA,ICWindow1,eASi3N4, dedxASi3N4);
-   	ICdE = simEloss(A,0.586,EA,ICLength,eAC4H10, dedxAC4H10);
+   	EA -= simEloss(A,0.5,EA,ICWindow1,A.EL.eSi3N4, A.EL.dedxSi3N4);
+   	ICdE = simEloss(A,0.586,EA,ICLength,A.EL.eC4H10, A.EL.dedxC4H10);
    	EA -= ICdE;
-   	EA -= simEloss(A,0.5,EA,ICWindow2,eASi3N4, dedxASi3N4);
-   	EA -= simEloss(A,47./108.,EA,AgFoil,eAAg, dedxAAg);
-   	EA -= simEloss(A,1.,EA,targetTh/2.,eAH, dedxAH);
+   	EA -= simEloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
+   	EA -= simEloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
+   	EA -= simEloss(A,1.,EA,targetTh/2.,A.EL.eH, A.EL.dedxH);
  
 	EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 	Double_t PA = sqrt(EA*EA+2*EA*mA);
@@ -305,6 +329,10 @@ int main(int argc, char *argv[])
 	printf("\nGamma at center of target: %.3lf \n", beamGamma);
 	printf("\nCM Energy at center of target: %.2lf MeV\n\n", beamEcm);
 
+	printf("YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DYY,yd.ThetaMin(prm.DYY),yd.ThetaMax(prm.DYY)); 
+	printf("CsI detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DYY+11.6,csi.ThetaMin(prm.DYY+11.6),csi.ThetaMax(prm.DYY+11.6)); 
+	printf("First S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3,sd1.ThetaMin(prm.DS3),sd1.ThetaMax(prm.DS3)); 
+	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3+14.8,sd2.ThetaMin(prm.DS3+14.8),sd2.ThetaMax(prm.DS3+14.8)); 
 	Double_t masses[4] = { mb, mB, mc, md};
 
 	TGenPhaseSpace PS0, PS1;
@@ -355,8 +383,6 @@ int main(int argc, char *argv[])
 		hP.Tdeg=RadToDeg()*hP.T;
 		lP.Pdeg=RadToDeg()*lP.P;
 		hP.Pdeg=RadToDeg()*hP.P;
-		// Etree[0] = lP.E;
-		// Etree[1] = hP.E;
 
 		if(seqdec)
 		{
@@ -374,17 +400,24 @@ int main(int argc, char *argv[])
 		}
 	
 		// Position on target	
-		Double_t  targetPosX = BeamSpot*rndm->Gaus();
-		Double_t  targetPosY = BeamSpot*rndm->Gaus();
+		Double_t targetPosX = BeamSpot*rndm->Gaus();
+		Double_t targetPosY = BeamSpot*rndm->Gaus();
 		TVector3 targetPos(targetPosX,targetPosY,0);
 		
-		LEHit = detHitsL(lP, b, targetTh, targetPos);
+		lP.TrgtdE = simEloss(b,1.,lP.E,targetTh/2./Cos(lP.T),b.EL.eH,b.EL.dedxH);	
+		lP.Ebt = lP.E-lP.TrgtdE;
+		
+		LEHit = detHits(lP, b, targetTh, targetPos);
 		
 		if(!seqdec){
-			HEHit = detHitsH(hP, B, targetTh, targetPos);	
+			hP.TrgtdE = simEloss(B,1.,hP.E,targetTh/2./Cos(hP.T),B.EL.eH,B.EL.dedxH);	
+			hP.Ebt = hP.E-hP.TrgtdE;
+			HEHit = detHits(hP, B, targetTh, targetPos);	
 		}
 		else{ 
-			HEHit = detHitsH(decP, decB, targetTh, targetPos);
+			decP.TrgtdE = simEloss(B,1.,decP.E,targetTh/2./Cos(decP.T),decB.EL.eH,decB.EL.dedxH);	
+			decP.Ebt = decP.E-decP.TrgtdE;
+			HEHit = detHits(decP, decB, targetTh, targetPos);
 		}
 		
 		if(LEHit && yd.dE[0]>0.){

@@ -31,8 +31,25 @@ void CsIHit::Clear()
 	}
 }
 
+Double_t CsIHit::ThetaMin(Double_t CsIDistance)
+{	
+	const Double_t RIn = 50.;	// Inner radius in mm
+	Double_t theta_min = TMath::ATan2(RIn,CsIDistance)*TMath::RadToDeg();
+	return theta_min;
+}
+
+Double_t CsIHit::ThetaMax(Double_t CsIDistance)
+{	
+	const Double_t ROut = 130.;	// Outer radius in mm
+	Double_t theta_max = TMath::ATan2(ROut,CsIDistance)*TMath::RadToDeg();
+	return theta_max;
+}
+
 Bool_t CsIHit::Calculate(Double_t theta, Double_t phi, Double_t CsIDistance, TVector3 targetPos)
 {
+	const Double_t RIn = 50.;	// Inner radius in mm
+	const Double_t ROut = 130.;	// Outer radius in mm
+
 	TRandom3 fRandom(0);
 	Double_t fX0, fY0;
 	Bool_t hitTheta = 0;
@@ -60,7 +77,7 @@ Bool_t CsIHit::Calculate(Double_t theta, Double_t phi, Double_t CsIDistance, TVe
 	theta = partVec.Theta();
 	phi = partVec.Phi();
 	
-	hitTheta = ((CsIDistance*tan(theta)>50.) && (CsIDistance*tan(theta)<130.));
+	hitTheta = ((CsIDistance*tan(theta)>RIn) && (CsIDistance*tan(theta)<ROut));
 	hitPhi = kTRUE;
 	//hitPhi = fabs(phiRel +TMath::Pi() - Seg*TMath::Pi()/4-TMath::Pi()/8) < phiRange/2;
   	hitBool = (hitPhi && hitTheta); 

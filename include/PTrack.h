@@ -13,6 +13,8 @@ class PTrack : public TObject{
 		Double_t Tcm; 	// Theta in center-of-mass system in degrees;
   		Double_t P; 	// Phi
 		Double_t Pdeg; 	// Phi in degrees
+		Double_t TrgtdE; 	// Energy loss in half the target
+		Double_t Ebt; 	// Energy behind the target
 
  	public:
   		PTrack();//! Create

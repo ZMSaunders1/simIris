@@ -35,8 +35,25 @@ void YYHit::Clear()
 	}
 }
 
+Double_t YYHit::ThetaMin(Double_t YdDistance)
+{	
+	const Double_t RIn = 50.;	// Inner radius in mm
+	Double_t theta_min = TMath::ATan2(RIn,YdDistance)*TMath::RadToDeg();
+	return theta_min;
+}
+
+Double_t YYHit::ThetaMax(Double_t YdDistance)
+{	
+	const Double_t ROut = 130.;	// Outer radius in mm
+	Double_t theta_max = TMath::ATan2(ROut,YdDistance)*TMath::RadToDeg();
+	return theta_max;
+}
+
 Bool_t YYHit::Calculate(Double_t theta, Double_t phi, Double_t YdDistance, TVector3 targetPos)
-{
+{	
+	const Double_t RIn = 50.;	// Inner radius in mm
+	const Double_t ROut = 130.;	// Outer radius in mm
+
 	TRandom3 fRandom(0);
 	Double_t fX0, fY0, Ring0, Seg0;
 	
@@ -62,14 +79,14 @@ Bool_t YYHit::Calculate(Double_t theta, Double_t phi, Double_t YdDistance, TVect
 	theta = partVec.Theta();
 	phi = partVec.Phi();
   	
-  	Ring0 = int((YdDistance*tan(theta) - 50.)/5.);
+  	Ring0 = int((YdDistance*tan(theta) - RIn)/5.);
   	Seg0 = int((phiRel+TMath::Pi())/(TMath::Pi()/4));
 	//if (Ring<13 && Ring>=0)  phiRange = TMath::Pi()/4-phiGap;
 	if (Ring0==13) phiRange =  TMath::Pi()/4-phiGap*2; 
 	else if (Ring0==14) phiRange =  TMath::Pi()/4-phiGap*3.5; 
 	else if (Ring0==15) phiRange =  TMath::Pi()/4-phiGap*5.5; 
 	hitPhi = fabs(phiRel +TMath::Pi() - Seg0*TMath::Pi()/4-TMath::Pi()/8) < phiRange/2;
-	hitTheta = ((YdDistance*tan(theta)>50.) && (YdDistance*tan(theta)<130.));
+	hitTheta = ((YdDistance*tan(theta)>RIn) && (YdDistance*tan(theta)<ROut));
 	hitBool = (hitTheta && hitPhi);
 
 	if (hitBool){

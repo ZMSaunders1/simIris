@@ -15,4 +15,6 @@ extern YYHit yd;
 extern CsIHit csi;
 extern S3Hit sd1;
 extern S3Hit sd2;
-
+extern PTrack hP;
+extern PTrack lP;
+extern PTrack decP;

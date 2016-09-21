@@ -15,6 +15,7 @@ nucleus::nucleus()
 	Sn=0.; 
 	S2p=0.; 
 	S2n=0.; 
+	EL.Clear();
 }
 void nucleus::Clear()
 {
@@ -27,6 +28,7 @@ void nucleus::Clear()
 	Sn=0.; 
 	S2p=0.; 
 	S2n=0.; 
+	EL.Clear();
 }
 
 void nucleus::ReadFile(Int_t inputA, std::string inpEl)

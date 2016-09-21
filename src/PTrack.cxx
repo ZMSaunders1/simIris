@@ -9,6 +9,8 @@ PTrack::PTrack()
 	Tcm = sqrt(-1);
 	P = sqrt(-1);
 	Pdeg = sqrt(-1);
+	TrgtdE = 0.;
+	Ebt = 0.;
 }
 
 void PTrack::Clear()
@@ -20,4 +22,6 @@ void PTrack::Clear()
 	Tcm = sqrt(-1);
 	P = sqrt(-1);
 	Pdeg = sqrt(-1);
+	TrgtdE = 0.;
+	Ebt = 0.;
 }

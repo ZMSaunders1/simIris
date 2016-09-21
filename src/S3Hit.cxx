@@ -35,8 +35,25 @@ void S3Hit::Clear()
 	}
 }
 
+Double_t S3Hit::ThetaMin(Double_t S3Distance)
+{	
+	const Double_t RIn = 11.;	// Inner radius in mm
+	Double_t theta_min = TMath::ATan2(RIn,S3Distance)*TMath::RadToDeg();
+	return theta_min;
+}
+
+Double_t S3Hit::ThetaMax(Double_t S3Distance)
+{	
+	const Double_t ROut = 35.;	// Outer radius in mm
+	Double_t theta_max = TMath::ATan2(ROut,S3Distance)*TMath::RadToDeg();
+	return theta_max;
+}
+
 Bool_t S3Hit::Calculate(Double_t theta, Double_t phi, Double_t S3Distance, TVector3 targetPos)
 {
+	const Double_t RIn = 11.;	// Inner radius in mm
+	const Double_t ROut = 35.;	// Outer radius in mm
+
 	TRandom3 fRandom(0);
 	Double_t fX0, fY0;
 	
@@ -54,19 +71,19 @@ Bool_t S3Hit::Calculate(Double_t theta, Double_t phi, Double_t S3Distance, TVect
 	phi = partVec.Phi();
 
    	// geometric efficiency
-	Bool_t hitBool = ((S3Distance*tan(theta)>11.) && (S3Distance*tan(theta)<35.));
+	Bool_t hitBool = ((S3Distance*tan(theta)>RIn) && (S3Distance*tan(theta)<ROut));
 
 	if (hitBool){
 	  	hit[mul] = 1;	
 		fX[mul] = fX0;
 		fY[mul] = fY0;
-		Ring[mul] = int(S3Distance*tan(theta) - 11.);
+		Ring[mul] = int(S3Distance*tan(theta) - RIn);
 		Seg[mul] = int(phi/(TMath::Pi()/16.));
       	Double_t random = 0.5;//fRandom.Rndm();
   		Double_t randomTheta = fRandom.Rndm();
  		fPhiCalc[mul] = (Seg[mul]-0.5+random)*5.625;
  		if (fPhiCalc[mul]<-180.)	fPhiCalc[mul] = fPhiCalc[mul]+360.;
- 		fThetaCalc[mul] = TMath::RadToDeg()*atan((11.+Ring[mul]+randomTheta)/S3Distance);
+ 		fThetaCalc[mul] = TMath::RadToDeg()*atan((RIn+Ring[mul]+randomTheta)/S3Distance);
     	mul++;
 	}
   	else{

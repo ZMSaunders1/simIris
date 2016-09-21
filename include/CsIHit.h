@@ -21,6 +21,8 @@ class CsIHit : public TObject{
   		virtual ~CsIHit() {} //!
 
   		//CsIHit(const CsIHit &);                          // The copy constructor.
+   		Double_t ThetaMin(Double_t);  //!
+  		Double_t ThetaMax(Double_t);  //!
   		Bool_t Calculate(Double_t, Double_t, Double_t, TVector3);  //!
   		void Clear();  //!
 	protected:
