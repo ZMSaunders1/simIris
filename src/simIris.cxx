@@ -17,8 +17,8 @@
 params prm, prm_inp;
 YYHit yd;
 CsIHit csi;
-S3Hit sd1, sd2;
-PTrack hP, lP, decP;
+S3Hit sd1(0,60.), sd2(1,1000.);
+PTrack hP, lP, decHP, declP1, declP2;
 
 Double_t mA;	
 Double_t ma;	
@@ -31,6 +31,8 @@ Double_t md;
 Double_t Qgen, Qdet;
 Double_t beamE, beamBeta, beamGamma, beamEcm;
 Double_t tdE;
+TVector3 reacPos;
+Double_t SSBdE;	
 
 void clearEvt()
 {
@@ -39,7 +41,8 @@ void clearEvt()
 	mBR=0.;
 	lP.Clear();
 	hP.Clear();
-	decP.Clear();
+	decHP.Clear();
+	SSBdE=0.;
 	yd.Clear();
 	csi.Clear();
 	sd1.Clear();
@@ -56,7 +59,11 @@ int main(int argc, char *argv[])
 	char *paramsname =NULL;
 	char *dedxpath =NULL;
 	char *outputname =NULL;
-	
+	Bool_t isAgReac = kFALSE;
+
+	std::string binpath(argv[0]);
+	printf("%s\n",binpath.data());
+
 	if (argc > 1){
 		for(int i=0; i<argc; i++){
 			if(strncmp(argv[i],"--output=",9)==0){
@@ -114,6 +121,9 @@ int main(int argc, char *argv[])
 			else if(strncmp(argv[i],"--DS3=",6)==0){
 	  			prm_inp.DS3 = strtod(argv[i]+6,&endptr);//converting string to number
 			}
+			else if(strncmp(argv[i],"--AgReac",9)==0){
+				isAgReac=kTRUE;
+			}
 		}
 	}
 	TStopwatch timer;
@@ -169,15 +179,18 @@ int main(int argc, char *argv[])
 	S3Hit *ipsd2 = &sd2; 
 	PTrack *iplP = &lP;
 	PTrack *iphP = &hP;
-	PTrack *ipdecP = &decP;
+	PTrack *ipdecHP = &decHP;
+	PTrack *ipdeclP1 = &declP1;
+	PTrack *ipdeclP2 = &declP2;
 	nucleus A, a, B, b, c, d, decB,decc,decd;
-	
-	A.getInfo(prm.A);
-	a.getInfo(prm.a);
-	B.getInfo(prm.B);
-	b.getInfo(prm.b);
-	c.getInfo(prm.c);
-	d.getInfo(prm.d);
+	Double_t reacX, reacY, reacZ;
+
+	A.getInfo(binpath, prm.A);
+	a.getInfo(binpath, prm.a);
+	B.getInfo(binpath, prm.B);
+	b.getInfo(binpath, prm.b);
+	c.getInfo(binpath, prm.c);
+	d.getInfo(binpath, prm.d);
 
 	mA = A.mass/1000.;	
 	ma = a.mass/1000.;	
@@ -219,40 +232,40 @@ int main(int argc, char *argv[])
 				seqdec = kTRUE;
 				printf("\nSequential 1n- decay!\n\n"); 
 				seqdecN =2;
-				decB.getInfo(B.N-1,B.Z);
+				decB.getInfo(binpath, B.N-1,B.Z);
 				mBdec=decB.mass/1000.;
-				decc.getInfo("n");
+				decc.getInfo(binpath, "n");
 				mcdec=decc.mass/1000.;
 				break;
 			case 2 : 
 				seqdec = kTRUE;
 				printf("\nSequential 1p- decay!\n\n"); 
 				seqdecN =2;
-				decB.getInfo(B.N,B.Z-1);
+				decB.getInfo(binpath, B.N,B.Z-1);
 				mBdec=decB.mass/1000.;
-				decc.getInfo("p");
+				decc.getInfo(binpath, "p");
 				mcdec=decc.mass/1000.;
 				break;
 			case 3 : 
 				seqdec = kTRUE;
 				printf("\nSequential 2n- decay!\n\n"); 
 				seqdecN =3;
-				decB.getInfo(B.N-2,B.Z);
+				decB.getInfo(binpath, B.N-2,B.Z);
 				mBdec=decB.mass/1000.;
-				decc.getInfo("n");
+				decc.getInfo(binpath, "n");
 				mcdec=decc.mass/1000.;
-				decd.getInfo("n");
+				decd.getInfo(binpath, "n");
 				mddec=decd.mass/1000.;
 				break;
 			case 4 : 
 				seqdec = kTRUE;
 				printf("\nSequential 2p- decay!\n\n"); 
 				seqdecN =3;
-				decB.getInfo(B.N,B.Z-2);
+				decB.getInfo(binpath, B.N,B.Z-2);
 				mBdec=decB.mass/1000.;
-				decc.getInfo("p");
+				decc.getInfo(binpath, "p");
 				mcdec=decc.mass/1000.;
-				decd.getInfo("p");
+				decd.getInfo(binpath, "p");
 				mddec=decd.mass/1000.;
 				break;
 			default : 
@@ -274,14 +287,18 @@ int main(int argc, char *argv[])
 	iris->Branch("beamBeta",&beamBeta,"beamBeta/D"); 
 	iris->Branch("beamGamma",&beamGamma,"beamGamma/D"); 
 	iris->Branch("beamEcm",&beamEcm,"beamEcm/D"); 
+	iris->Branch("reacPos","TVector3",&reacPos); 
 	iris->Branch("lP",&iplP,32000,99); 
 	iris->Branch("hP",&iphP,32000,99); 
-	iris->Branch("decP",&ipdecP,32000,99); 
+	iris->Branch("decHP",&ipdecHP,32000,99); 
+	iris->Branch("declP1",&ipdeclP1,32000,99); 
+	iris->Branch("declP2",&ipdeclP2,32000,99); 
 	iris->Branch("wght",&wght,"wght/D"); 
 	iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	iris->Branch("Qdet",&Qdet,"Qdet/D"); 
 	iris->Branch("mBR",&mBR,"mBR/D"); 
 	iris->Branch("ICdE",&ICdE,"ICdE/D"); 
+	iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
 	iris->Branch("yd",&ipyd,32000,99); 
 	iris->Branch("csi",&ipcsi,32000,99); 
 	iris->Branch("sd1",&ipsd1,32000,99); 
@@ -299,9 +316,25 @@ int main(int argc, char *argv[])
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	//const Double_t AgFoil=5.44*10.473*0.1; //mu*g/cm^3*0.1
-	const Double_t AgFoil=4.355*10.473*0.1; //mu*g/cm^3*0.1
+	const Double_t AgFoil=4.57*10.473*0.1; //mu*g/cm^3*0.1
 
 	Bool_t LEHit, HEHit;
+
+	Int_t LEHitcntr=0;
+
+	Double_t LEeff;
+	Double_t E_before_Tgt;
+	Double_t E_center_Tgt;
+	Double_t E_after_Tgt;
+	Double_t E_before_Ag;
+	Double_t E_center_Ag;
+
+	TLorentzVector target, beam, Sys;
+	TVector3 boostvect;
+
+	TGenPhaseSpace PS0, PS1;
+	Double_t wght_max,width;
+	Bool_t allowed;
 
 	// Calculate energy loss up to center of the target
 	Double_t EA = prm.E;	
@@ -309,53 +342,107 @@ int main(int argc, char *argv[])
    	ICdE = eloss(A,0.586,EA,ICLength,A.EL.eC4H10, A.EL.dedxC4H10);
    	EA -= ICdE;
    	EA -= eloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
-   	EA -= eloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
-   	EA -= eloss(A,1.,EA,targetTh/2.,A.EL.eH, A.EL.dedxH);
- 
+	E_before_Ag = EA;
+	if(isAgReac){
+		E_center_Ag = EA - eloss(A,47./108.,EA,AgFoil/2.,A.EL.eAg, A.EL.dedxAg);
+		EA -= eloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
+   		E_before_Tgt = EA;
+	}
+	else{
+		EA -= eloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
+   		E_before_Tgt = EA;
+   		E_center_Tgt = EA - eloss(A,1.,EA,targetTh/2.,A.EL.eH, A.EL.dedxH);
+   		E_after_Tgt = EA-eloss(A,1.,EA,targetTh,A.EL.eH, A.EL.dedxH);
+		
+		reacZ = targetTh/2.;
+   		EA -= eloss(A,1.,EA,reacZ,A.EL.eH, A.EL.dedxH);
+	}
+	
 	EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 	Double_t PA = sqrt(EA*EA+2*EA*mA);
-
-	TLorentzVector target(0.0, 0.0, 0.0, ma);
-	TLorentzVector beam(0.0, 0.0, PA, mA+EA);
-	TLorentzVector Sys = beam + target;
-	TVector3 boostvect = Sys.BoostVector();
-
+	target.SetXYZT(0.0, 0.0, 0.0, ma);
+	beam.SetXYZT(0.0, 0.0, PA, mA+EA);
+	Sys = beam + target;
 	beamE = EA*1000.;
 	beamBeta = Sys.Beta();
 	beamGamma = Sys.Gamma();
 	beamEcm = EA*ma*1000./(mA+ma);
-	printf("\n\nEnergy at center of target: %.2lf MeV\n", beamE);
-	printf("\nBeta at center of target: %.3lf \n", beamBeta);
-	printf("\nGamma at center of target: %.3lf \n", beamGamma);
-	printf("\nCM Energy at center of target: %.2lf MeV\n\n", beamEcm);
+
+	if(isAgReac){
+		printf("\n\nEnergy before of silver foil: %.2lf MeV\n", E_before_Ag);
+		printf("\n\nEnergy at center of silver foil: %.2lf MeV\n", E_center_Ag);
+		printf("\n\nEnergy after silver foil: %.2lf MeV\n", E_before_Tgt);
+	}
+	else{
+		printf("\n\nEnergy before target: %.2lf MeV\n", E_before_Tgt);
+		printf("\n\nEnergy at center of target: %.2lf MeV\n", E_center_Tgt);
+		printf("\n\nEnergy at behind target: %.2lf MeV\n", E_after_Tgt);
+	
+		printf("\nBeta at center of target: %.3lf \n", beamBeta);
+		printf("\nGamma at center of target: %.3lf \n", beamGamma);
+		printf("\nCM Energy at center of target: %.2lf MeV\n\n", beamEcm);
+	}
 
 	printf("YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DYY,yd.ThetaMin(prm.DYY),yd.ThetaMax(prm.DYY)); 
 	printf("CsI detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DYY+11.6,csi.ThetaMin(prm.DYY+11.6),csi.ThetaMax(prm.DYY+11.6)); 
 	printf("First S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3,sd1.ThetaMin(prm.DS3),sd1.ThetaMax(prm.DS3)); 
 	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3+14.8,sd2.ThetaMin(prm.DS3+14.8),sd2.ThetaMax(prm.DS3+14.8)); 
 	Double_t masses[4] = { mb, mB, mc, md};
-
-	TGenPhaseSpace PS0, PS1;
-	Bool_t allowed = PS0.SetDecay(Sys, prm.N, masses);
-
+	
+	
+	allowed = PS0.SetDecay(Sys, prm.N, masses);
+	
 	if(!allowed){
 		printf("Impossible decay!\n");
 		printf("Exiting...\n");
 		exit(0);
 	}
+	else{
+		printf("Starting...\n");
+	}
 
-	Double_t wght_max=PS0.GetWtMax();
+	wght_max=PS0.GetWtMax();
 	printf("%lf\n",wght_max);
-	Double_t width = prm.W/2.355/1000.;
+	width = prm.W/2.355/1000.;
 	printf("%lf\t%lf\n",mB,width);
-
 	while(Evnt<nsim) 
 	{
+		if(isAgReac){
+			reacZ = rndm->Uniform(0,AgFoil);
+   			EA = E_before_Ag - eloss(A,47./108.,E_before_Ag,reacZ,A.EL.eAg, A.EL.dedxAg);
+		}
+		else{	
+			reacZ = rndm->Uniform(0,targetTh);
+   			EA = E_before_Tgt - eloss(A,1.,E_before_Tgt,reacZ,A.EL.eH, A.EL.dedxH);
+ 		}
+		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
+		PA = sqrt(EA*EA+2*EA*mA);
+
+		target.SetXYZT(0.0, 0.0, 0.0, ma);
+		beam.SetXYZT(0.0, 0.0, PA, mA+EA);
+		Sys = beam + target;
+		boostvect = Sys.BoostVector();
+
+		beamE = EA*1000.;
+		beamBeta = Sys.Beta();
+		beamGamma = Sys.Gamma();
+		beamEcm = EA*ma*1000./(mA+ma);
+
+		allowed = PS0.SetDecay(Sys, prm.N, masses);
+	//
+	//	if(!allowed){
+	//		clearEvt();
+	//		continue;
+	//	}
+
+		wght_max=PS0.GetWtMax();
+		width = prm.W/2.355/1000.;
+
 		wght = 0.;
 		clearEvt();
 		mBR = rndm->Gaus(mB,width);
 		masses[1] =mBR;
-		PS0.SetDecay(Sys, prm.N, masses);
+		//PS0.SetDecay(Sys, prm.N, masses);
 
 		do{	
 			wght = PS0.Generate();
@@ -366,6 +453,8 @@ int main(int argc, char *argv[])
 		TLorentzVector *LVb  = PS0.GetDecay(0);
 		TLorentzVector *LVB  = PS0.GetDecay(1);
 		TLorentzVector *LVBdec;
+		TLorentzVector *LVcdec;
+		TLorentzVector *LVddec;
 
 		TLorentzVector Frag  = Sys-*LVb;
 
@@ -391,36 +480,85 @@ int main(int argc, char *argv[])
 				wght2 = PS1.Generate();			
 				chck2 = rndm->Uniform(0,1);
 				LVBdec  = PS1.GetDecay(0);
+				LVcdec  = PS1.GetDecay(1);
+				if(seqdecN>2) LVddec  = PS1.GetDecay(2);
 			}while(wght2<chck2);
-			decP.T=LVBdec->Theta();
-			decP.E=(LVBdec->E()-mBdec)*1000.;
-			decP.P=LVBdec->Phi();	
-			decP.Tdeg=RadToDeg()*hP.T;
-			decP.Pdeg=RadToDeg()*hP.P;
+			decHP.T=LVBdec->Theta();
+			decHP.E=(LVBdec->E()-mBdec)*1000.;
+			decHP.P=LVBdec->Phi();	
+			decHP.Tdeg=RadToDeg()*decHP.T;
+			decHP.Pdeg=RadToDeg()*decHP.P;
+			declP1.T=LVcdec->Theta();
+			declP1.E=(LVcdec->E()-mBdec)*1000.;
+			declP1.P=LVcdec->Phi();	
+			declP1.Tdeg=RadToDeg()*declP1.T;
+			declP1.Pdeg=RadToDeg()*declP1.P;
+			if(seqdecN>2){
+				declP2.T=LVcdec->Theta();
+				declP2.E=(LVcdec->E()-mBdec)*1000.;
+				declP2.P=LVcdec->Phi();	
+				declP2.Tdeg=RadToDeg()*declP2.T;
+				declP2.Pdeg=RadToDeg()*declP2.P;
+			}
 		}
 	
 		// Position on target	
-		Double_t targetPosX = BeamSpot*rndm->Gaus();
-		Double_t targetPosY = BeamSpot*rndm->Gaus();
-		TVector3 targetPos(targetPosX,targetPosY,0);
-		
-		lP.TrgtdE = eloss(b,1.,lP.E,targetTh/2./Cos(lP.T),b.EL.eH,b.EL.dedxH);	
-		lP.Ebt = lP.E-lP.TrgtdE;
-		
-		LEHit = detHits(lP, b, targetTh, targetPos);
-		
-		if(!seqdec){
-			hP.TrgtdE = eloss(B,1.,hP.E,targetTh/2./Cos(hP.T),B.EL.eH,B.EL.dedxH);	
-			hP.Ebt = hP.E-hP.TrgtdE;
-			HEHit = detHits(hP, B, targetTh, targetPos);	
+		reacX = BeamSpot*rndm->Gaus();
+		reacY = BeamSpot*rndm->Gaus();
+		reacPos.SetXYZ(reacX,reacY,reacZ);
+
+		Double_t EbAg;		
+		if(isAgReac){ 
+			EbAg = eloss(b,47./108.,lP.E,(AgFoil-reacZ)/Cos(lP.T),b.EL.eAg,b.EL.dedxAg);	
+			lP.TrgtdE = eloss(b,1.,lP.E-EbAg,targetTh/Cos(lP.T),b.EL.eH,b.EL.dedxH);	
+			lP.Ebt = lP.E-EbAg-lP.TrgtdE;
 		}
 		else{ 
-			decP.TrgtdE = eloss(B,1.,decP.E,targetTh/2./Cos(decP.T),decB.EL.eH,decB.EL.dedxH);	
-			decP.Ebt = decP.E-decP.TrgtdE;
-			HEHit = detHits(decP, decB, targetTh, targetPos);
+			lP.TrgtdE = eloss(b,1.,lP.E,(targetTh-reacZ)/Cos(lP.T),b.EL.eH,b.EL.dedxH);	
+			lP.Ebt = lP.E-lP.TrgtdE;
 		}
 		
+		LEHit = detHits(lP, b, reacPos);
+		
+		if(!seqdec){
+			if(isAgReac){ 
+				EbAg = eloss(B,47./108.,hP.E,(AgFoil-reacZ)/Cos(hP.T),B.EL.eAg,B.EL.dedxAg);	
+				hP.TrgtdE = eloss(B,1.,hP.E-EbAg,targetTh/Cos(hP.T),B.EL.eH,B.EL.dedxH);	
+				hP.Ebt = hP.E-EbAg-hP.TrgtdE;
+			}
+			else {
+				hP.TrgtdE = eloss(B,1.,hP.E,(targetTh-reacZ)/Cos(hP.T),B.EL.eH,B.EL.dedxH);	
+				hP.Ebt = hP.E-hP.TrgtdE;
+			}
+			HEHit = detHits(hP, B, reacPos);
+		}
+		else{ 
+			decHP.TrgtdE = eloss(B,1.,decHP.E,(targetTh-reacZ)/Cos(decHP.T),decB.EL.eH,decB.EL.dedxH);	
+			decHP.Ebt = decHP.E-decHP.TrgtdE;
+			HEHit = detHits(decHP, decB, reacPos);	
+			if(decc.Z>0){
+				declP1.TrgtdE = eloss(B,1.,declP1.E,(targetTh-reacZ)/Cos(declP1.T),decB.EL.eH,decB.EL.dedxH);	
+				declP1.Ebt = declP1.E-declP1.TrgtdE;
+				detHits(declP1, decB, reacPos);
+			}	
+			if(seqdecN>2&&decd.Z>0){
+				declP2.TrgtdE = eloss(B,1.,declP2.E,(targetTh-reacZ)/Cos(declP2.T),decB.EL.eH,decB.EL.dedxH);	
+				declP2.Ebt = declP2.E-declP2.TrgtdE;
+				detHits(declP2, decB, reacPos);
+			}
+		}
+		Double_t E_before_SSB;
+		if(isAgReac){
+			E_before_SSB = E_before_Tgt - eloss(A,1.,E_before_Tgt,targetTh,A.EL.eH,A.EL.dedxH);
+			SSBdE = eloss(A,14./28.,E_before_SSB,1000.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
+		}
+		else{ 
+			SSBdE = eloss(A,14./28.,E_before_SSB,1000.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
+		}
+		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
+		
 		if(LEHit && yd.dE[0]>0.){
+			if(csi.dE[0]>0.) LEHitcntr++;
 			Double_t Pb = LVb->P();
 			Double_t Eb = LVb->E()-mb;	
  			Qdet = mA+ma-mb- sqrt(mA*mA+mb*mb-ma*ma-2.*(mA+EA)*(mb+Eb)+2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad())+2.*(EA+mA+ma-Eb-mb)*ma);
@@ -434,15 +572,19 @@ int main(int argc, char *argv[])
 		lP.Tcm = RadToDeg()*(Pi()-LVb->Theta());
 		hP.Tcm = RadToDeg()*LVB->Theta();
 
-		printf("%.5d Events processed..\r",Evnt);
+
+		printf("%.6d Events processed..\r",Evnt);
 		Evnt++;
 		iris->Fill();
 	}
 
 	iris->AutoSave();
 	f->Close();
+	LEeff=Double_t(LEHitcntr)/Double_t(nsim)*100.;
+	printf("Acceptance for target-like particles: %.1f\n",LEeff);
 	Double_t time=timer.RealTime();
 	printf("\nDone. %lf s\n",time);
+	printf("\nOutput written to %s \n", outputname);
 	
 	return 0;
 }

@@ -17,4 +17,6 @@ extern S3Hit sd1;
 extern S3Hit sd2;
 extern PTrack hP;
 extern PTrack lP;
-extern PTrack decP;
+extern PTrack decHP;
+extern PTrack declP1;
+extern PTrack declP2;

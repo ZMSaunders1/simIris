@@ -31,8 +31,22 @@ void nucleus::Clear()
 	EL.Clear();
 }
 
-void nucleus::ReadFile(Int_t inputA, std::string inpEl)
+void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 {
+	std::string massfilename, rctfilename1, rctfilename2;
+	if(binpath.length()<8)
+	{
+		massfilename = "../ame/mass.mas12";
+		rctfilename1 = "../ame/rct1.mas12";
+		rctfilename2 = "../ame/rct2.mas12";
+	}
+	else{
+		binpath.erase(binpath.end()-11,binpath.end());
+		massfilename = binpath + "ame/mass.mas12";
+		rctfilename1 = binpath + "ame/rct1.mas12";
+		rctfilename2 = binpath + "ame/rct2.mas12";
+	}
+
 	const Double_t Amu=931.494061;
 	char buffer[124];
 	std::string cN,cZ,cA,cEl,cME,cAM;
@@ -42,8 +56,8 @@ void nucleus::ReadFile(Int_t inputA, std::string inpEl)
 	Double_t mass2=0.;
 	
 	FILE *massfile;
-	massfile=fopen("ame/mass.mas12","r");
-	if(massfile==NULL) massfile=fopen("../ame/mass.mas12","r");
+	massfile=fopen(massfilename.data(),"r");
+	//if(massfile==NULL) massfile=fopen("../ame/mass.mas12","r");
 	if(massfile==NULL){
 		printf("Cannot open mass table !!\n");
 		exit(0);
@@ -81,8 +95,8 @@ void nucleus::ReadFile(Int_t inputA, std::string inpEl)
 	fclose(massfile);
 
 	FILE *rctfile1;
-	rctfile1=fopen("ame/rct1.mas12","r");
-	if(rctfile1==NULL) rctfile1=fopen("../ame/rct1.mas12","r");
+	rctfile1=fopen(rctfilename1.data(),"r");
+	//if(rctfile1==NULL) rctfile1=fopen("../ame/rct1.mas12","r");
 	if(rctfile1==NULL){
 		printf("Cannot open first separation energy table !!\n");
 		exit(0);
@@ -117,8 +131,8 @@ void nucleus::ReadFile(Int_t inputA, std::string inpEl)
 	fclose(rctfile1);
 
 	FILE *rctfile2;
-	rctfile2=fopen("ame/rct2.mas12","r");
-	if(rctfile2==NULL) rctfile2=fopen("../ame/rct2.mas12","r");
+	rctfile2=fopen(rctfilename2.data(),"r");
+	//if(rctfile2==NULL) rctfile2=fopen("../ame/rct2.mas12","r");
 	if(rctfile2==NULL){
 		printf("Cannot open second separation energy table !!\n");
 		exit(0);
@@ -155,16 +169,28 @@ void nucleus::ReadFile(Int_t inputA, std::string inpEl)
 	return;
 }
 
-void nucleus::getInfo(Int_t inputN, Int_t inputZ)
+void nucleus::getInfo(std::string binpath, Int_t inputN, Int_t inputZ)
 {
+	std::string massfilename;
+	if(binpath.length()<8)
+	{
+		massfilename = "../ame/mass.mas12";
+	}
+	else{
+		massfilename = binpath;
+		massfilename.erase(massfilename.end()-11,massfilename.end());
+		massfilename = massfilename + "ame/mass.mas12";
+	}
+
+
 	Int_t inputA = inputN+inputZ;
 	Int_t N0, Z0;
 	char buffer[124];
 	std::string cN,cZ,cEl;
 
 	FILE *massfile;
-	massfile=fopen("ame/mass.mas12","r");
-	if(massfile==NULL) massfile=fopen("../ame/mass.mas12","r");
+	massfile=fopen(massfilename.data(),"r");
+	//if(massfile==NULL) massfile=fopen("../ame/mass.mas12","r");
 	if(massfile==NULL){
 		printf("Cannot open mass table !!\n");
 		exit(0);
@@ -191,12 +217,12 @@ void nucleus::getInfo(Int_t inputN, Int_t inputZ)
 //	inpEl.erase( std::remove_if( inpEl.begin(), inpEl.end(), ::isspace ), inpEl.end() );
 
 	printf("%d%s\t===================================================================\n",inputA,cEl.data());
-	ReadFile(inputA,cEl);
+	ReadFile(binpath,inputA,cEl);
 	
 	return;
 }
 
-void nucleus::getInfo(std::string input)
+void nucleus::getInfo(std::string binpath, std::string input)
 {
 	char inputEl[2];
 	Int_t inputA;
@@ -212,7 +238,7 @@ void nucleus::getInfo(std::string input)
 	inpEl.erase( std::remove_if( inpEl.begin(), inpEl.end(), ::isspace ), inpEl.end() );
 
 	printf("%d%s\t===================================================================\n",inputA,inpEl.data());
-	ReadFile(inputA,inpEl);
+	ReadFile(binpath, inputA,inpEl);
 	
 	return;
 }

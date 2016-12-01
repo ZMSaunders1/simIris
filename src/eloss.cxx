@@ -1,16 +1,4 @@
 #include "eloss.h"
-#include <TRandom3.h>
-#include <TMath.h>
-
-Double_t straggling(nucleus P, Double_t TZoverA, Double_t ein,  Double_t th)
-{
-	Double_t k= 1.1+0.47*TMath::Log10(ein/Double_t(P.A));
-	Double_t Bohr2 = 0.157 * th * P.Z*P.Z *TZoverA /P.A;
-	Double_t Bohr = sqrt(Bohr2);
-	Double_t d = k*Bohr;
-
-	return d;
-}
 
 Double_t eval(Double_t in, Double_t x[100], Double_t y[100])
 {
@@ -44,13 +32,16 @@ Double_t eval(Double_t in, Double_t x[100], Double_t y[100])
 //Make it a method for a particle class.
 Double_t eloss(nucleus P, Double_t TZoverA, Double_t ein, Double_t th , Double_t x[100], Double_t y[100])//initial energy and thickness are given as arguments 
 {
+
 	Double_t k;
 	Double_t Bohr;
 	Double_t sgm;
 	Double_t strg;
 
-	TRandom3 *rndm = new TRandom3(0);
 	if(ein==0.) return 0;
+	if(th==0.) return 0.;
+	
+	TRandom3 *rndm = new TRandom3(0);
 	//Energy loss calculation including energy Straggling
 	Double_t dx =th/100.; //in mg/cm2
 	Bohr = TMath::Sqrt(0.157 * dx * P.Z*P.Z *TZoverA)/1000.;

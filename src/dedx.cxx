@@ -41,9 +41,9 @@ void dedx::loadIncomingELoss(std::string path, std::string name, Double_t mass)
 	loadELoss(Form("%s/lise_%s_in_Ag.txt",path.data(),name.data()),eAg,dedxAg,mass/1000.);	
 	printf("Loading %s/lise_%s_in_C4H10.txt\n",path.data(),name.data());	
 	loadELoss(Form("%s/lise_%s_in_C4H10.txt",path.data(),name.data()),eC4H10,dedxC4H10,mass/1000.);	
-	printf("\nLoading %s/lise_%s_in_H.txt\n",path.data(),name.data());	
+	printf("Loading %s/lise_%s_in_H.txt\n",path.data(),name.data());	
 	loadELoss(Form("%s/lise_%s_in_H.txt",path.data(),name.data()),eH,dedxH,mass/1000.);	
-	printf("Loading %s/lise_%s_in_Si3N4.txt\n",path.data(),name.data());	
+	printf("Loading %s/lise_%s_in_Si3N4.txt\n\n",path.data(),name.data());	
 	loadELoss(Form("%s/lise_%s_in_Si3N4.txt",path.data(),name.data()),eSi3N4,dedxSi3N4,mass/1000.);	
 }
 
@@ -53,7 +53,7 @@ void dedx::loadOutgoingELoss(std::string path, std::string name, Double_t mass)
 	loadELoss(Form("%s/lise_%s_in_Al.txt",path.data(),name.data()),eAl,dedxAl,mass/1000.);
 	printf("Loading %s/lise_%s_in_B.txt\n",path.data(),name.data());
 	loadELoss(Form("%s/lise_%s_in_B.txt",path.data(),name.data()),eB,dedxB,mass/1000.);
-	printf("Loading %s/lise_%s_in_CsI.txt\n\n",path.data(),name.data());	
+	printf("Loading %s/lise_%s_in_CsI.txt\n",path.data(),name.data());	
 	loadELoss(Form("%s/lise_%s_in_CsI.txt",path.data(),name.data()),eCsI,dedxCsI,mass/1000.);	
 	printf("Loading %s/lise_%s_in_H.txt\n",path.data(),name.data());
 	loadELoss(Form("%s/lise_%s_in_H.txt",path.data(),name.data()),eH,dedxH,mass/1000.);
@@ -63,7 +63,7 @@ void dedx::loadOutgoingELoss(std::string path, std::string name, Double_t mass)
 	loadELoss(Form("%s/lise_%s_in_P.txt",path.data(),name.data()),eP,dedxP,mass/1000.);
 	printf("Loading %s/lise_%s_in_Si.txt\n",path.data(),name.data());	
 	loadELoss(Form("%s/lise_%s_in_Si.txt",path.data(),name.data()),eSi,dedxSi,mass/1000.);	
-	printf("Loading %s/lise_%s_in_SiO2.txt\n",path.data(),name.data());
+	printf("Loading %s/lise_%s_in_SiO2.txt\n\n",path.data(),name.data());
 	loadELoss(Form("%s/lise_%s_in_SiO2.txt",path.data(),name.data()),eSiO2,dedxSiO2,mass/1000.);
 }
 

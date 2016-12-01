@@ -23,9 +23,10 @@ class nucleus : public TObject {
 		dedx EL; 
 
 		//virtual void ReadCalibPar(char* line);
-		virtual void getInfo(std::string);
-		virtual void getInfo(Int_t, Int_t);
-		virtual void ReadFile(Int_t, std::string);
+		virtual void getInfo(std::string,std::string);
+		virtual void getInfo(std::string, Int_t, Int_t);
+		virtual void ReadFile(std::string, Int_t, std::string);
+		//virtual void SetFilenames(std::string);
 		virtual void Print();
 		virtual void Clear();
 //		ClassDef(nucleus,1)
