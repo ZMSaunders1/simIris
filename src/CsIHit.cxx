@@ -131,7 +131,9 @@ Double_t CsIHit::ELoss(nucleus ncl, Double_t E, Double_t T)
 		E -= eloss(ncl,100./192.,E,6.*1.4*0.1/cos(T),ncl.EL.eMy, ncl.EL.dedxMy);
 		dE[mul-1] = eloss(ncl,108./260.,E,Thickness/cos(T),ncl.EL.eCsI, ncl.EL.dedxCsI);
 		E -= dE[mul-1];
-		dE[mul-1] = rndm->Gaus(dE[mul-1],0.031*14.1*sqrt(14.1/dE[mul-1]));
+		if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
+		if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.031*dE[mul-1]*sqrt(14.1/dE[mul-1]));
+		if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
 	}
 	return E;
 }

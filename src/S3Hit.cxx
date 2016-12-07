@@ -130,7 +130,9 @@ Double_t S3Hit::ELoss(nucleus ncl, Double_t E, Double_t T)
 			E -= eloss(ncl,5./10.,E,0.1*2.3502*0.5/cos(T),ncl.EL.eB,ncl.EL.dedxB); //boron junction implant 		
 			dE[mul-1] = eloss(ncl,14./28.,E,Thickness/cos(T),ncl.EL.eSi,ncl.EL.dedxSi);
    			E -= dE[mul-1];
-			dE[mul-1] = rndm->Gaus(dE[mul-1],0.01*dE[mul-1]);
+			if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
+			if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.01*dE[mul-1]);
+			if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
 		}
 		else{ // sectors first
 			E -= eloss(ncl,15./31.,E,0.1*1.8219*0.5/cos(T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
@@ -139,7 +141,9 @@ Double_t S3Hit::ELoss(nucleus ncl, Double_t E, Double_t T)
 			E -= eloss(ncl,15./31.,E,0.1*1.822*0.5/cos(T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
 			dE[mul-1] = eloss(ncl,14./28.,E,Thickness/cos(T),ncl.EL.eSi,ncl.EL.dedxSi);
    			E -= dE[mul-1];
-			dE[mul-1] = rndm->Gaus(dE[mul-1],0.01*dE[mul-1]);
+			if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
+			if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.01*dE[mul-1]);
+			if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
 		}
 	}
 	return E;

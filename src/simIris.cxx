@@ -54,11 +54,13 @@ void clearEvt()
 int main(int argc, char *argv[])
 {
 	Bool_t load_params_from_file=kFALSE;
+	Bool_t have_dwba_xsec=kFALSE;
 	char *endptr;
 	Int_t nsim = 1E6;
 	char *paramsname =NULL;
 	char *dedxpath =NULL;
 	char *outputname =NULL;
+	char *dwbaname =NULL;
 	Bool_t isAgReac = kFALSE;
 
 	std::string binpath(argv[0]);
@@ -75,6 +77,10 @@ int main(int argc, char *argv[])
 			else if(strncmp(argv[i],"--params=",9)==0){
 				load_params_from_file=kTRUE;
 				paramsname = argv[i]+9;
+			}
+			else if(strncmp(argv[i],"--dwba=",7)==0){
+				have_dwba_xsec=kTRUE;
+				dwbaname = argv[i]+7;
 			}
 			else if(strncmp(argv[i],"--events=",9)==0){
 	  			nsim = strtol(argv[i]+9,&endptr,10);//converting string to number
@@ -312,7 +318,7 @@ int main(int argc, char *argv[])
 
 	Double_t targetTh=prm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
 	Double_t BeamSpot=prm.Bs/2.355; // FWHM->sigma 
-	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr
+	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr // 10 Torr!
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	//const Double_t AgFoil=5.44*10.473*0.1; //mu*g/cm^3*0.1
@@ -389,7 +395,17 @@ int main(int argc, char *argv[])
 	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3+14.8,sd2.ThetaMin(prm.DS3+14.8),sd2.ThetaMax(prm.DS3+14.8)); 
 	Double_t masses[4] = { mb, mB, mc, md};
 	
+	Double_t tht=0.; 
+	Double_t xsec=0.; 
+	Double_t xsec_chck=0.; 
+	Double_t xsec_max=0.; 
+	Double_t dwba_th[181]={0.}; 
+	Double_t dwba_xsec[181]={0.}; 
 	
+	if(have_dwba_xsec==kTRUE){ 
+		printf("Using DWBA cross section from %s!\n",dwbaname);
+		xsec_max = load_dwba(dwbaname,dwba_th,dwba_xsec); 
+	}
 	allowed = PS0.SetDecay(Sys, prm.N, masses);
 	
 	if(!allowed){
@@ -402,9 +418,12 @@ int main(int argc, char *argv[])
 	}
 
 	wght_max=PS0.GetWtMax();
-	printf("%lf\n",wght_max);
+	printf("%lf\t%lf\n",wght_max,xsec_max);
 	width = prm.W/2.355/1000.;
 	printf("%lf\t%lf\n",mB,width);
+
+	Int_t whilecount;
+	// Start of event loop
 	while(Evnt<nsim) 
 	{
 		if(isAgReac){
@@ -428,13 +447,6 @@ int main(int argc, char *argv[])
 		beamGamma = Sys.Gamma();
 		beamEcm = EA*ma*1000./(mA+ma);
 
-		allowed = PS0.SetDecay(Sys, prm.N, masses);
-	//
-	//	if(!allowed){
-	//		clearEvt();
-	//		continue;
-	//	}
-
 		wght_max=PS0.GetWtMax();
 		width = prm.W/2.355/1000.;
 
@@ -442,13 +454,27 @@ int main(int argc, char *argv[])
 		clearEvt();
 		mBR = rndm->Gaus(mB,width);
 		masses[1] =mBR;
-		//PS0.SetDecay(Sys, prm.N, masses);
 
+		TLorentzVector *LTmp;
+		whilecount=0;
 		do{	
 			wght = PS0.Generate();
-			chck = rndm->Uniform(0,1);
-
-		}while(wght<chck);
+			chck = rndm->Uniform(0,wght_max);
+			if(have_dwba_xsec==kTRUE){
+				LTmp = PS0.GetDecay(0);
+				LTmp->Boost(-boostvect);
+				tht = RadToDeg()*LTmp->Theta();
+				xsec=eval_theta(tht,dwba_th,dwba_xsec);
+				xsec_chck = rndm->Uniform(0,xsec_max);
+				LTmp->Boost(boostvect);
+			}
+			else{
+				xsec=1.;
+				xsec_chck=0.;
+			}
+			whilecount++;
+			//printf("%d\t%f\t%f\t%f\n",whilecount,tht,xsec,xsec_chck);
+		}while(wght<chck||xsec<xsec_chck);
 
 		TLorentzVector *LVb  = PS0.GetDecay(0);
 		TLorentzVector *LVB  = PS0.GetDecay(1);

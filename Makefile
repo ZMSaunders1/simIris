@@ -23,9 +23,8 @@ LDFLAGS = -O2
 
 all:  $(BINARYDIR)/simIris
 
-$(BINARYDIR)/simIris: $(OBJECTDIR)/simIris.o $(OBJECTDIR)/nucleus.o $(OBJECTDIR)/params.o $(OBJECTDIR)/dedx.o $(OBJECTDIR)/eloss.o $(OBJECTDIR)/shieldClear.o $(LIBDIR)/libSimEvent.so $(OBJECTDIR)/SimEventDict.o
+$(BINARYDIR)/simIris: $(OBJECTDIR)/simIris.o $(OBJECTDIR)/nucleus.o $(OBJECTDIR)/params.o $(OBJECTDIR)/dedx.o $(OBJECTDIR)/dwba.o $(OBJECTDIR)/eloss.o $(OBJECTDIR)/shieldClear.o $(LIBDIR)/libSimEvent.so $(OBJECTDIR)/SimEventDict.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ $(ROOTGLIBS) -lm -lz -lutil -lnsl -lpthread -lrt
-	#$(LD) -o $@ $(LDFLAGS) $(ROOTGLIBS) $^ #-lm -lz -lutil
 
 $(LIBDIR)/libSimEvent.so:	$(OBJECTDIR)/PTrack.o $(OBJECTDIR)/YYHit.o $(OBJECTDIR)/CsIHit.o $(OBJECTDIR)/S3Hit.o $(OBJECTDIR)/SimEventDict.o
 	$(LD) $(SOFLAGS) $(LDFLAGS) $(ROOTGLIBS) $^ -o $@
@@ -43,6 +42,9 @@ $(OBJECTDIR)/nucleus.o: $(SOURCEDIR)/nucleus.cxx
 $(OBJECTDIR)/dedx.o: $(SOURCEDIR)/dedx.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+$(OBJECTDIR)/dwba.o: $(SOURCEDIR)/dwba.cxx
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 $(OBJECTDIR)/eloss.o: $(SOURCEDIR)/eloss.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -52,32 +54,11 @@ $(OBJECTDIR)/shieldClear.o: $(SOURCEDIR)/shieldClear.cxx
 $(OBJECTDIR)/YYHit.o: $(SOURCEDIR)/YYHit.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# $(OBJECTDIR)/YYHitDict.o: $(SOURCEDIR)/YYHitDict.cxx
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
-# 
-# $(SOURCEDIR)/YYHitDict.cxx: $(SOURCEDIR)/YYHit.cxx $(INCLUDEDIR)/YYHitLinkDef.h
-# 	@echo "Generating dictionary $@..."
-# 	@rootcint -f $@ -c $(HEADER) $^
-
 $(OBJECTDIR)/CsIHit.o: $(SOURCEDIR)/CsIHit.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
- 
-# $(OBJECTDIR)/CsIHitDict.o: $(SOURCEDIR)/CsIHitDict.cxx
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
-# 
-# $(SOURCEDIR)/CsIHitDict.cxx: $(SOURCEDIR)/CsIHit.cxx $(INCLUDEDIR)/CsIHitLinkDef.h
-# 	@echo "Generating dictionary $@..."
-# 	@rootcint -f $@ -c $(HEADER) $^
 
 $(OBJECTDIR)/S3Hit.o: $(SOURCEDIR)/S3Hit.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# $(OBJECTDIR)/S3HitDict.o: $(SOURCEDIR)/S3HitDict.cxx
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
-# 
-# $(SOURCEDIR)/S3HitDict.cxx: $(SOURCEDIR)/S3Hit.cxx $(INCLUDEDIR)/S3HitLinkDef.h
-# 	@echo "Generating dictionary $@..."
-# 	@rootcint -f $@ -c $(HEADER) $^
 
 $(OBJECTDIR)/PTrack.o: $(SOURCEDIR)/PTrack.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@

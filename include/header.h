@@ -2,6 +2,7 @@
 #include "nucleus.h"
 #include "shieldClear.h"
 #include "eloss.h"
+#include "dwba.h"
 #include "PTrack.h"
 #include "YYHit.h"
 #include "CsIHit.h"
