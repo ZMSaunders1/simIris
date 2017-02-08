@@ -11,8 +11,8 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos)
 
 	Double_t ETmp = tr.Ebt;
 
-	//if(mask && shield){
-	if(shield){
+	if(mask && shield){
+	//if(shield){
 		if(YYHit) ETmp = yd.ELoss(ncl,ETmp,tr.T);
 		if(CsIHit) ETmp = csi.ELoss(ncl,ETmp,tr.T);
 		if(Sd1Hit) ETmp = sd1.ELoss(ncl,ETmp,tr.T);

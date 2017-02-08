@@ -20,6 +20,7 @@ YYHit::YYHit()
 		fZ[i] = sqrt(-1);
 		fPhiCalc[i] = sqrt(-1);
 		fThetaCalc[i] = sqrt(-1);
+		fThetaRand[i] = sqrt(-1);
 		hit[i] = 0;
 		Seg[i] = -1;
 		Ring[i] = -1;
@@ -44,6 +45,7 @@ YYHit::YYHit(Double_t th0, Double_t th1, Double_t th2, Double_t th3, Double_t th
 		fZ[i] = sqrt(-1);
 		fPhiCalc[i] = sqrt(-1);
 		fThetaCalc[i] = sqrt(-1);
+		fThetaRand[i] = sqrt(-1);
 		hit[i] = 0;
 		Seg[i] = sqrt(-1);
 		Ring[i] = sqrt(-1);
@@ -60,6 +62,7 @@ void YYHit::Clear()
 		fZ[i] = sqrt(-1);
 		fPhiCalc[i] = sqrt(-1);
 		fThetaCalc[i] = sqrt(-1);
+		fThetaRand[i] = sqrt(-1);
 		hit[i] = 0;
 		Seg[i] = sqrt(-1);
 		Ring[i] = sqrt(-1);
@@ -131,10 +134,12 @@ Bool_t YYHit::Hit(Double_t theta, Double_t phi, Double_t YdDistance, TVector3 ta
   		Seg[mul] = Seg0;
   		Ring[mul] = Ring0;
       	Double_t random = 0.5;//fRandom.Rndm();
-  		Double_t randomTheta = fRandom.Rndm();
+  		//Double_t randomTheta = random;
+  		Double_t randomTheta = fRandom.Uniform();
  		fPhiCalc[mul] = (Seg[mul]-0.5+random)*45.+phiShift*TMath::RadToDeg()-180.;
  		if (fPhiCalc[mul]<-180.)	fPhiCalc[mul] = fPhiCalc[mul]+360.;
- 		fThetaCalc[mul] = TMath::RadToDeg()*atan((50.+(Ring[mul]*5.)+5.*randomTheta)/YdDistance);
+ 		fThetaCalc[mul] = TMath::RadToDeg()*atan((50.+(Ring[mul]*5.)+5.*random)/YdDistance);
+ 		fThetaRand[mul] = TMath::RadToDeg()*atan((50.+(Ring[mul]*5.)+5.*randomTheta)/YdDistance);
    		mul++;
    	}
   	else{
@@ -145,6 +150,7 @@ Bool_t YYHit::Hit(Double_t theta, Double_t phi, Double_t YdDistance, TVector3 ta
   	   	Seg[mul] = -1;
 		fPhiCalc[mul] = sqrt(-1);
 		fThetaCalc[mul] = sqrt(-1);
+		fThetaRand[mul] = sqrt(-1);
 	}
  	
 	return hitBool;
@@ -159,8 +165,10 @@ Double_t YYHit::ELoss(nucleus ncl, Double_t E, Double_t T)
   		dE[mul-1] = eloss(ncl,14./28.,E,Thickness[Seg[mul-1]]/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
 		E = E-dE[mul-1];
 		if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
+  		//if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.00225*dE[mul-1]);
   		if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.00225*dE[mul-1]*sqrt(5.73/dE[mul-1]));
-		if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
+		if(dE[mul-1]<0.) dE[mul-1] = 0.;
+		//if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
 	}
 	return E;
 }

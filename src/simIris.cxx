@@ -18,7 +18,8 @@ params prm, prm_inp;
 YYHit yd;
 CsIHit csi;
 S3Hit sd1(0,60.), sd2(1,1000.);
-PTrack hP, lP, decHP, declP1, declP2;
+PTrack hP, lP;
+PTrack decHP, declP1, declP2;
 
 Double_t mA;	
 Double_t ma;	
@@ -28,7 +29,8 @@ Double_t mb;
 Double_t mc;
 Double_t md;
 
-Double_t Qgen, Qdet;
+Double_t Qgen, Qdet, Qalt;
+Double_t EB_det, PB_det;
 Double_t beamE, beamBeta, beamGamma, beamEcm;
 Double_t tdE;
 TVector3 reacPos;
@@ -37,7 +39,8 @@ Double_t SSBdE;
 void clearEvt()
 {
 	//TargdE[0]=0.; TargdE[1]=0.;
-	Qgen=0.; Qdet=0.;
+	Qgen=sqrt(-1.); Qdet=sqrt(-1.); Qalt=sqrt(-1.);
+	EB_det=sqrt(-1.); PB_det=sqrt(-1.);
 	mBR=0.;
 	lP.Clear();
 	hP.Clear();
@@ -302,6 +305,9 @@ int main(int argc, char *argv[])
 	iris->Branch("wght",&wght,"wght/D"); 
 	iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	iris->Branch("Qdet",&Qdet,"Qdet/D"); 
+	iris->Branch("Qalt",&Qalt,"Qalt/D"); 
+	iris->Branch("EB_det",&EB_det,"EB_det/D"); 
+	iris->Branch("PB_det",&PB_det,"PB_det/D"); 
 	iris->Branch("mBR",&mBR,"mBR/D"); 
 	iris->Branch("ICdE",&ICdE,"ICdE/D"); 
 	iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
@@ -431,7 +437,8 @@ int main(int argc, char *argv[])
    			EA = E_before_Ag - eloss(A,47./108.,E_before_Ag,reacZ,A.EL.eAg, A.EL.dedxAg);
 		}
 		else{	
-			reacZ = rndm->Uniform(0,targetTh);
+			//reacZ = rndm->Uniform(0,targetTh);
+			reacZ = targetTh/2.;
    			EA = E_before_Tgt - eloss(A,1.,E_before_Tgt,reacZ,A.EL.eH, A.EL.dedxH);
  		}
 		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
@@ -527,7 +534,37 @@ int main(int argc, char *argv[])
 				declP2.Pdeg=RadToDeg()*declP2.P;
 			}
 		}
-	
+		else if(prm.N>3) // 4body
+		{
+			LVcdec = PS0.GetDecay(2);
+			LVddec = PS0.GetDecay(3);
+		
+			declP1.T=LVcdec->Theta();	
+			declP2.T=LVddec->Theta();
+			declP1.E=(LVcdec->E()-mc)*1000.; 	
+			declP2.E=(LVddec->E()-md)*1000.;
+			declP1.P=LVcdec->Phi();	
+			declP2.P=LVddec->Phi();	
+			
+			// Convert angles to degrees for root file
+			declP1.Tdeg=RadToDeg()*declP1.T;
+			declP2.Tdeg=RadToDeg()*declP2.T;
+			declP1.Pdeg=RadToDeg()*declP1.P;
+			declP2.Pdeg=RadToDeg()*declP2.P;
+		}
+		else if(prm.N>2) // 3body
+		{
+			LVcdec = PS0.GetDecay(2);
+		
+			declP1.T=LVcdec->Theta();	
+			declP1.E=(LVcdec->E()-mc)*1000.; 	
+			declP1.P=LVcdec->Phi();	
+			
+			// Convert angles to degrees for root file
+			declP1.Tdeg=RadToDeg()*declP1.T;
+			declP1.Pdeg=RadToDeg()*declP1.P;
+		}
+
 		// Position on target	
 		reacX = BeamSpot*rndm->Gaus();
 		reacY = BeamSpot*rndm->Gaus();
@@ -583,12 +620,26 @@ int main(int argc, char *argv[])
 		}
 		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
 		
+		//Calculating "measured" Q-Value
 		if(LEHit && yd.dE[0]>0.){
 			if(csi.dE[0]>0.) LEHitcntr++;
-			Double_t Pb = LVb->P();
-			Double_t Eb = LVb->E()-mb;	
- 			Qdet = mA+ma-mb- sqrt(mA*mA+mb*mb-ma*ma-2.*(mA+EA)*(mb+Eb)+2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad())+2.*(EA+mA+ma-Eb-mb)*ma);
+			Double_t Eb = csi.dE[0];
+			Eb= Eb+elossFi(Eb,0.1*1.4*6./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eMy,b.EL.dedxMy); //Mylar                                                                                  
+	      	Eb= Eb+elossFi(Eb,0.1*2.702*0.3/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eAl,b.EL.dedxAl); //0.3 u Al                                                                            
+	      	Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eP,b.EL.dedxP); // 0.1Phosphorus                                                                      
+			Eb+= yd.dE[0]; //use measured Yd // change june28
+	      	Eb= Eb+elossFi(Eb,0.1*2.32*0.35/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si                                                            
+	    	Eb= Eb+elossFi(Eb,targetTh/2./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eH,b.EL.dedxH); //deuteron energy  in mid target midtarget
+		
+			Eb= Eb/1000.;
+
+			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
+ 			Qdet = mA + ma - mb - sqrt(mA*mA+mb*mb-ma*ma-2.*(mA+EA)*(mb+Eb)+2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad())+2.*(EA+mA+ma-Eb-mb)*ma);
 			Qdet =Qdet*1000.;
+			EB_det = EA+mA+ma-Eb-mb;
+			PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad()));
+			Qalt = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+			Qalt =Qalt*1000.;
 		}
 
 		lP.Ecm = (LVb->E()-mb)*ma*1000./(mA+ma);
@@ -597,7 +648,22 @@ int main(int argc, char *argv[])
 		LVB->Boost(-boostvect);
 		lP.Tcm = RadToDeg()*(Pi()-LVb->Theta());
 		hP.Tcm = RadToDeg()*LVB->Theta();
-
+		
+		if(prm.N>3) // 4body
+		{
+			declP1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
+			declP2.Ecm = (LVddec->E()-md)*ma*1000./(mA+ma);
+			LVcdec->Boost(-boostvect);
+			LVddec->Boost(-boostvect);
+			declP1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+			declP2.Tcm = RadToDeg()*LVddec->Theta();
+		}
+		else if(prm.N>2) // 4body
+		{
+			declP1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
+			LVcdec->Boost(-boostvect);
+			declP1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+		}
 
 		printf("%.6d Events processed..\r",Evnt);
 		Evnt++;

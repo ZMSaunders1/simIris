@@ -66,3 +66,21 @@ Double_t eloss(nucleus P, Double_t TZoverA, Double_t ein, Double_t th , Double_t
 	return ein-en;
 }
 
+Double_t elossFi(Double_t efi, Double_t th, Double_t x[100], Double_t y[100])//final energy and thickness are given as arguments 
+{
+	if (th==0) return efi;
+	//Energy loss calculation
+	Double_t dx =th/100.; //in 
+	Double_t de = 0; //energy loss
+	Double_t en= efi; //the energy variable
+	Double_t pos = 0.;// the position variable
+	
+	while (pos<= th){
+		de =  (dx* eval(en,x,y))/2.; //
+		en = en + de;
+		de =(dx* eval(en,x,y))/2.;//energy loss in dx
+		en = en +de; // energy remaining after dx
+		pos = pos +dx;
+	}
+ 	return en-efi;
+}

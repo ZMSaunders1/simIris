@@ -8,5 +8,6 @@
 
 Double_t eval(Double_t, Double_t[100], Double_t[100]);
 Double_t eloss(nucleus, Double_t, Double_t, Double_t, Double_t[100], Double_t[100]);
+Double_t elossFi(Double_t, Double_t, Double_t[100], Double_t[100]);
 #endif
 // end

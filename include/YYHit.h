@@ -17,6 +17,7 @@ class YYHit : public TObject{
   		Double_t fZ[4];//should be equal to distance to YY1
   		Double_t fPhiCalc[4];//Hitd phi (using Seg)
   		Double_t fThetaCalc[4];//Hitd theta (using YdRing)
+  		Double_t fThetaRand[4];//Hitd theta (using YdRing)
   		Double_t dE[4];//Energy loss
   		Bool_t hit[4];//hits YY1
   		Int_t Seg[4];
