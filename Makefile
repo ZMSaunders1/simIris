@@ -26,7 +26,7 @@ all:  $(BINARYDIR)/simIris
 $(BINARYDIR)/simIris: $(OBJECTDIR)/simIris.o $(OBJECTDIR)/nucleus.o $(OBJECTDIR)/params.o $(OBJECTDIR)/dedx.o $(OBJECTDIR)/dwba.o $(OBJECTDIR)/eloss.o $(OBJECTDIR)/shieldClear.o $(LIBDIR)/libSimEvent.so $(OBJECTDIR)/SimEventDict.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ $(ROOTGLIBS) -lm -lz -lutil -lnsl -lpthread -lrt
 
-$(LIBDIR)/libSimEvent.so:	$(OBJECTDIR)/PTrack.o $(OBJECTDIR)/YYHit.o $(OBJECTDIR)/CsIHit.o $(OBJECTDIR)/S3Hit.o $(OBJECTDIR)/SimEventDict.o
+$(LIBDIR)/libSimEvent.so:	$(OBJECTDIR)/PTrack.o $(OBJECTDIR)/YYHit.o $(OBJECTDIR)/CsIHit.o $(OBJECTDIR)/S3Hit.o $(OBJECTDIR)/IDet.o $(OBJECTDIR)/SimEventDict.o
 	$(LD) $(SOFLAGS) $(LDFLAGS) $(ROOTGLIBS) $^ -o $@
 	@echo "$@ done"
 
@@ -51,6 +51,9 @@ $(OBJECTDIR)/eloss.o: $(SOURCEDIR)/eloss.cxx
 $(OBJECTDIR)/shieldClear.o: $(SOURCEDIR)/shieldClear.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+$(OBJECTDIR)/IDet.o: $(SOURCEDIR)/IDet.cxx
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 $(OBJECTDIR)/YYHit.o: $(SOURCEDIR)/YYHit.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -66,7 +69,7 @@ $(OBJECTDIR)/PTrack.o: $(SOURCEDIR)/PTrack.cxx
 $(OBJECTDIR)/SimEventDict.o: $(LIBDIR)/SimEventDict.cxx
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(LIBDIR)/SimEventDict.cxx: $(INCLUDEDIR)/PTrack.h $(INCLUDEDIR)/YYHit.h $(INCLUDEDIR)/CsIHit.h $(INCLUDEDIR)/S3Hit.h $(INCLUDEDIR)/SimEventLinkDef.h
+$(LIBDIR)/SimEventDict.cxx: $(INCLUDEDIR)/PTrack.h $(INCLUDEDIR)/YYHit.h $(INCLUDEDIR)/CsIHit.h $(INCLUDEDIR)/S3Hit.h $(INCLUDEDIR)/IDet.h $(INCLUDEDIR)/SimEventLinkDef.h
 	@echo "Generating dictionary $@..."
 	@rootcint -f $@ -c $(HEADER) $^
 

@@ -20,6 +20,7 @@ CsIHit csi;
 S3Hit sd1(0,60.), sd2(1,1000.);
 PTrack hP, lP;
 PTrack decHP, declP1, declP2;
+IDet det;
 
 Double_t mA;	
 Double_t ma;	
@@ -50,6 +51,7 @@ void clearEvt()
 	csi.Clear();
 	sd1.Clear();
 	sd2.Clear();
+	det.Clear();
 	
 	return;
 }
@@ -191,6 +193,7 @@ int main(int argc, char *argv[])
 	PTrack *ipdecHP = &decHP;
 	PTrack *ipdeclP1 = &declP1;
 	PTrack *ipdeclP2 = &declP2;
+	IDet *ipdet = &det;
 	nucleus A, a, B, b, c, d, decB,decc,decd;
 	Double_t reacX, reacY, reacZ;
 
@@ -289,32 +292,34 @@ int main(int argc, char *argv[])
 
 	// Set up output file and tree
 	TFile *f = new TFile(outputname,"RECREATE");
-	TTree *iris = new TTree("iris","iris simulation");
+	TTree *Iris = new TTree("Iris","Iris simulation");
 	
-	iris->Branch("Evnt",&Evnt,"Evnt/I"); 
-	iris->Branch("beamE",&beamE,"beamE/D"); 
-	iris->Branch("beamBeta",&beamBeta,"beamBeta/D"); 
-	iris->Branch("beamGamma",&beamGamma,"beamGamma/D"); 
-	iris->Branch("beamEcm",&beamEcm,"beamEcm/D"); 
-	iris->Branch("reacPos","TVector3",&reacPos); 
-	iris->Branch("lP",&iplP,32000,99); 
-	iris->Branch("hP",&iphP,32000,99); 
-	iris->Branch("decHP",&ipdecHP,32000,99); 
-	iris->Branch("declP1",&ipdeclP1,32000,99); 
-	iris->Branch("declP2",&ipdeclP2,32000,99); 
-	iris->Branch("wght",&wght,"wght/D"); 
-	iris->Branch("Qgen",&Qgen,"Qgen/D"); 
-	iris->Branch("Qdet",&Qdet,"Qdet/D"); 
-	iris->Branch("Qalt",&Qalt,"Qalt/D"); 
-	iris->Branch("EB_det",&EB_det,"EB_det/D"); 
-	iris->Branch("PB_det",&PB_det,"PB_det/D"); 
-	iris->Branch("mBR",&mBR,"mBR/D"); 
-	iris->Branch("ICdE",&ICdE,"ICdE/D"); 
-	iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
-	iris->Branch("yd",&ipyd,32000,99); 
-	iris->Branch("csi",&ipcsi,32000,99); 
-	iris->Branch("sd1",&ipsd1,32000,99); 
-	iris->Branch("sd2",&ipsd2,32000,99); 
+	Iris->Branch("Evnt",&Evnt,"Evnt/I"); 
+	Iris->Branch("beamE",&beamE,"beamE/D"); 
+	Iris->Branch("beamBeta",&beamBeta,"beamBeta/D"); 
+	Iris->Branch("beamGamma",&beamGamma,"beamGamma/D"); 
+	Iris->Branch("beamEcm",&beamEcm,"beamEcm/D"); 
+	Iris->Branch("reacPos","TVector3",&reacPos); 
+	Iris->Branch("lP",&iplP,32000,99); 
+	Iris->Branch("hP",&iphP,32000,99); 
+	Iris->Branch("decHP",&ipdecHP,32000,99); 
+	Iris->Branch("declP1",&ipdeclP1,32000,99); 
+	Iris->Branch("declP2",&ipdeclP2,32000,99); 
+	Iris->Branch("wght",&wght,"wght/D"); 
+	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
+	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
+	Iris->Branch("Qalt",&Qalt,"Qalt/D"); 
+	Iris->Branch("EB_det",&EB_det,"EB_det/D"); 
+	Iris->Branch("PB_det",&PB_det,"PB_det/D"); 
+	Iris->Branch("mBR",&mBR,"mBR/D"); 
+	Iris->Branch("ICdE",&ICdE,"ICdE/D"); 
+	Iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
+	Iris->Branch("yd",&ipyd,32000,99); 
+	Iris->Branch("csi",&ipcsi,32000,99); 
+	Iris->Branch("sd1",&ipsd1,32000,99); 
+	Iris->Branch("sd2",&ipsd2,32000,99); 
+	Iris->Branch("sd2",&ipsd2,32000,99); 
+	Iris->Branch("det",&ipdet,32000,99); 
 
 	std::string dedxstr = dedxpath;
 	A.EL.loadIncomingELoss(dedxstr,A.name.data(),A.mass);
@@ -664,13 +669,13 @@ int main(int argc, char *argv[])
 			LVcdec->Boost(-boostvect);
 			declP1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
 		}
-
+		setIDet(ICdE,SSBdE);
 		printf("%.6d Events processed..\r",Evnt);
 		Evnt++;
-		iris->Fill();
+		Iris->Fill();
 	}
 
-	iris->AutoSave();
+	Iris->AutoSave();
 	f->Close();
 	LEeff=Double_t(LEHitcntr)/Double_t(nsim)*100.;
 	printf("Acceptance for target-like particles: %.1f\n",LEeff);

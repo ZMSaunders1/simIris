@@ -10,6 +10,7 @@
 #pragma link C++ class YYHit+;
 #pragma link C++ class CsIHit+;
 #pragma link C++ class S3Hit+;
+#pragma link C++ class IDet+;
 
 #endif
 

@@ -7,6 +7,7 @@
 #include "YYHit.h"
 #include "CsIHit.h"
 #include "S3Hit.h"
+#include "IDet.h"
 
 using namespace TMath;
 
@@ -21,3 +22,4 @@ extern PTrack lP;
 extern PTrack decHP;
 extern PTrack declP1;
 extern PTrack declP2;
+extern IDet det;
