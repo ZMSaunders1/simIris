@@ -307,7 +307,7 @@ int main(int argc, char *argv[])
 	Iris->Branch("declP2.",&ipdeclP2,32000,99); 
 	Iris->Branch("wght",&wght,"wght/D"); 
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
-	//Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
+	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
 	//Iris->Branch("Qalt",&Qalt,"Qalt/D"); 
 	//Iris->Branch("EB_det",&EB_det,"EB_det/D"); 
 	//Iris->Branch("PB_det",&PB_det,"PB_det/D"); 
@@ -638,12 +638,12 @@ int main(int argc, char *argv[])
 			Eb= Eb/1000.;
 
 			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
- 			Qdet = mA + ma - mb - sqrt(mA*mA+mb*mb-ma*ma-2.*(mA+EA)*(mb+Eb)+2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad())+2.*(EA+mA+ma-Eb-mb)*ma);
-			Qdet =Qdet*1000.;
+ 			Qalt = mA + ma - mb - sqrt(mA*mA+mb*mb-ma*ma-2.*(mA+EA)*(mb+Eb)+2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad())+2.*(EA+mA+ma-Eb-mb)*ma);
+			Qalt =Qalt*1000.;
 			EB_det = EA+mA+ma-Eb-mb;
 			PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad()));
-			Qalt = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
-			Qalt =Qalt*1000.;
+			Qdet = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+			Qdet =Qdet*1000.;
 		}
 
 		lP.Ecm = (LVb->E()-mb)*ma*1000./(mA+ma);
