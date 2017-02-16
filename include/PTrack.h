@@ -3,9 +3,11 @@
 
 #include "TObject.h"
 #include "TClass.h"
+#include "nucleus.h"
 
 class PTrack : public TObject{
  	public:
+		nucleus nuc;
   		Double_t E; 	// Energy
   		Double_t Ecm; 	// Energy in center-of-mass system
   		Double_t T; 	// Theta

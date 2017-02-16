@@ -289,6 +289,8 @@ int main(int argc, char *argv[])
 		masses2[2] = mddec;
 	}
 // *******************************************************************
+	lP.nuc = b;
+	hP.nuc = B;
 
 	// Set up output file and tree
 	TFile *f = new TFile(outputname,"RECREATE");
@@ -416,6 +418,7 @@ int main(int argc, char *argv[])
 		printf("Using DWBA cross section from %s!\n",dwbaname);
 		xsec_max = load_dwba(dwbaname,dwba_th,dwba_xsec); 
 	}
+	
 	allowed = PS0.SetDecay(Sys, prm.N, masses);
 	
 	if(!allowed){
@@ -429,7 +432,7 @@ int main(int argc, char *argv[])
 
 	wght_max=PS0.GetWtMax();
 	printf("%lf\t%lf\n",wght_max,xsec_max);
-	width = prm.W/2.355/1000.;
+	width = prm.W/1000.;
 	printf("%lf\t%lf\n",mB,width);
 
 	Int_t whilecount;
@@ -459,13 +462,14 @@ int main(int argc, char *argv[])
 		beamEcm = EA*ma*1000./(mA+ma);
 
 		wght_max=PS0.GetWtMax();
-		width = prm.W/2.355/1000.;
+		//width = prm.W/1000.;
 
 		wght = 0.;
 		clearEvt();
-		mBR = rndm->Gaus(mB,width);
+		mBR = rndm->BreitWigner(mB,width);
 		masses[1] =mBR;
-
+		PS0.SetDecay(Sys, prm.N, masses); //recalculate with resonance energy
+			
 		TLorentzVector *LTmp;
 		whilecount=0;
 		do{	
