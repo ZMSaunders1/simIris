@@ -676,7 +676,7 @@ int main(int argc, char *argv[])
 			declP1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
 		}
 		setIDet(ICdE,SSBdE);
-		printf("Writing %s: %.6d of %.6d events processed..\t\r",outputname,Evnt,nsim);
+		printf("Writing %s: %.6d of %.6d events processed..\r",outputname,Evnt,nsim);
 		Evnt++;
 		Iris->Fill();
 	}

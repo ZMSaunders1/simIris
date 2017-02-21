@@ -13,6 +13,7 @@ YYHit::YYHit()
 	Thickness[5] = 109. * 2.3212 * 0.1; 
 	Thickness[6] = 111. * 2.3212 * 0.1; 
 	Thickness[7] = 103. * 2.3212 * 0.1; 
+	Avg_Thickness = 107.6 * 2.3212 * 0.1; 
 	mul = 0;
 	for(UInt_t i=0; i<4; i++){
 		fX[i] = sqrt(-1);
@@ -38,6 +39,7 @@ YYHit::YYHit(Double_t th0, Double_t th1, Double_t th2, Double_t th3, Double_t th
 	Thickness[5] = th5 * 2.3212 * 0.1; 
 	Thickness[6] = th6 * 2.3212 * 0.1; 
 	Thickness[7] = th7 * 2.3212 * 0.1; 
+	Avg_Thickness = (th0+th1+th2+th3+th4+th5+th6+th7)/8. * 2.3212 * 0.1; 
 	mul = 0;
 	for(UInt_t i=0; i<4; i++){
 		fX[i] = sqrt(-1);
@@ -163,9 +165,9 @@ Double_t YYHit::ELoss(nucleus ncl, Double_t E, Double_t T)
 		E -= eloss(ncl,13./27.,E,0.1*2.702*0.1/cos(T),ncl.EL.eAl, ncl.EL.dedxAl);
   		E -= eloss(ncl,5./10.,E,0.05*2.3502*0.1/cos(T),ncl.EL.eB, ncl.EL.dedxB);
   		dE[mul-1] = eloss(ncl,14./28.,E,Thickness[Seg[mul-1]]/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
+  		dE_ideal[mul-1] = eloss(ncl,14./28.,E,Avg_Thickness/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
 		E = E-dE[mul-1];
 		if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
-		dE_ideal[mul-1] = dE[mul-1];
   		//if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.00225*dE[mul-1]);
   		if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.00225*dE[mul-1]*sqrt(5.73/dE[mul-1]));
 		if(dE[mul-1]<0.) dE[mul-1] = 0.;

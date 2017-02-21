@@ -11,6 +11,7 @@
 class YYHit : public TObject{
  	public:
 		Double_t Thickness[8]; // in um
+		Double_t Avg_Thickness; // in um
   		Int_t mul;
   		Double_t fX[4];
   		Double_t fY[4];
