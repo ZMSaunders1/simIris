@@ -180,8 +180,10 @@ int main(int argc, char *argv[])
 
 	TRandom3 *rndm = new TRandom3(0);
 	Int_t Evnt=0; 
-	Double_t chck, chck2;
-	Double_t wght, wght2;
+	Double_t chck=0.;
+	Double_t chck2=0.;
+	Double_t wght=0.;
+	Double_t wght2=0.;
 
 	Double_t ICdE;	
 	YYHit *ipyd = &yd; 
@@ -469,11 +471,12 @@ int main(int argc, char *argv[])
 		mBR = rndm->BreitWigner(mB,width);
 		masses[1] =mBR;
 		PS0.SetDecay(Sys, prm.N, masses); //recalculate with resonance energy
-			
+	
 		TLorentzVector *LTmp;
 		whilecount=0;
 		do{	
 			wght = PS0.Generate();
+			if(wght!=wght) continue; // catch NaNs
 			chck = rndm->Uniform(0,wght_max);
 			if(have_dwba_xsec==kTRUE){
 				LTmp = PS0.GetDecay(0);
@@ -673,7 +676,7 @@ int main(int argc, char *argv[])
 			declP1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
 		}
 		setIDet(ICdE,SSBdE);
-		printf("%.6d Events processed..\r",Evnt);
+		printf("Writing %s: %.6d of %.6d events processed..\t\r",outputname,Evnt,nsim);
 		Evnt++;
 		Iris->Fill();
 	}
