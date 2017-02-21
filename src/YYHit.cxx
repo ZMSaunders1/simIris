@@ -165,6 +165,7 @@ Double_t YYHit::ELoss(nucleus ncl, Double_t E, Double_t T)
   		dE[mul-1] = eloss(ncl,14./28.,E,Thickness[Seg[mul-1]]/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
 		E = E-dE[mul-1];
 		if(dE[mul-1]<0.) dE[mul-1] = -dE[mul-1];
+		dE_ideal[mul-1] = dE[mul-1];
   		//if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.00225*dE[mul-1]);
   		if(dE[mul-1]!=0.) dE[mul-1] = rndm->Gaus(dE[mul-1],0.00225*dE[mul-1]*sqrt(5.73/dE[mul-1]));
 		if(dE[mul-1]<0.) dE[mul-1] = 0.;

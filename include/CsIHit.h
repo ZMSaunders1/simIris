@@ -18,6 +18,7 @@ class CsIHit : public TObject{
   		Double_t fZ[4];//should be equal to distance to CsI
   		Double_t fPhiCalc[4];//Hitd phi (using Seg)
   		Double_t dE[4];//Energy loss
+  		Double_t dE_ideal[4];//Energy loss
   		Bool_t hit[4];//hits CsI
   		Int_t Seg[4];
  	public:

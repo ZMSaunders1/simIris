@@ -19,6 +19,7 @@ class S3Hit : public TObject{
   		Double_t fPhiCalc[4];//Hitd phi (using Seg)
   		Double_t fThetaCalc[4];//Hitd theta (using YdRing)
   		Double_t dE[4];//Energy loss
+  		Double_t dE_ideal[4];//Energy loss
   		Bool_t hit[4];//hits S3
   		Int_t Seg[4];
   		Int_t Ring[4];
