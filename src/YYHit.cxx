@@ -5,15 +5,15 @@
 
 YYHit::YYHit()
 {
-	Thickness[0] = 112. * 2.3212 * 0.1; 
-	Thickness[1] = 109. * 2.3212 * 0.1; 
-	Thickness[2] = 110. * 2.3212 * 0.1; 
-	Thickness[3] = 106. * 2.3212 * 0.1; 
-	Thickness[4] = 101. * 2.3212 * 0.1; 
-	Thickness[5] = 109. * 2.3212 * 0.1; 
-	Thickness[6] = 111. * 2.3212 * 0.1; 
-	Thickness[7] = 103. * 2.3212 * 0.1; 
-	Avg_Thickness = 107.6 * 2.3212 * 0.1; 
+	Thickness[0] = 104.65 * 2.3212 * 0.1; 
+	Thickness[1] = 101.15 * 2.3212 * 0.1; 
+	Thickness[2] = 106.13 * 2.3212 * 0.1; 
+	Thickness[3] = 101.75 * 2.3212 * 0.1; 
+	Thickness[4] = 100.05 * 2.3212 * 0.1; 
+	Thickness[5] = 105.65 * 2.3212 * 0.1; 
+	Thickness[6] = 102.48 * 2.3212 * 0.1; 
+	Thickness[7] = 105.84 * 2.3212 * 0.1; 
+	Avg_Thickness = 103.46 * 2.3212 * 0.1; 
 	mul = 0;
 	for(UInt_t i=0; i<4; i++){
 		fX[i] = sqrt(-1);
