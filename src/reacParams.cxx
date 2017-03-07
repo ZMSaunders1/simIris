@@ -1,13 +1,13 @@
-#include "params.h"
+#include "reacParams.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-params::params(){
-  //params::Class()->IgnoreTObjectStreamer;
-  params::Clear();
+reacParams::reacParams(){
+  //reacParams::Class()->IgnoreTObjectStreamer;
+  reacParams::Clear();
 }
 
-void params::ReadParams(char* line)
+void reacParams::ReadParams(char* line)
 {
 	bool expect_val=true;
 	char *from=line;
@@ -72,34 +72,19 @@ void params::ReadParams(char* line)
 	if (strcmp(line,"E")==0){
 	   E=fval;
 	}
-	if (strcmp(line,"Bs")==0){
-	   Bs=fval;
-	}
-	if (strcmp(line,"Tt")==0){
-	   Tt=fval;
-	}
-	if (strcmp(line,"DYY")==0){
-	   DYY=fval;
-	}
-	if (strcmp(line,"DS3")==0){
-	   DS3=fval;
-	}
-
-
-
 }
 
-void params::Load(std::string filename){	
+void reacParams::Load(std::string filename){	
 
 	char line[256];
 	FILE* file=fopen(filename.data(),"rb");
 	if (!file)
 	{
-		printf("Cannot open params file '%s' for reading. Stop.\n",filename.data());
+		printf("Cannot open reacParams file '%s' for reading. Stop.\n",filename.data());
 		exit(0);
 	}
 	
-	printf("Reading params file '%s'\n",filename.data());
+	printf("Reading reacParams file '%s'\n",filename.data());
 	
 	while (!feof(file))
 	{
@@ -121,30 +106,25 @@ void params::Load(std::string filename){
 	file=NULL;
 }
 
-void params::Print(){
+void reacParams::Print(){
 	printf("\n********************************\n");
 	switch(N){
 		case 2:
-			printf("%s(%s,%s)%s(%.1lf) @ %.1lf MeV, %.1lf mu, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,E,Tt,W);
+			printf("%s(%s,%s)%s(%.1lf) @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,E,W);
 			break;
 		case 3:
-			printf("%s(%s,%s)%s(%.1lf)+%s @ %.1lf MeV, %.1lf mu, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),E,Tt,W);
+			printf("%s(%s,%s)%s(%.1lf)+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),E,W);
 			break;
 		case 4:
-			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, %.1lf mu, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,Tt,W);
+			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,W);
 			break;
 		default:
-			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, %.1lf mu, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,Tt,W);
+			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,W);
 			break;
 	}
-	printf("********************************\n\n");
-	printf("Size of beamspot: %.1lf mm\n",Bs);
-	printf("Distance target-YY: %.1lf mm\n",DYY);
-	printf("Distance target-S3: %.1lf mm\n",DS3);
-	printf("********************************\n\n");
 }
 
-void params::Clear(){
+void reacParams::Clear(){
 
 	A.clear(); 
 	a.clear();
@@ -156,11 +136,6 @@ void params::Clear(){
 	E=0.;
 	R=0.;
 	W=0.;
-	Tt= 0.; 
-	Bs=0.; 
-	
-	DYY=0.; 
-	DS3=0.; 
 
 	N=0;
 

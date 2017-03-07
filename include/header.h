@@ -1,4 +1,5 @@
-#include "params.h"
+#include "reacParams.h"
+#include "geoParams.h"
 #include "nucleus.h"
 #include "shieldClear.h"
 #include "eloss.h"
@@ -11,8 +12,8 @@
 
 using namespace TMath;
 
-extern params prm;
-extern params prm_inp;
+extern reacParams reacPrm;
+extern geoParams geoPrm;
 extern YYHit yd;
 extern CsIHit csi;
 extern S3Hit sd1;

@@ -14,7 +14,8 @@
 #include "header.h"
 #include "detHits.h"
 
-params prm, prm_inp;
+reacParams reacPrm;
+geoParams geoPrm;
 YYHit yd;
 CsIHit csi;
 S3Hit sd1(0,60.), sd2(1,1000.);
@@ -58,11 +59,13 @@ void clearEvt()
 
 int main(int argc, char *argv[])
 {
-	Bool_t load_params_from_file=kFALSE;
+	Bool_t have_reaction=kFALSE;
+	Bool_t have_geometry=kFALSE;
 	Bool_t have_dwba_xsec=kFALSE;
 	char *endptr;
-	Int_t nsim = 1E6;
-	char *paramsname =NULL;
+	Int_t nsim = 1E3;
+	char *reacParamsname =NULL;
+	char *geoParamsname =NULL;
 	char *dedxpath =NULL;
 	char *outputname =NULL;
 	char *dwbaname =NULL;
@@ -79,9 +82,13 @@ int main(int argc, char *argv[])
 			else if(strncmp(argv[i],"--dedx_dir=",11)==0){
 				dedxpath = argv[i]+11;
 			}
-			else if(strncmp(argv[i],"--params=",9)==0){
-				load_params_from_file=kTRUE;
-				paramsname = argv[i]+9;
+			else if(strncmp(argv[i],"--reaction=",11)==0){
+				have_reaction=kTRUE;
+				reacParamsname = argv[i]+9;
+			}
+			else if(strncmp(argv[i],"--geo=",6)==0){
+				have_geometry=kTRUE;
+				geoParamsname = argv[i]+9;
 			}
 			else if(strncmp(argv[i],"--dwba=",7)==0){
 				have_dwba_xsec=kTRUE;
@@ -90,48 +97,6 @@ int main(int argc, char *argv[])
 			else if(strncmp(argv[i],"--events=",9)==0){
 	  			nsim = strtol(argv[i]+9,&endptr,10);//converting string to number
 			}
-			else if(strncmp(argv[i],"--N=",4)==0){
-	  			prm_inp.N = strtol(argv[i]+4,&endptr,10);//converting string to number
-			}
-			else if(strncmp(argv[i],"--A=",4)==0){
-	  			prm_inp.A = argv[i]+4;
-			}
-			else if(strncmp(argv[i],"--a=",4)==0){
-	  			prm_inp.a = argv[i]+4;
-			}
-			else if(strncmp(argv[i],"--b=",4)==0){
-	  			prm_inp.b = argv[i]+4;
-			}
-			else if(strncmp(argv[i],"--c=",4)==0){
-	  			prm_inp.c = argv[i]+4;
-			}
-			else if(strncmp(argv[i],"--d=",4)==0){
-	  			prm_inp.d = argv[i]+4;
-			}
-			else if(strncmp(argv[i],"--B=",4)==0){
-	  			prm_inp.B = argv[i]+4;
-			}
-			else if(strncmp(argv[i],"--E=",4)==0){
-	  			prm_inp.E  = strtod(argv[i]+4,&endptr);//converting string to number
-			}
-			else if(strncmp(argv[i],"--R=",4)==0){
-	  			prm_inp.R = strtod(argv[i]+4,&endptr);//converting string to number
-			}
-			else if(strncmp(argv[i],"--W=",4)==0){
-	  			prm_inp.W = strtod(argv[i]+4,&endptr);//converting string to number
-			}
-			else if(strncmp(argv[i],"--Tt=",5)==0){
-	  			prm_inp.Tt = strtod(argv[i]+5,&endptr);//converting string to number
-			}
-			else if(strncmp(argv[i],"--Bs=",5)==0){
-	  			prm_inp.Bs = strtod(argv[i]+5,&endptr);//converting string to number
-			}
-			else if(strncmp(argv[i],"--DYY=",6)==0){
-	  			prm_inp.DYY = strtod(argv[i]+6,&endptr);//converting string to number
-			}
-			else if(strncmp(argv[i],"--DS3=",6)==0){
-	  			prm_inp.DS3 = strtod(argv[i]+6,&endptr);//converting string to number
-			}
 			else if(strncmp(argv[i],"--AgReac",9)==0){
 				isAgReac=kTRUE;
 			}
@@ -139,44 +104,18 @@ int main(int argc, char *argv[])
 	}
 	TStopwatch timer;
 	timer.Start();
-	
-	if(load_params_from_file==kTRUE){
-		printf("Loading parameters from file %s.\n",paramsname);
-		prm.Load(paramsname);
+		
+	if(have_reaction==kTRUE){
+		printf("Loading parameters from file %s.\n",reacParamsname);
+		reacPrm.Load(reacParamsname);
+	}
+	reacPrm.Print();
 
-		if(!prm_inp.A.empty()) prm.A=prm_inp.A; 
-		if(!prm_inp.a.empty()) prm.a=prm_inp.a;
-		if(!prm_inp.B.empty()) prm.B=prm_inp.B;
-		if(!prm_inp.b.empty()) prm.b=prm_inp.b;
-		if(!prm_inp.c.empty()) prm.c=prm_inp.c;
-		if(!prm_inp.d.empty()) prm.d=prm_inp.d;
-		if(prm_inp.E>0.) prm.E=prm_inp.E;
-		if(prm_inp.R>0.) prm.R=prm_inp.R;
-		if(prm_inp.W>0.) prm.W=prm_inp.W;
-		if(prm_inp.Tt>0.) prm.Tt=prm_inp.Tt; 
-		if(prm_inp.Bs>0.) prm.Bs=prm_inp.Bs; 
-		if(prm_inp.DYY>0.) prm.DYY=prm_inp.DYY; 
-		if(prm_inp.DS3>0.) prm.DS3=prm_inp.DS3; 
-		if(prm_inp.N>0) prm.N=prm_inp.N;
+	if(have_geometry==kTRUE){
+		printf("Loading parameters from file %s.\n",geoParamsname);
+		geoPrm.Load(geoParamsname);
 	}
-	else{
-		prm.A=prm_inp.A; 
-		prm.a=prm_inp.a;
-		prm.B=prm_inp.B;
-		prm.b=prm_inp.b;
-		prm.c=prm_inp.c;
-		prm.d=prm_inp.d;
-		prm.E=prm_inp.E;
-		prm.R=prm_inp.R;
-		prm.W=prm_inp.W;
-		prm.Tt=prm_inp.Tt; 
-		prm.Bs=prm_inp.Bs; 
-		prm.DYY=prm_inp.DYY; 
-		prm.DS3=prm_inp.DS3; 
-		prm.N=prm_inp.N;
-	}
-	prm_inp.Print();
-	prm.Print();
+	geoPrm.Print();
 
 	TRandom3 *rndm = new TRandom3(0);
 	Int_t Evnt=0; 
@@ -199,16 +138,16 @@ int main(int argc, char *argv[])
 	nucleus A, a, B, b, c, d, decB,decc,decd;
 	Double_t reacX, reacY, reacZ;
 
-	A.getInfo(binpath, prm.A);
-	a.getInfo(binpath, prm.a);
-	B.getInfo(binpath, prm.B);
-	b.getInfo(binpath, prm.b);
-	c.getInfo(binpath, prm.c);
-	d.getInfo(binpath, prm.d);
+	A.getInfo(binpath, reacPrm.A);
+	a.getInfo(binpath, reacPrm.a);
+	B.getInfo(binpath, reacPrm.B);
+	b.getInfo(binpath, reacPrm.b);
+	c.getInfo(binpath, reacPrm.c);
+	d.getInfo(binpath, reacPrm.d);
 
 	mA = A.mass/1000.;	
 	ma = a.mass/1000.;	
-	mB = B.mass/1000.+prm.R/1000.;	
+	mB = B.mass/1000.+reacPrm.R/1000.;	
 	mBR = mB;	
 	mb = b.mass/1000.;	
 	mc = c.mass/1000.;
@@ -238,9 +177,9 @@ int main(int argc, char *argv[])
 		S_low=B.S2p;
 		pick=4;
 	}
-	printf("\nResonance Energy: %.2lf\tlowest threshold: %.2lf\n",prm.R,S_low);
+	printf("\nResonance Energy: %.2lf\tlowest threshold: %.2lf\n",reacPrm.R,S_low);
 
-	if(S_low<prm.R){
+	if(S_low<reacPrm.R){
 		switch(pick){
 			case 1 : 
 				seqdec = kTRUE;
@@ -330,9 +269,9 @@ int main(int argc, char *argv[])
 	if(!seqdec) B.EL.loadOutgoingELoss(dedxstr,B.name.data(),B.mass);
 	else decB.EL.loadOutgoingELoss(dedxstr,decB.name.data(),decB.mass);
 
-	Double_t targetTh=prm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
-	Double_t BeamSpot=prm.Bs/2.355; // FWHM->sigma 
-	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr // 10 Torr!
+	Double_t targetTh=geoPrm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
+	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
+	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr 
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	//const Double_t AgFoil=5.44*10.473*0.1; //mu*g/cm^3*0.1
@@ -357,7 +296,7 @@ int main(int argc, char *argv[])
 	Bool_t allowed;
 
 	// Calculate energy loss up to center of the target
-	Double_t EA = prm.E;	
+	Double_t EA = reacPrm.E;	
    	EA -= eloss(A,0.5,EA,ICWindow1,A.EL.eSi3N4, A.EL.dedxSi3N4);
    	ICdE = eloss(A,0.586,EA,ICLength,A.EL.eC4H10, A.EL.dedxC4H10);
    	EA -= ICdE;
@@ -403,10 +342,10 @@ int main(int argc, char *argv[])
 		printf("\nCM Energy at center of target: %.2lf MeV\n\n", beamEcm);
 	}
 
-	printf("YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DYY,yd.ThetaMin(prm.DYY),yd.ThetaMax(prm.DYY)); 
-	printf("CsI detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DYY+11.6,csi.ThetaMin(prm.DYY+11.6),csi.ThetaMax(prm.DYY+11.6)); 
-	printf("First S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3,sd1.ThetaMin(prm.DS3),sd1.ThetaMax(prm.DS3)); 
-	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",prm.DS3+14.8,sd2.ThetaMin(prm.DS3+14.8),sd2.ThetaMax(prm.DS3+14.8)); 
+	printf("YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYY,yd.ThetaMin(geoPrm.DYY),yd.ThetaMax(geoPrm.DYY)); 
+	printf("CsI detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYY+11.6,csi.ThetaMin(geoPrm.DYY+11.6),csi.ThetaMax(geoPrm.DYY+11.6)); 
+	printf("First S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3,sd1.ThetaMin(geoPrm.DS3),sd1.ThetaMax(geoPrm.DS3)); 
+	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3+14.8,sd2.ThetaMin(geoPrm.DS3+14.8),sd2.ThetaMax(geoPrm.DS3+14.8)); 
 	Double_t masses[4] = { mb, mB, mc, md};
 	
 	Double_t tht=0.; 
@@ -421,7 +360,7 @@ int main(int argc, char *argv[])
 		xsec_max = load_dwba(dwbaname,dwba_th,dwba_xsec); 
 	}
 	
-	allowed = PS0.SetDecay(Sys, prm.N, masses);
+	allowed = PS0.SetDecay(Sys, reacPrm.N, masses);
 	
 	if(!allowed){
 		printf("Impossible decay!\n");
@@ -434,7 +373,7 @@ int main(int argc, char *argv[])
 
 	wght_max=PS0.GetWtMax();
 	printf("%lf\t%lf\n",wght_max,xsec_max);
-	width = prm.W/1000.;
+	width = reacPrm.W/1000.;
 	printf("%lf\t%lf\n",mB,width);
 
 	Int_t whilecount;
@@ -464,13 +403,13 @@ int main(int argc, char *argv[])
 		beamEcm = EA*ma*1000./(mA+ma);
 
 		wght_max=PS0.GetWtMax();
-		//width = prm.W/1000.;
+		//width = reacPrm.W/1000.;
 
 		wght = 0.;
 		clearEvt();
 		mBR = rndm->BreitWigner(mB,width);
 		masses[1] =mBR;
-		PS0.SetDecay(Sys, prm.N, masses); //recalculate with resonance energy
+		PS0.SetDecay(Sys, reacPrm.N, masses); //recalculate with resonance energy
 	
 		TLorentzVector *LTmp;
 		whilecount=0;
@@ -545,7 +484,7 @@ int main(int argc, char *argv[])
 				declP2.Pdeg=RadToDeg()*declP2.P;
 			}
 		}
-		else if(prm.N>3) // 4body
+		else if(reacPrm.N>3) // 4body
 		{
 			LVcdec = PS0.GetDecay(2);
 			LVddec = PS0.GetDecay(3);
@@ -563,7 +502,7 @@ int main(int argc, char *argv[])
 			declP1.Pdeg=RadToDeg()*declP1.P;
 			declP2.Pdeg=RadToDeg()*declP2.P;
 		}
-		else if(prm.N>2) // 3body
+		else if(reacPrm.N>2) // 3body
 		{
 			LVcdec = PS0.GetDecay(2);
 		
@@ -660,7 +599,7 @@ int main(int argc, char *argv[])
 		lP.Tcm = RadToDeg()*(Pi()-LVb->Theta());
 		hP.Tcm = RadToDeg()*LVB->Theta();
 		
-		if(prm.N>3) // 4body
+		if(reacPrm.N>3) // 4body
 		{
 			declP1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
 			declP2.Ecm = (LVddec->E()-md)*ma*1000./(mA+ma);
@@ -669,7 +608,7 @@ int main(int argc, char *argv[])
 			declP1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
 			declP2.Tcm = RadToDeg()*LVddec->Theta();
 		}
-		else if(prm.N>2) // 4body
+		else if(reacPrm.N>2) // 4body
 		{
 			declP1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
