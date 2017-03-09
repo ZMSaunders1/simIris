@@ -18,7 +18,7 @@ reacParams reacPrm;
 geoParams geoPrm;
 YYHit yd;
 CsIHit csi;
-S3Hit sd1(0,60.), sd2(1,1000.);
+S3Hit sd1, sd2;
 PTrack hP, lP;
 PTrack decHP, declP1, declP2;
 IDet det;
@@ -84,11 +84,11 @@ int main(int argc, char *argv[])
 			}
 			else if(strncmp(argv[i],"--reaction=",11)==0){
 				have_reaction=kTRUE;
-				reacParamsname = argv[i]+9;
+				reacParamsname = argv[i]+11;
 			}
 			else if(strncmp(argv[i],"--geo=",6)==0){
 				have_geometry=kTRUE;
-				geoParamsname = argv[i]+9;
+				geoParamsname = argv[i]+6;
 			}
 			else if(strncmp(argv[i],"--dwba=",7)==0){
 				have_dwba_xsec=kTRUE;
@@ -96,9 +96,6 @@ int main(int argc, char *argv[])
 			}
 			else if(strncmp(argv[i],"--events=",9)==0){
 	  			nsim = strtol(argv[i]+9,&endptr,10);//converting string to number
-			}
-			else if(strncmp(argv[i],"--AgReac",9)==0){
-				isAgReac=kTRUE;
 			}
 		}
 	}
@@ -110,7 +107,9 @@ int main(int argc, char *argv[])
 		reacPrm.Load(reacParamsname);
 	}
 	reacPrm.Print();
-
+	
+	if(reacPrm.a.compare("107Ag")==0) isAgReac=kTRUE;
+	
 	if(have_geometry==kTRUE){
 		printf("Loading parameters from file %s.\n",geoParamsname);
 		geoPrm.Load(geoParamsname);
@@ -269,24 +268,28 @@ int main(int argc, char *argv[])
 	if(!seqdec) B.EL.loadOutgoingELoss(dedxstr,B.name.data(),B.mass);
 	else decB.EL.loadOutgoingELoss(dedxstr,decB.name.data(),decB.mass);
 
-	Double_t targetTh=geoPrm.Tt*0.0867*0.1; //mu*g/cm^3*0.1
+	Double_t AgFoil=geoPrm.TAg*10.473*0.1; //mu*g/cm^3*0.1
+	Double_t targetTh=geoPrm.TTgt*0.0867*0.1; //mu*g/cm^3*0.1
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
 	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr 
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	//const Double_t AgFoil=5.44*10.473*0.1; //mu*g/cm^3*0.1
-	const Double_t AgFoil=4.57*10.473*0.1; //mu*g/cm^3*0.1
+
+	yd.Init(geoPrm.TYY);
+	sd1.Init(0,geoPrm.TS3[0]);
+	sd2.Init(1,geoPrm.TS3[1]);
 
 	Bool_t LEHit, HEHit;
 
 	Int_t LEHitcntr=0;
 
 	Double_t LEeff;
-	Double_t E_before_Tgt;
-	Double_t E_center_Tgt;
-	Double_t E_after_Tgt;
-	Double_t E_before_Ag;
-	Double_t E_center_Ag;
+	Double_t E_before_Tgt=0.;
+	Double_t E_center_Tgt=0.;
+	Double_t E_after_Tgt=0.;
+	Double_t E_before_Ag=0.;
+	Double_t E_center_Ag=0.;
 
 	TLorentzVector target, beam, Sys;
 	TVector3 boostvect;
@@ -563,10 +566,10 @@ int main(int argc, char *argv[])
 		Double_t E_before_SSB;
 		if(isAgReac){
 			E_before_SSB = E_before_Tgt - eloss(A,1.,E_before_Tgt,targetTh,A.EL.eH,A.EL.dedxH);
-			SSBdE = eloss(A,14./28.,E_before_SSB,1000.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
+			SSBdE = eloss(A,14./28.,E_before_SSB,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
 		}
 		else{ 
-			SSBdE = eloss(A,14./28.,E_before_SSB,1000.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
+			SSBdE = eloss(A,14./28.,E_before_SSB,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
 		}
 		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
 		

@@ -46,18 +46,48 @@ void geoParams::ReadParams(char* line)
 	if (strcmp(line,"Bs")==0){
 	   Bs=fval;
 	}
-	if (strcmp(line,"Tt")==0){
-	   Tt=fval;
+	if (strcmp(line,"TAg")==0){
+	   TAg=fval;
+	}
+	if (strcmp(line,"TTgt")==0){
+	   TTgt=fval;
 	}
 	if (strcmp(line,"DYY")==0){
 	   DYY=fval;
 	}
+	if (strcmp(line,"TYY1")==0){
+	   TYY[0]=fval;
+	}
+	if (strcmp(line,"TYY2")==0){
+	   TYY[1]=fval;
+	}
+	if (strcmp(line,"TYY3")==0){
+	   TYY[2]=fval;
+	}
+	if (strcmp(line,"TYY4")==0){
+	   TYY[3]=fval;
+	}
+	if (strcmp(line,"TYY5")==0){
+	   TYY[4]=fval;
+	}
+	if (strcmp(line,"TYY6")==0){
+	   TYY[5]=fval;
+	}
+	if (strcmp(line,"TYY7")==0){
+	   TYY[6]=fval;
+	}
+	if (strcmp(line,"TYY8")==0){
+	   TYY[7]=fval;
+	}
 	if (strcmp(line,"DS3")==0){
 	   DS3=fval;
 	}
-
-
-
+	if (strcmp(line,"TS31")==0){
+	   TS3[0]=fval;
+	}
+	if (strcmp(line,"TS32")==0){
+	   TS3[1]=fval;
+	}
 }
 
 void geoParams::Load(std::string filename){	
@@ -95,10 +125,14 @@ void geoParams::Load(std::string filename){
 void geoParams::Print(){
 
 	printf("********************************\n\n");
-	printf("Target thickness: %.1lf mm\n",Tt);
+	printf("Ag-Foil thickness: %.2lf um\n",TAg);
+	printf("Target thickness: %.1lf um\n",TTgt);
 	printf("Size of beamspot: %.1lf mm\n",Bs);
 	printf("Distance target-YY: %.1lf mm\n",DYY);
+	printf("Thickness YY1: %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\n",TYY[0],TYY[1],TYY[2],TYY[3],TYY[4],TYY[5],TYY[6],TYY[7]);
 	printf("Distance target-S3: %.1lf mm\n",DS3);
+	printf("Thickness 1st S3: %.1lf um\n",TS3[0]);
+	printf("Thickness 2nd S3: %.1lf um\n",TS3[1]);
 	printf("********************************\n\n");
 }
 

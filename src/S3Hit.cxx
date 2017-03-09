@@ -21,7 +21,7 @@ S3Hit::S3Hit()
 	}
 }
 
-S3Hit::S3Hit(Bool_t o, Double_t th)
+void S3Hit::Init(Bool_t o, Double_t th)
 {
 	Orientation = o; // 0 = rings first, 1 = sectors first
 	Thickness = th*2.3212*0.1; //um*g/cm^3*0.1

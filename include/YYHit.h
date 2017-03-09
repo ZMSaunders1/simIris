@@ -26,10 +26,10 @@ class YYHit : public TObject{
   		Int_t Ring[4];
  	public:
   		YYHit();//! Create
-  		YYHit(Double_t, Double_t, Double_t, Double_t, Double_t, Double_t, Double_t, Double_t);//! Create
   		virtual ~YYHit() {} //!
 
   		//YYHit(const YYHit &);                          // The copy constructor.
+  		void Init(Double_t[8]);//! Create
   		Double_t ThetaMin(Double_t);  //!
   		Double_t ThetaMax(Double_t);  //!
   		Bool_t Hit(Double_t, Double_t, Double_t, TVector3);  //!

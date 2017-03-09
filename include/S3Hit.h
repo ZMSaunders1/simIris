@@ -25,10 +25,10 @@ class S3Hit : public TObject{
   		Int_t Ring[4];
  	public:
   		S3Hit();//! Create
-  		S3Hit(Bool_t, Double_t);//! Create
   		virtual ~S3Hit() {} //!
 
   		//S3Hit(const S3Hit &);                          // The copy constructor.
+  		void Init(Bool_t, Double_t);//! Create
    		Double_t ThetaMin(Double_t);  //!
   		Double_t ThetaMax(Double_t);  //!
   		Bool_t Hit(Double_t, Double_t, Double_t, TVector3);  //!

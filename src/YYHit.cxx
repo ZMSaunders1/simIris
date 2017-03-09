@@ -29,17 +29,17 @@ YYHit::YYHit()
 	}
 }
 
-YYHit::YYHit(Double_t th0, Double_t th1, Double_t th2, Double_t th3, Double_t th4, Double_t th5, Double_t th6, Double_t th7)
+void YYHit::Init(Double_t th[8])
 {
-	Thickness[0] = th0 * 2.3212 * 0.1; 
-	Thickness[1] = th1 * 2.3212 * 0.1; 
-	Thickness[2] = th2 * 2.3212 * 0.1; 
-	Thickness[3] = th3 * 2.3212 * 0.1; 
-	Thickness[4] = th4 * 2.3212 * 0.1; 
-	Thickness[5] = th5 * 2.3212 * 0.1; 
-	Thickness[6] = th6 * 2.3212 * 0.1; 
-	Thickness[7] = th7 * 2.3212 * 0.1; 
-	Avg_Thickness = (th0+th1+th2+th3+th4+th5+th6+th7)/8. * 2.3212 * 0.1; 
+	Thickness[0] = th[0] * 2.3212 * 0.1; 
+	Thickness[1] = th[1] * 2.3212 * 0.1; 
+	Thickness[2] = th[2] * 2.3212 * 0.1; 
+	Thickness[3] = th[3] * 2.3212 * 0.1; 
+	Thickness[4] = th[4] * 2.3212 * 0.1; 
+	Thickness[5] = th[5] * 2.3212 * 0.1; 
+	Thickness[6] = th[6] * 2.3212 * 0.1; 
+	Thickness[7] = th[7] * 2.3212 * 0.1; 
+	Avg_Thickness = (th[0]+th[1]+th[2]+th[3]+th[4]+th[5]+th[6]+th[7])/8. * 2.3212 * 0.1; 
 	mul = 0;
 	for(UInt_t i=0; i<4; i++){
 		fX[i] = sqrt(-1);
