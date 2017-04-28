@@ -140,5 +140,9 @@ void geoParams::Clear(){
 
 	DYY=0.; 
 	DS3=0.; 
-
+	Bs=0.; 
+	TAg=0.; 
+	TTgt=0.; 
+	for(Int_t i=0; i<8; i++) { TYY[i] = 0.; }
+	for(Int_t i=0; i<2; i++) { TS3[i] = 0.; }
 }

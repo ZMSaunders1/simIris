@@ -49,6 +49,8 @@ void dedx::loadIncomingELoss(std::string path, std::string name, Double_t mass)
 
 void dedx::loadOutgoingELoss(std::string path, std::string name, Double_t mass)
 {
+	printf("Loading %s/lise_%s_in_Ag.txt\n",path.data(),name.data());	
+	loadELoss(Form("%s/lise_%s_in_Ag.txt",path.data(),name.data()),eAg,dedxAg,mass/1000.);	
 	printf("Loading %s/lise_%s_in_Al.txt\n",path.data(),name.data());
 	loadELoss(Form("%s/lise_%s_in_Al.txt",path.data(),name.data()),eAl,dedxAl,mass/1000.);
 	printf("Loading %s/lise_%s_in_B.txt\n",path.data(),name.data());

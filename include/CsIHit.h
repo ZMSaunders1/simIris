@@ -13,14 +13,15 @@ class CsIHit : public TObject{
 	public:
 		Double_t Thickness;
   		Int_t mul;
-  		Double_t fX[4];
-  		Double_t fY[4];
-  		Double_t fZ[4];//should be equal to distance to CsI
-  		Double_t fPhiCalc[4];//Hitd phi (using Seg)
-  		Double_t dE[4];//Energy loss
-  		Double_t dE_ideal[4];//Energy loss
-  		Bool_t hit[4];//hits CsI
-  		Int_t Seg[4];
+  		std::vector<Double_t> fX;
+  		std::vector<Double_t> fY;
+  		std::vector<Double_t> fZ;//should be equal to distance to CsI
+  		std::vector<Double_t> fPhiCalc;//Hitd phi (using Seg)
+  		std::vector<Double_t> fPhiRand;//Hitd phi (using Seg)
+  		std::vector<Double_t> dE;//Energy loss
+  		std::vector<Double_t> dE_ideal;//Energy loss
+  		//std::vector<Bool_t> hit;//hits CsI
+  		std::vector<Int_t> Seg;
  	public:
   		CsIHit();//! Create
   		CsIHit(Double_t);//! Create
@@ -31,6 +32,7 @@ class CsIHit : public TObject{
   		Double_t ThetaMax(Double_t);  //!
   		Bool_t Hit(Double_t, Double_t, Double_t, TVector3);  //!
 		Double_t ELoss(nucleus, Double_t, Double_t);
+		void SortByEnergy();
   		void Clear();  //!
 	protected:
 

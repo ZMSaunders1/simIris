@@ -21,10 +21,14 @@ void IDet::Clear()
 	TCsI2Mul=0;
   	TCsI1Energy.clear();
   	TCsI2Energy.clear();
+  	//TCsIEnergy.clear();
   	TCsI1ADC.clear();
   	TCsI2ADC.clear();
+//	TCsIChannel.clear();
 	TCsI1Channel.clear();
 	TCsI2Channel.clear();
+	TCsI1Phi.clear();
+	TCsI2Phi.clear();
 
   	TYdCsI1ETot=0;
   	TYdCsI2ETot=0;
@@ -52,7 +56,15 @@ void IDet::Clear()
   	TSd2sEnergy.clear();
 	TSd2sChannel.clear();
   	TSd2sADC.clear();
-  	TSdTheta.clear();
-  	TSdPhi.clear();
+  	TSd1Theta.clear();
+  	TSd2Theta.clear();
+  	TSd1Phi.clear();
+  	TSd2Phi.clear();
+//	TQv1=0; // Q-value  
+//	TQv2=0; // Q-value
+// 	QValue1=sqrt(-1.);//Not a number (nan) AS
+// 	QValue2=sqrt(-1.);//                                                                                
+// 	QValue=sqrt(-1.);//                                                                                
+// 	TBE=0; //Beam energy                                                                             
 }
 

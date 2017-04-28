@@ -48,10 +48,11 @@ void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 	}
 
 	const Double_t Amu=931.494061;
-	char buffer[124];
+	char buffer[124] = "";
 	std::string cN,cZ,cA,cEl,cME,cAM;
 	
-	Double_t ME,AM;
+	Double_t ME=0.;
+	Double_t AM=0.;
 	Double_t mass1=0.;
 	Double_t mass2=0.;
 	
@@ -74,7 +75,7 @@ void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 		cA.erase( std::remove_if( cA.begin(), cA.end(), ::isspace ), cA.end() );
 		cEl.assign(buffer+20,buffer+22);
 		cEl.erase( std::remove_if( cEl.begin(), cEl.end(), ::isspace ), cEl.end() );
-		cME.assign(buffer+30,buffer+41);
+		cME.assign(buffer+29,buffer+41);
 		cME.erase( std::remove_if( cME.begin(), cME.end(), ::isspace ), cME.end() );
 		cAM.assign(buffer+96,buffer+112);
 		cAM.erase( std::remove_if( cAM.begin(), cAM.end(), ::isspace ), cAM.end() );
@@ -88,7 +89,7 @@ void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 		if(A==inputA&&cEl==inpEl) {
 			mass=mass1;
 			name=cA+cEl;
-			printf("\tN=%d\tZ=%d\tA=%d\t%s\t%.3lf\t%.3lf\n",N,Z,A,cEl.data(),mass1,mass2);
+			printf("\tN=%d\tZ=%d\tA=%d\t%s\t%.3lf\t%.3lf\t%.3f\n",N,Z,A,cEl.data(),mass1,mass2,ME/1000.);
 			break;
 		}
 	}
@@ -224,8 +225,8 @@ void nucleus::getInfo(std::string binpath, Int_t inputN, Int_t inputZ)
 
 void nucleus::getInfo(std::string binpath, std::string input)
 {
-	char inputEl[2];
-	Int_t inputA;
+	char inputEl[2] = "";
+	Int_t inputA = 0;
 
 	if(input=="p") input="1H";
 	else if(input=="d") input="2H";

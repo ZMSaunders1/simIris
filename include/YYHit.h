@@ -13,17 +13,17 @@ class YYHit : public TObject{
 		Double_t Thickness[8]; // in um
 		Double_t Avg_Thickness; // in um
   		Int_t mul;
-  		Double_t fX[4];
-  		Double_t fY[4];
-  		Double_t fZ[4];//should be equal to distance to YY1
-  		Double_t fPhiCalc[4];//Hitd phi (using Seg)
-  		Double_t fThetaCalc[4];//Hitd theta (using YdRing)
-  		Double_t fThetaRand[4];//Hitd theta (using YdRing)
-  		Double_t dE[4];//Energy loss
-  		Double_t dE_ideal[4];//Energy loss
-  		Bool_t hit[4];//hits YY1
-  		Int_t Seg[4];
-  		Int_t Ring[4];
+  		std::vector<Double_t> fX;
+  		std::vector<Double_t> fY;
+  		std::vector<Double_t> fZ;//should be equal to distance to YY1
+  		std::vector<Double_t> fPhiCalc;//Hitd phi (using Seg)
+  		std::vector<Double_t> fThetaCalc;//Hitd theta (using YdRing)
+  		std::vector<Double_t> fThetaRand;//Hitd theta (using YdRing)
+  		std::vector<Double_t> dE;//Energy loss
+  		std::vector<Double_t> dE_ideal;//Energy loss
+  		//std::vector<Bool_t> hit;//hits YY1
+  		std::vector<Int_t> Seg;
+  		std::vector<Int_t> Ring;
  	public:
   		YYHit();//! Create
   		virtual ~YYHit() {} //!
@@ -34,6 +34,7 @@ class YYHit : public TObject{
   		Double_t ThetaMax(Double_t);  //!
   		Bool_t Hit(Double_t, Double_t, Double_t, TVector3);  //!
 		Double_t ELoss(nucleus, Double_t, Double_t);
+		void SortByEnergy();
   		void Clear();  //!
 	protected:
 
