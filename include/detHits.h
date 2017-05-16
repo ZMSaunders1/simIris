@@ -1,9 +1,9 @@
 #include "header.h"
 
-Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos)
+Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t shieldIn)
 {
-	Bool_t mask = maskClear(tr.T,tr.P);
-	Bool_t shield = shieldClear(tr.T,tr.P);
+	Bool_t mask = maskClear(tr.T,tr.P) || !maskIn;
+	Bool_t shield = shieldClear(tr.T,tr.P) || !shieldIn;
 	Bool_t YYHit = 0;
 	Bool_t CsIHit = 0;
 	Bool_t Sd1Hit = 0;

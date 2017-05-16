@@ -72,6 +72,9 @@ void reacParams::ReadParams(char* line)
 	if (strcmp(line,"E")==0){
 	   E=fval;
 	}
+	if (strcmp(line,"SHT")==0){
+	   SHT=(fval==1.);
+	}
 }
 
 void reacParams::Load(std::string filename){	
@@ -122,6 +125,8 @@ void reacParams::Print(){
 			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,W);
 			break;
 	}
+	if(SHT) printf("Reaction in solid Hydrogen/Deuterium Target.");
+	else printf("Reaction in foil.");
 }
 
 void reacParams::Clear(){

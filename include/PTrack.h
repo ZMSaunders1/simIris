@@ -7,7 +7,7 @@
 
 class PTrack : public TObject{
  	public:
-		nucleus nuc;
+		//nucleus nuc;
   		Double_t E; 	// Energy
   		Double_t Ecm; 	// Energy in center-of-mass system
   		Double_t T; 	// Theta

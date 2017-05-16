@@ -19,8 +19,8 @@ geoParams geoPrm;
 YYHit yd;
 CsIHit csi;
 S3Hit sd1, sd2;
-PTrack hP, lP;
-PTrack hPdec, lPdec1, lPdec2;
+PTrack blP, tlP;
+PTrack blPdec, tlPdec1, tlPdec2;
 IDet det;
 
 TGenPhaseSpace PS0, PS1;
@@ -55,11 +55,11 @@ void clearEvt()
 	Qgen=sqrt(-1.); Qdet=sqrt(-1.);
 	EB_det=sqrt(-1.); PB_det=sqrt(-1.);
 	mBR=0.;
-	lP.Clear();
-	hP.Clear();
-	hPdec.Clear();
-	lPdec1.Clear();
-	lPdec2.Clear();
+	tlP.Clear();
+	blP.Clear();
+	blPdec.Clear();
+	tlPdec1.Clear();
+	tlPdec2.Clear();
 	SSBdE=0.;
 	yd.Clear();
 	csi.Clear();
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 	char *dedxpath =NULL;
 	char *outputname =NULL;
 	char *dwbaname =NULL;
-	Bool_t isAgReac = kFALSE;
+	Bool_t isSHTReac = kFALSE;
 
 	std::string binpath(argv[0]);
 	printf("%s\n",binpath.data());
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 	}
 	reacPrm.Print();
 	
-	if((reacPrm.a.compare("107Ag")==0)||(reacPrm.a.compare("109Ag")==0)) isAgReac=kTRUE;
+	isSHTReac=reacPrm.SHT;
 	
 	if(have_geometry==kTRUE){
 		printf("Loading parameters from file %s.\n",geoParamsname);
@@ -148,11 +148,11 @@ int main(int argc, char *argv[])
 	CsIHit *ipcsi = &csi; 
 	S3Hit *ipsd1 = &sd1; 
 	S3Hit *ipsd2 = &sd2; 
-	PTrack *iplP = &lP;
-	PTrack *iphP = &hP;
-	PTrack *iphPdec = &hPdec;
-	PTrack *iplPdec1 = &lPdec1;
-	PTrack *iplPdec2 = &lPdec2;
+	PTrack *iptlP = &tlP;
+	PTrack *ipblP = &blP;
+	PTrack *ipblPdec = &blPdec;
+	PTrack *iptlPdec1 = &tlPdec1;
+	PTrack *iptlPdec2 = &tlPdec2;
 	IDet *ipdet = &det;
 	TLorentzVector *LVb = &LorVb;	
 	TLorentzVector *LVB = &LorVB;	
@@ -267,11 +267,11 @@ int main(int argc, char *argv[])
 	Iris->Branch("reacX",&reacX,"reacX/D"); 
 	Iris->Branch("reacY",&reacY,"reacY/D"); 
 	Iris->Branch("reacZ",&reacZ,"reacZ/D"); 
-	Iris->Branch("lP.",&iplP,32000,99); 
-	Iris->Branch("hP.",&iphP,32000,99); 
-	Iris->Branch("hPdec.",&iphPdec,32000,99); 
-	Iris->Branch("lPdec1.",&iplPdec1,32000,99); 
-	Iris->Branch("lPdec2.",&iplPdec2,32000,99); 
+	Iris->Branch("tlP.",&iptlP,32000,99); 
+	Iris->Branch("blP.",&ipblP,32000,99); 
+	Iris->Branch("blPdec.",&ipblPdec,32000,99); 
+	Iris->Branch("tlPdec1.",&iptlPdec1,32000,99); 
+	Iris->Branch("tlPdec2.",&iptlPdec2,32000,99); 
 	Iris->Branch("wght",&wght,"wght/D"); 
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
@@ -287,24 +287,24 @@ int main(int argc, char *argv[])
 	Iris->Branch("det",&ipdet,32000,99); 
 
 	std::string dedxstr = dedxpath;
-	A.EL.loadIncomingELoss(dedxstr,A.name.data(),A.mass);
-	b.EL.loadOutgoingELoss(dedxstr,b.name.data(),b.mass);
-	if(!seqdec) B.EL.loadOutgoingELoss(dedxstr,B.name.data(),B.mass);
+	A.EL.loadIncomingELoss(dedxstr,A.name.data(),geoPrm.MFoil,geoPrm.MTgt,A.mass);
+	b.EL.loadOutgoingELoss(dedxstr,b.name.data(),geoPrm.MFoil,geoPrm.MTgt,b.mass);
+	if(!seqdec) B.EL.loadOutgoingELoss(dedxstr,B.name.data(),geoPrm.MFoil,geoPrm.MTgt,B.mass);
 	else{
-	   	decB.EL.loadOutgoingELoss(dedxstr,decB.name.data(),decB.mass);
-	   	if(decc.Z>0) decc.EL.loadOutgoingELoss(dedxstr,decc.name.data(),decc.mass);
-	   	if(seqdecN>2&&decd.Z>0) decd.EL.loadOutgoingELoss(dedxstr,decd.name.data(),decd.mass);
+	   	decB.EL.loadOutgoingELoss(dedxstr,decB.name.data(),geoPrm.MFoil,geoPrm.MTgt,decB.mass);
+	   	if(decc.Z>0) decc.EL.loadOutgoingELoss(dedxstr,decc.name.data(),geoPrm.MFoil,geoPrm.MTgt,decc.mass);
+	   	if(seqdecN>2&&decd.Z>0) decd.EL.loadOutgoingELoss(dedxstr,decd.name.data(),geoPrm.MFoil,geoPrm.MTgt,decd.mass);
 	}
 
-	Double_t AgFoil=geoPrm.TAg*10.473*0.1; //mu*g/cm^3*0.1
-	Double_t targetTh=geoPrm.TTgt*0.0867*0.1; //mu*g/cm^3*0.1
+	Double_t FoilTh=geoPrm.TFoil; //mu*g/cm^3*0.1
+	Double_t targetTh=geoPrm.TTgt; //mu*g/cm^3*0.1
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
 	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr 
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	
-	lP.nuc = b;
-	hP.nuc = B;
+	//tlP.nuc = b;
+	//blP.nuc = B;
 
 	yd.Init(geoPrm.TYY);
 	sd1.Init(0,geoPrm.TS3[0]);
@@ -336,20 +336,20 @@ int main(int argc, char *argv[])
    	EA -= ICdE;
    	EA -= eloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
 	E_before_Ag = EA;
-	if(isAgReac){
-		E_center_Ag = EA - eloss(A,47./108.,EA,AgFoil/2.,A.EL.eAg, A.EL.dedxAg);
-		EA -= eloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
+	if(!isSHTReac){
+		E_center_Ag = EA - eloss(A,47./108.,EA,FoilTh/2.,A.EL.eFoil, A.EL.dedxFoil);
+		EA -= eloss(A,47./108.,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
    		E_before_Tgt = EA;
 	}
 	else{
-		EA -= eloss(A,47./108.,EA,AgFoil,A.EL.eAg, A.EL.dedxAg);
+		EA -= eloss(A,47./108.,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
    		E_after_Ag = EA;
    		E_before_Tgt = EA;
-   		E_center_Tgt = EA - eloss(A,1.,EA,targetTh/2.,A.EL.eH, A.EL.dedxH);
-   		E_after_Tgt = EA-eloss(A,1.,EA,targetTh,A.EL.eH, A.EL.dedxH);
+   		E_center_Tgt = EA - eloss(A,1.,EA,targetTh/2.,A.EL.eTgt, A.EL.dedxTgt);
+   		E_after_Tgt = EA-eloss(A,1.,EA,targetTh,A.EL.eTgt, A.EL.dedxTgt);
 		
 		reacZ = targetTh/2.;
-   		EA -= eloss(A,1.,EA,reacZ,A.EL.eH, A.EL.dedxH);
+   		EA -= eloss(A,1.,EA,reacZ,A.EL.eTgt, A.EL.dedxTgt);
 	}
 	
 	EA = EA/1000.; // convert to GeV for TGenPhaseSpace
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
 	beamGamma = Sys.Gamma();
 	beamEcm = EA*ma*1000./(mA+ma);
 
-	if(isAgReac){
+	if(!isSHTReac){
 		printf("\n\nEnergy before of silver foil: %.2lf MeV\n", E_before_Ag);
 		printf("\n\nEnergy at center of silver foil: %.2lf MeV\n", E_center_Ag);
 		printf("\n\nEnergy after silver foil: %.2lf MeV\n", E_before_Tgt);
@@ -415,15 +415,15 @@ int main(int argc, char *argv[])
 	// Start of event loop
 	while(Evnt<nsim) 
 	{
-		if(isAgReac){
-			reacZ = AgFoil/2.;
-			//reacZ = rndm->Uniform(0,AgFoil);
-   			EA = E_before_Ag - eloss(A,47./108.,E_before_Ag,reacZ,A.EL.eAg, A.EL.dedxAg);
+		if(!isSHTReac){
+			reacZ = FoilTh/2.;
+			//reacZ = rndm->Uniform(0,FoilTh);
+   			EA = E_before_Ag - eloss(A,47./108.,E_before_Ag,reacZ,A.EL.eFoil, A.EL.dedxFoil);
 		}
 		else{	
 			//reacZ = rndm->Uniform(0,targetTh);
 			reacZ = targetTh/2.;
-   			EA = E_before_Tgt - eloss(A,1.,E_before_Tgt,reacZ,A.EL.eH, A.EL.dedxH);
+   			EA = E_before_Tgt - eloss(A,1.,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
  		}
 		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 		PA = sqrt(EA*EA+2*EA*mA);
@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
 		mBR = rndm->BreitWigner(mB,width);
 		masses[1] =mBR;
 		PS0.SetDecay(Sys, reacPrm.N, masses); //recalculate with resonance energy
-		//wght_max=PS0.GetWtMax();
+		wght_max=PS0.GetWtMax();
 	
 		TLorentzVector *LTmp;
 		whilecount=0;
@@ -476,18 +476,18 @@ int main(int argc, char *argv[])
 
 		Qgen= (mA+ma-mb-Frag.M())*1000.;	
 	
-		lP.T=LVb->Theta();	
-		hP.T=LVB->Theta();
-		lP.E=(LVb->E()-mb)*1000.; 	
-		hP.E=(LVB->E()-mB)*1000.;
-		lP.P=LVb->Phi();	
-		hP.P=LVB->Phi();	
+		tlP.T=LVb->Theta();	
+		blP.T=LVB->Theta();
+		tlP.E=(LVb->E()-mb)*1000.; 	
+		blP.E=(LVB->E()-mB)*1000.;
+		tlP.P=LVb->Phi();	
+		blP.P=LVB->Phi();	
 		
 		// Convert angles to degrees for root file
-		lP.Tdeg=RadToDeg()*lP.T;
-		hP.Tdeg=RadToDeg()*hP.T;
-		lP.Pdeg=RadToDeg()*lP.P;
-		hP.Pdeg=RadToDeg()*hP.P;
+		tlP.Tdeg=RadToDeg()*tlP.T;
+		blP.Tdeg=RadToDeg()*blP.T;
+		tlP.Pdeg=RadToDeg()*tlP.P;
+		blP.Pdeg=RadToDeg()*blP.P;
 
 		if(seqdec)
 		{
@@ -499,22 +499,22 @@ int main(int argc, char *argv[])
 				LVcdec  = PS1.GetDecay(1);
 				if(seqdecN>2) LVddec  = PS1.GetDecay(2);
 			}while(wght2<chck2);
-			hPdec.T=LVBdec->Theta();
-			hPdec.E=(LVBdec->E()-mBdec)*1000.;
-			hPdec.P=LVBdec->Phi();	
-			hPdec.Tdeg=RadToDeg()*hPdec.T;
-			hPdec.Pdeg=RadToDeg()*hPdec.P;
-			lPdec1.T=LVcdec->Theta();
-			lPdec1.E=(LVcdec->E()-mcdec)*1000.;
-			lPdec1.P=LVcdec->Phi();	
-			lPdec1.Tdeg=RadToDeg()*lPdec1.T;
-			lPdec1.Pdeg=RadToDeg()*lPdec1.P;
+			blPdec.T=LVBdec->Theta();
+			blPdec.E=(LVBdec->E()-mBdec)*1000.;
+			blPdec.P=LVBdec->Phi();	
+			blPdec.Tdeg=RadToDeg()*blPdec.T;
+			blPdec.Pdeg=RadToDeg()*blPdec.P;
+			tlPdec1.T=LVcdec->Theta();
+			tlPdec1.E=(LVcdec->E()-mcdec)*1000.;
+			tlPdec1.P=LVcdec->Phi();	
+			tlPdec1.Tdeg=RadToDeg()*tlPdec1.T;
+			tlPdec1.Pdeg=RadToDeg()*tlPdec1.P;
 			if(seqdecN>2){
-				lPdec2.T=LVcdec->Theta();
-				lPdec2.E=(LVcdec->E()-mddec)*1000.;
-				lPdec2.P=LVcdec->Phi();	
-				lPdec2.Tdeg=RadToDeg()*lPdec2.T;
-				lPdec2.Pdeg=RadToDeg()*lPdec2.P;
+				tlPdec2.T=LVcdec->Theta();
+				tlPdec2.E=(LVcdec->E()-mddec)*1000.;
+				tlPdec2.P=LVcdec->Phi();	
+				tlPdec2.Tdeg=RadToDeg()*tlPdec2.T;
+				tlPdec2.Pdeg=RadToDeg()*tlPdec2.P;
 			}
 		}
 		else if(reacPrm.N>3) // 4body
@@ -522,30 +522,30 @@ int main(int argc, char *argv[])
 			LVcdec = PS0.GetDecay(2);
 			LVddec = PS0.GetDecay(3);
 		
-			lPdec1.T=LVcdec->Theta();	
-			lPdec2.T=LVddec->Theta();
-			lPdec1.E=(LVcdec->E()-mc)*1000.; 	
-			lPdec2.E=(LVddec->E()-md)*1000.;
-			lPdec1.P=LVcdec->Phi();	
-			lPdec2.P=LVddec->Phi();	
+			tlPdec1.T=LVcdec->Theta();	
+			tlPdec2.T=LVddec->Theta();
+			tlPdec1.E=(LVcdec->E()-mc)*1000.; 	
+			tlPdec2.E=(LVddec->E()-md)*1000.;
+			tlPdec1.P=LVcdec->Phi();	
+			tlPdec2.P=LVddec->Phi();	
 			
 			// Convert angles to degrees for root file
-			lPdec1.Tdeg=RadToDeg()*lPdec1.T;
-			lPdec2.Tdeg=RadToDeg()*lPdec2.T;
-			lPdec1.Pdeg=RadToDeg()*lPdec1.P;
-			lPdec2.Pdeg=RadToDeg()*lPdec2.P;
+			tlPdec1.Tdeg=RadToDeg()*tlPdec1.T;
+			tlPdec2.Tdeg=RadToDeg()*tlPdec2.T;
+			tlPdec1.Pdeg=RadToDeg()*tlPdec1.P;
+			tlPdec2.Pdeg=RadToDeg()*tlPdec2.P;
 		}
 		else if(reacPrm.N>2) // 3body
 		{
 			LVcdec = PS0.GetDecay(2);
 		
-			lPdec1.T=LVcdec->Theta();	
-			lPdec1.E=(LVcdec->E()-mc)*1000.; 	
-			lPdec1.P=LVcdec->Phi();	
+			tlPdec1.T=LVcdec->Theta();	
+			tlPdec1.E=(LVcdec->E()-mc)*1000.; 	
+			tlPdec1.P=LVcdec->Phi();	
 			
 			// Convert angles to degrees for root file
-			lPdec1.Tdeg=RadToDeg()*lPdec1.T;
-			lPdec1.Pdeg=RadToDeg()*lPdec1.P;
+			tlPdec1.Tdeg=RadToDeg()*tlPdec1.T;
+			tlPdec1.Pdeg=RadToDeg()*tlPdec1.P;
 		}
 
 		// Position on target	
@@ -553,51 +553,51 @@ int main(int argc, char *argv[])
 		reacY = BeamSpot*rndm->Gaus();
 		reacPos.SetXYZ(reacX,reacY,reacZ);
 
-		if(isAgReac){ 
-			lP.AgdE = eloss(b,47./108.,lP.E,(AgFoil-reacZ)/Cos(lP.T),b.EL.eAg,b.EL.dedxAg);	
-			lP.TrgtdE = eloss(b,1.,lP.E-lP.AgdE,targetTh/Cos(lP.T),b.EL.eH,b.EL.dedxH);	
-			lP.Ebt = lP.E-lP.AgdE-lP.TrgtdE;
+		if(!isSHTReac){ 
+			tlP.AgdE = eloss(b,47./108.,tlP.E,(FoilTh-reacZ)/Cos(tlP.T),b.EL.eFoil,b.EL.dedxFoil);	
+			tlP.TrgtdE = eloss(b,1.,tlP.E-tlP.AgdE,targetTh/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
+			tlP.Ebt = tlP.E-tlP.AgdE-tlP.TrgtdE;
 		}
 		else{
-		   	lP.AgdE = 0.;	
-			lP.TrgtdE = eloss(b,1.,lP.E,(targetTh-reacZ)/Cos(lP.T),b.EL.eH,b.EL.dedxH);	
-			lP.Ebt = lP.E-lP.TrgtdE;
+		   	tlP.AgdE = 0.;	
+			tlP.TrgtdE = eloss(b,1.,tlP.E,(targetTh-reacZ)/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
+			tlP.Ebt = tlP.E-tlP.TrgtdE;
 		}
 		
-		LEHit = detHits(lP, b, reacPos);
+		LEHit = detHits(tlP, b, reacPos,geoPrm.Mask,geoPrm.Shield);
 		
 		if(!seqdec){
-			if(isAgReac){ 
-				hP.AgdE = eloss(B,47./108.,hP.E,(AgFoil-reacZ)/Cos(hP.T),B.EL.eAg,B.EL.dedxAg);	
-				hP.TrgtdE = eloss(B,1.,hP.E-hP.AgdE,targetTh/Cos(hP.T),B.EL.eH,B.EL.dedxH);	
+			if(!isSHTReac){ 
+				blP.AgdE = eloss(B,47./108.,blP.E,(FoilTh-reacZ)/Cos(blP.T),B.EL.eFoil,B.EL.dedxFoil);	
+				blP.TrgtdE = eloss(B,1.,blP.E-blP.AgdE,targetTh/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
 			}
 			else {
-		   		hP.AgdE = 0.;	
-				hP.TrgtdE = eloss(B,1.,hP.E,(targetTh-reacZ)/Cos(hP.T),B.EL.eH,B.EL.dedxH);	
+		   		blP.AgdE = 0.;	
+				blP.TrgtdE = eloss(B,1.,blP.E,(targetTh-reacZ)/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
 			}
-			hP.Ebt = hP.E-hP.AgdE-hP.TrgtdE;
-			HEHit = detHits(hP, B, reacPos);
+			blP.Ebt = blP.E-blP.AgdE-blP.TrgtdE;
+			HEHit = detHits(blP, B, reacPos,geoPrm.Mask,geoPrm.Shield);
 		}
 		else{ 
-		   	hPdec.AgdE = 0.;	
-			hPdec.TrgtdE = eloss(decB,1.,hPdec.E,(targetTh-reacZ)/Cos(hPdec.T),decB.EL.eH,decB.EL.dedxH);	
-			hPdec.Ebt = hPdec.E-hPdec.TrgtdE;
-			HEHit = detHits(hPdec, decB, reacPos);	
+		   	blPdec.AgdE = 0.;	
+			blPdec.TrgtdE = eloss(decB,1.,blPdec.E,(targetTh-reacZ)/Cos(blPdec.T),decB.EL.eTgt,decB.EL.dedxTgt);	
+			blPdec.Ebt = blPdec.E-blPdec.TrgtdE;
+			HEHit = detHits(blPdec, decB, reacPos,geoPrm.Mask,geoPrm.Shield);	
 			if(decc.Z>0){
-		   		lPdec1.AgdE = 0.;	
-				lPdec1.TrgtdE = eloss(decc,1.,lPdec1.E,(targetTh-reacZ)/Cos(lPdec1.T),decc.EL.eH,decc.EL.dedxH);	
-				lPdec1.Ebt = lPdec1.E-lPdec1.TrgtdE;
-				detHits(lPdec1, decc, reacPos);
+		   		tlPdec1.AgdE = 0.;	
+				tlPdec1.TrgtdE = eloss(decc,1.,tlPdec1.E,(targetTh-reacZ)/Cos(tlPdec1.T),decc.EL.eTgt,decc.EL.dedxTgt);	
+				tlPdec1.Ebt = tlPdec1.E-tlPdec1.TrgtdE;
+				detHits(tlPdec1, decc, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}	
 			if(seqdecN>2&&decd.Z>0){
-		   		lPdec2.AgdE = 0.;	
-				lPdec2.TrgtdE = eloss(decd,1.,lPdec2.E,(targetTh-reacZ)/Cos(lPdec2.T),decd.EL.eH,decd.EL.dedxH);	
-				lPdec2.Ebt = lPdec2.E-lPdec2.TrgtdE;
-				detHits(lPdec2, decd, reacPos);
+		   		tlPdec2.AgdE = 0.;	
+				tlPdec2.TrgtdE = eloss(decd,1.,tlPdec2.E,(targetTh-reacZ)/Cos(tlPdec2.T),decd.EL.eTgt,decd.EL.dedxTgt);	
+				tlPdec2.Ebt = tlPdec2.E-tlPdec2.TrgtdE;
+				detHits(tlPdec2, decd, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}
 		}
-		if(isAgReac){
-			//E_before_SSB = E_before_Tgt - eloss(A,1.,E_after_Ag,targetTh,A.EL.eH,A.EL.dedxH);
+		if(!isSHTReac){
+			//E_before_SSB = E_before_Tgt - eloss(A,1.,E_after_Ag,targetTh,A.EL.eTgt,A.EL.dedxTgt);
 			SSBdE = eloss(A,14./28.,E_after_Ag,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
 		}
 		else{ 
@@ -607,61 +607,65 @@ int main(int argc, char *argv[])
 		sortEnergies(); // sort detector hits by energy
 
 		//Calculating "measured" Q-Value
-		if(LEHit && yd.dE[0]>0.){
-			if(csi.dE[0]>0.) LEHitcntr++;
-			Double_t Eb = csi.dE[0];
-			Eb= Eb+elossFi(Eb,0.1*1.4*6./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eMy,b.EL.dedxMy); //Mylar
-	      	Eb= Eb+elossFi(Eb,0.1*2.702*0.3/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eAl,b.EL.dedxAl); //0.3 u Al
-	      	Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
-			Eb+= yd.dE[0]; //use measured Yd // change june28
-	      	Eb= Eb+elossFi(Eb,0.1*2.32*0.35/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
-	    	Eb= Eb+elossFi(Eb,targetTh/2./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eH,b.EL.dedxH); //deuteron energy  in mid target midtarget
+		if(LEHit && yd.dE.size()>0 && csi.dE.size()>0){
+			if(csi.dE[0]>0. && yd.dE[0]>0.){
+			   	LEHitcntr++;
+				Double_t Eb = csi.dE[0];
+				Eb= Eb+elossFi(Eb,0.1*1.4*6./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eMy,b.EL.dedxMy); //Mylar
+	      		Eb= Eb+elossFi(Eb,0.1*2.702*0.3/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eAl,b.EL.dedxAl); //0.3 u Al
+	      		Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
+				Eb+= yd.dE[0]; //use measured Yd // change june28
+	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
+	    		Eb= Eb+elossFi(Eb,targetTh/2./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
-			Eb= Eb/1000.;
+				Eb= Eb/1000.;
 
-			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
-			EB_det = EA+mA+ma-Eb-mb;
-			PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad()));
-			Qdet = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
-			Qdet =Qdet*1000.;
+				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
+				EB_det = EA+mA+ma-Eb-mb;
+				PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad()));
+				Qdet = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+				Qdet =Qdet*1000.;
+			}
 		}
 
-		if(HEHit && sd1.dE[0]>0. && sd2.dE[0]>0.) HEHitcntr++;
-		lP.Ecm = (LVb->E()-mb)*ma*1000./(mA+ma);
-		hP.Ecm = (LVB->E()-mB)*ma*1000./(mA+ma);
+		if(HEHit && sd1.dE.size()>0 && sd2.dE.size()>0.){
+			if(sd1.dE[0]>0. && sd2.dE[0]>0.) HEHitcntr++;
+		}
+		tlP.Ecm = (LVb->E()-mb)*ma*1000./(mA+ma);
+		blP.Ecm = (LVB->E()-mB)*ma*1000./(mA+ma);
 		LVb->Boost(-boostvect);
 		LVB->Boost(-boostvect);
-		lP.Tcm = RadToDeg()*(Pi()-LVb->Theta());
-		hP.Tcm = RadToDeg()*LVB->Theta();
+		tlP.Tcm = RadToDeg()*(Pi()-LVb->Theta());
+		blP.Tcm = RadToDeg()*LVB->Theta();
 		
 		if(seqdec)
 		{
-			hPdec.Ecm = (LVBdec->E()-mBdec)*ma*1000./(mA+ma);
+			blPdec.Ecm = (LVBdec->E()-mBdec)*ma*1000./(mA+ma);
 			LVBdec->Boost(-boostvect);
-			hPdec.Tcm = RadToDeg()*LVBdec->Theta();
-			lPdec1.Ecm = (LVcdec->E()-mcdec)*ma*1000./(mA+ma);
+			blPdec.Tcm = RadToDeg()*LVBdec->Theta();
+			tlPdec1.Ecm = (LVcdec->E()-mcdec)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
-			lPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+			tlPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
 			if(seqdecN>2){
-				lPdec2.Ecm = (LVddec->E()-mddec)*ma*1000./(mA+ma);
+				tlPdec2.Ecm = (LVddec->E()-mddec)*ma*1000./(mA+ma);
 				LVddec->Boost(-boostvect);
-				lPdec2.Tcm = RadToDeg()*LVddec->Theta();
+				tlPdec2.Tcm = RadToDeg()*LVddec->Theta();
 			}
 		}
 		else if(reacPrm.N>3) // 4body
 		{
-			lPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
-			lPdec2.Ecm = (LVddec->E()-md)*ma*1000./(mA+ma);
+			tlPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
+			tlPdec2.Ecm = (LVddec->E()-md)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
 			LVddec->Boost(-boostvect);
-			lPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
-			lPdec2.Tcm = RadToDeg()*LVddec->Theta();
+			tlPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+			tlPdec2.Tcm = RadToDeg()*LVddec->Theta();
 		}
 		else if(reacPrm.N>2) // 3body
 		{
-			lPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
+			tlPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
-			lPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+			tlPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
 		}
 		setIDet(ICdE,SSBdE);
 		printf("Writing %s: %.6d of %.6d events processed..\r",outputname,Evnt,nsim);

@@ -2,7 +2,7 @@
 
 PTrack::PTrack()
 {
-	nuc.Clear();
+	//nuc.Clear();
 	E = 0.;
 	Ecm = 0.;
 	T = sqrt(-1);
@@ -17,7 +17,6 @@ PTrack::PTrack()
 
 void PTrack::Clear()
 {
-	nuc.Clear();
 	E = 0.;
 	Ecm = 0.;
 	T = sqrt(-1);

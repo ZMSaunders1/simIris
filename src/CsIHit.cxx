@@ -145,7 +145,7 @@ Double_t CsIHit::ELoss(nucleus ncl, Double_t E, Double_t T)
 		E -= dE0;
 		if(dE0<0.) dE0 = -dE0;
 		dE_ideal0 = dE0;
-		if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.031*dE0*sqrt(14.1/dE0));
+		if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.018*dE0*sqrt(14.1/dE0)); // resolution changed 3.1 % -> 1.8 %, May 2 2017
 		if(dE0<0.) dE0 = 0.;
 		dE.push_back(dE0);
 		dE_ideal.push_back(dE_ideal0);

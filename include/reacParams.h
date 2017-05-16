@@ -27,6 +27,8 @@ class reacParams : public TObject {
 		Double_t R; // Resonance energy
 		Double_t W; // Resonance width
 		
+		Bool_t SHT; // Reaction in solid Hydrogen/Deuterium target?
+		
 		//virtual void ReadCalibPar(char* line);
 		virtual void ReadParams(char* line);
 		virtual void Load(std::string filename);

@@ -14,12 +14,16 @@ class geoParams : public TObject {
 		virtual ~geoParams() {} //! 
 		
 		Double_t Bs; 
-		Double_t TAg; 
+		Double_t TFoil; 
 		Double_t TTgt; 
 		Double_t DYY; 
 		Double_t TYY[8]; 
 		Double_t DS3; 
-		Double_t TS3[2]; 
+		Double_t TS3[2];
+		std::string MFoil;
+		std::string MTgt;	
+		Bool_t Mask;
+		Bool_t Shield;
 
 		//virtual void ReadCalibPar(char* line);
 		virtual void ReadParams(char* line);
