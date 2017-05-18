@@ -122,7 +122,7 @@ Bool_t YYHit::Hit(Double_t theta, Double_t phi, Double_t YdDistance, TVector3 ta
 	if (Ring0==13) phiRange =  TMath::Pi()/4-phiGap*2; 
 	else if (Ring0==14) phiRange =  TMath::Pi()/4-phiGap*3.5; 
 	else if (Ring0==15) phiRange =  TMath::Pi()/4-phiGap*5.5; 
-	hitPhi = fabs(phiRel +TMath::Pi() - Seg0*TMath::Pi()/4-TMath::Pi()/8) < phiRange/2;
+	hitPhi = fabs(phiRel +TMath::Pi() - Seg0*TMath::Pi()/4.-TMath::Pi()/8.) < phiRange/2.;
 	hitTheta = ((YdDistance*tan(theta)>RIn) && (YdDistance*tan(theta)<ROut));
 	hitBool = (hitTheta && hitPhi);
 	
@@ -139,7 +139,9 @@ Bool_t YYHit::Hit(Double_t theta, Double_t phi, Double_t YdDistance, TVector3 ta
 		Seg0 = Seg0 +6;
 		if(Seg0>7) Seg0 = Seg0 - 8;
  		fThetaCalc0 = TMath::RadToDeg()*atan((50.+(Ring0*5.)+2.5)/YdDistance);
+ 		fThetaCalc0 = (fThetaCalc0>0) ? fThetaCalc0 : fThetaCalc0+180.;
  		fThetaRand0 = TMath::RadToDeg()*atan((50.+(Ring0*5.)+5.*randomTheta)/YdDistance);
+ 		fThetaRand0 = (fThetaRand0>0) ? fThetaRand0 : fThetaRand0+180.;
    		fX.push_back(fX0);
 		fY.push_back(fY0);
 		fZ.push_back(fZ0);
@@ -164,22 +166,23 @@ Bool_t YYHit::Hit(Double_t theta, Double_t phi, Double_t YdDistance, TVector3 ta
 	return hitBool;
 }
 
-Double_t YYHit::ELoss(nucleus ncl, Double_t E, Double_t T)
+Double_t YYHit::ELoss(nucleus ncl, Double_t E, Double_t Theta)
 {
-	//if(mul>0 && hit[mul-1]==1) {	
-  		Double_t dE0, dE_ideal0;
-		TRandom3 *rndm = new TRandom3(0);
-		E -= eloss(ncl,13./27.,E,0.1*2.702*0.1/cos(T),ncl.EL.eAl, ncl.EL.dedxAl);
-  		E -= eloss(ncl,5./10.,E,0.05*2.3502*0.1/cos(T),ncl.EL.eB, ncl.EL.dedxB);
-  		dE0 = eloss(ncl,14./28.,E,Thickness[Seg.at(Seg.size()-1)]/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
-  		dE_ideal0 = eloss(ncl,14./28.,E,Avg_Thickness/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
-		E = E-dE0;
-		if(dE0<0.) dE0 = -dE0;
-  		if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.00225*dE0*sqrt(5.73/dE0));
-		if(dE0<0.) dE0 = 0.;
-		dE.push_back(dE0);
-		dE_ideal.push_back(dE_ideal0);
-//}
+	Double_t T = (Theta<TMath::Pi()/2.) ? Theta : TMath::Pi()-Theta;
+  	Double_t dE0, dE_ideal0;
+	TRandom3 *rndm = new TRandom3(0);
+	
+	E -= eloss(ncl,13./27.,E,0.1*2.702*0.1/cos(T),ncl.EL.eAl, ncl.EL.dedxAl);
+  	E -= eloss(ncl,5./10.,E,0.05*2.3502*0.1/cos(T),ncl.EL.eB, ncl.EL.dedxB);
+  	dE0 = eloss(ncl,14./28.,E,Thickness[Seg.at(Seg.size()-1)]/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
+  	dE_ideal0 = eloss(ncl,14./28.,E,Avg_Thickness/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
+	E = E-dE0;
+	if(dE0<0.) dE0 = -dE0;
+  	if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.00225*dE0*sqrt(5.73/dE0));
+	if(dE0<0.) dE0 = 0.;
+	dE.push_back(dE0);
+	dE_ideal.push_back(dE_ideal0);
+	rndm->Delete();
 	return E;
 }
 

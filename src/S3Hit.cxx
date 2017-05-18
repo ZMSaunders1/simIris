@@ -116,8 +116,10 @@ Bool_t S3Hit::Hit(Double_t theta, Double_t phi, Double_t S3Distance, TVector3 ta
 			// fPhiRand[mul] = -fPhiRand[mul];
 		}
 		fThetaCalc0 = TMath::RadToDeg()*atan((RIn+Ring0+0.5)/S3Distance);
+ 		fThetaCalc0 = (fThetaCalc0>0) ? fThetaCalc0 : fThetaCalc0+180.;
       	rndm = 0.99*fRandom.Rndm();
  		fThetaRand0 = TMath::RadToDeg()*atan((RIn+Ring0+rndm)/S3Distance);
+ 		fThetaRand0 = (fThetaRand0>0) ? fThetaRand0 : fThetaRand0+180.;
 		fX.push_back(fX0);
 		fY.push_back(fY0);
 		fZ.push_back(fZ0);
@@ -142,38 +144,39 @@ Bool_t S3Hit::Hit(Double_t theta, Double_t phi, Double_t S3Distance, TVector3 ta
 	return hitBool;
 }
 
-Double_t S3Hit::ELoss(nucleus ncl, Double_t E, Double_t T)
+Double_t S3Hit::ELoss(nucleus ncl, Double_t E, Double_t Theta)
 {
   	Double_t dE0, dE_ideal0;
-	//if(mul>0 && hit0==1){
-		TRandom3 *rndm = new TRandom3(0);
-		if(Orientation==0){ // rings first
-			E -= eloss(ncl,13./27.,E,0.1*2.702*1.5/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //first metal
-			E -= eloss(ncl,30./60.,E,0.1*2.65*3.5/cos(T),ncl.EL.eSiO2,ncl.EL.dedxSiO2); //SiO2
-			E -= eloss(ncl,13./27.,E,0.1*2.702*0.3/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //second metal
-			E -= eloss(ncl,5./10.,E,0.1*2.3502*0.5/cos(T),ncl.EL.eB,ncl.EL.dedxB); //boron junction implant 		
-			dE0 = eloss(ncl,14./28.,E,Thickness/cos(T),ncl.EL.eSi,ncl.EL.dedxSi);
-   			E -= dE0;
-			if(dE0<0.) dE0 = -dE0;
-			dE_ideal0 = dE0;
-			if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.01*dE0);
-			if(dE0<0.) dE0 = -dE0;
-		}
-		else{ // sectors first
-			E -= eloss(ncl,15./31.,E,0.1*1.8219*0.5/cos(T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
-			E -= eloss(ncl,13./27.,E,0.1*2.702*0.3/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
-			E -= eloss(ncl,13./27.,E,0.1*2.702*0.3/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
-			E -= eloss(ncl,15./31.,E,0.1*1.822*0.5/cos(T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
-			dE0 = eloss(ncl,14./28.,E,Thickness/cos(T),ncl.EL.eSi,ncl.EL.dedxSi);
-   			E -= dE0;
-			if(dE0<0.) dE0 = -dE0;
-			dE_ideal0 = dE0;
-			if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.01*dE0);
-			if(dE0<0.) dE0 = -dE0;
-		}
-		dE.push_back(dE0);
-		dE_ideal.push_back(dE_ideal0);
-	//}
+	Double_t T = (Theta<TMath::Pi()/2.) ? Theta : TMath::Pi()-Theta;
+	TRandom3 *rndm = new TRandom3(0);
+	
+	if(Orientation==0){ // rings first
+		E -= eloss(ncl,13./27.,E,0.1*2.702*1.5/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //first metal
+		E -= eloss(ncl,30./60.,E,0.1*2.65*3.5/cos(T),ncl.EL.eSiO2,ncl.EL.dedxSiO2); //SiO2
+		E -= eloss(ncl,13./27.,E,0.1*2.702*0.3/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //second metal
+		E -= eloss(ncl,5./10.,E,0.1*2.3502*0.5/cos(T),ncl.EL.eB,ncl.EL.dedxB); //boron junction implant 		
+		dE0 = eloss(ncl,14./28.,E,Thickness/cos(T),ncl.EL.eSi,ncl.EL.dedxSi);
+   		E -= dE0;
+		if(dE0<0.) dE0 = -dE0;
+		dE_ideal0 = dE0;
+		if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.01*dE0);
+		if(dE0<0.) dE0 = -dE0;
+	}
+	else{ // sectors first
+		E -= eloss(ncl,15./31.,E,0.1*1.8219*0.5/cos(T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
+		E -= eloss(ncl,13./27.,E,0.1*2.702*0.3/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
+		E -= eloss(ncl,13./27.,E,0.1*2.702*0.3/cos(T),ncl.EL.eAl,ncl.EL.dedxAl); //metal
+		E -= eloss(ncl,15./31.,E,0.1*1.822*0.5/cos(T),ncl.EL.eP,ncl.EL.dedxP); //phosphorus implant
+		dE0 = eloss(ncl,14./28.,E,Thickness/cos(T),ncl.EL.eSi,ncl.EL.dedxSi);
+   		E -= dE0;
+		if(dE0<0.) dE0 = -dE0;
+		dE_ideal0 = dE0;
+		if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.01*dE0);
+		if(dE0<0.) dE0 = -dE0;
+	}
+	dE.push_back(dE0);
+	dE_ideal.push_back(dE_ideal0);
+	rndm->Delete();
 	return E;
 }
 

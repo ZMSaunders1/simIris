@@ -41,8 +41,8 @@ Double_t load_dwba(std::string filename, Double_t x[181], Double_t y[181])
 		for(Int_t i=0; i<181; i++){
 			if (!fgets(line,32,dFile)) break;
 			//printf("%s",line);
-			cTheta.assign(line,line+9);
-			cXsec.assign(line+10,line+31);
+			cTheta.assign(line,line+7);
+			cXsec.assign(line+8,line+31);
 			sscanf(cTheta.data(),"%lf",&x[i]);
 			sscanf(cXsec.data(),"%lf",&y[181-i]);
 			printf("%lf\t%lf\n",x[i],y[i]);

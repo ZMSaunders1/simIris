@@ -4,14 +4,26 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t s
 {
 	Bool_t mask = maskClear(tr.T,tr.P) || !maskIn;
 	Bool_t shield = shieldClear(tr.T,tr.P) || !shieldIn;
+	Bool_t forward = (tr.T<TMath::Pi()/2.);
+	Bool_t backward = (tr.T>TMath::Pi()/2.);
 	Bool_t YYHit = 0;
 	Bool_t CsIHit = 0;
 	Bool_t Sd1Hit = 0;
 	Bool_t Sd2Hit = 0;
+	Bool_t YuHit = 0;
+	Bool_t SuHit = 0;
 
 	Double_t ETmp = tr.Ebt;
+	Double_t ETmpU = tr.Ebt;
 
-	if(mask && shield){
+	if(backward){
+		YuHit = yu.Hit(tr.T,tr.P,geoPrm.DYYU,reacPos) ;
+		SuHit = su.Hit(tr.T,tr.P,geoPrm.DS3U,reacPos);
+		if(YuHit) ETmpU = yu.ELoss(ncl,ETmpU,tr.T);
+		if(SuHit) ETmpU = su.ELoss(ncl,ETmpU,tr.T);
+	}	
+	
+	if(mask && shield&&forward){
 		YYHit = yd.Hit(tr.T,tr.P,geoPrm.DYY,reacPos) ;
 		CsIHit = csi.Hit(tr.T,tr.P,geoPrm.DYY+11.6,reacPos) ;
 		Sd1Hit = sd1.Hit(tr.T,tr.P,geoPrm.DS3,reacPos);
@@ -27,9 +39,11 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t s
 
 void sortEnergies(){
 	if(yd.mul>1) yd.SortByEnergy();
+	if(yu.mul>1) yu.SortByEnergy();
 	if(csi.mul>1) csi.SortByEnergy();
 	if(sd1.mul>1) sd1.SortByEnergy();
 	if(sd2.mul>1) sd2.SortByEnergy();
+	if(su.mul>1) su.SortByEnergy();
 }
 
 void setIDet(Double_t ICdE, Double_t SSBdE)

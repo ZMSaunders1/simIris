@@ -143,5 +143,5 @@ void reacParams::Clear(){
 	W=0.;
 
 	N=0;
-
+	SHT=0;
 }

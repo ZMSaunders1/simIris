@@ -149,6 +149,7 @@ Double_t CsIHit::ELoss(nucleus ncl, Double_t E, Double_t T)
 		if(dE0<0.) dE0 = 0.;
 		dE.push_back(dE0);
 		dE_ideal.push_back(dE_ideal0);
+		rndm->Delete();
 		//}
 	return E;
 }

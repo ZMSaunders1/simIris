@@ -49,11 +49,17 @@ void geoParams::ReadParams(char* line)
 	if (strcmp(line,"TFoil")==0){
 	   TFoil=fval;
 	}
+	if (strcmp(line,"AoZFoil")==0){
+	   AoZFoil=fval;
+	}
 	if (strcmp(line,"TTgt")==0){
 	   TTgt=fval;
 	}
 	if (strcmp(line,"DYY")==0){
 	   DYY=fval;
+	}
+	if (strcmp(line,"DYU")==0){
+	   DYYU=fval;
 	}
 	if (strcmp(line,"TYY1")==0){
 	   TYY[0]=fval;
@@ -79,14 +85,44 @@ void geoParams::ReadParams(char* line)
 	if (strcmp(line,"TYY8")==0){
 	   TYY[7]=fval;
 	}
-	if (strcmp(line,"DS3")==0){
+	if (strcmp(line,"TYU1")==0){
+	   TYYU[0]=fval;
+	}
+	if (strcmp(line,"TYU2")==0){
+	   TYYU[1]=fval;
+	}
+	if (strcmp(line,"TYU3")==0){
+	   TYYU[2]=fval;
+	}
+	if (strcmp(line,"TYU4")==0){
+	   TYYU[3]=fval;
+	}
+	if (strcmp(line,"TYU5")==0){
+	   TYYU[4]=fval;
+	}
+	if (strcmp(line,"TYU6")==0){
+	   TYYU[5]=fval;
+	}
+	if (strcmp(line,"TYU7")==0){
+	   TYYU[6]=fval;
+	}
+	if (strcmp(line,"TYU8")==0){
+	   TYYU[7]=fval;
+	}
+	if (strcmp(line,"DSD")==0){
 	   DS3=fval;
 	}
-	if (strcmp(line,"TS31")==0){
+	if (strcmp(line,"DSU")==0){
+	   DS3U=fval;
+	}
+	if (strcmp(line,"TSD1")==0){
 	   TS3[0]=fval;
 	}
-	if (strcmp(line,"TS32")==0){
+	if (strcmp(line,"TSD2")==0){
 	   TS3[1]=fval;
+	}
+	if (strcmp(line,"TSU")==0){
+	   TS3U=fval;
 	}
 	if (strcmp(line,"MASK")==0){
 	   Mask=(fval==1.);
@@ -137,14 +173,18 @@ void geoParams::Load(std::string filename){
 void geoParams::Print(){
 
 	printf("********************************\n\n");
-	printf("Ag-Foil thickness: %.2lf mg/cm2\n",TFoil);
-	printf("Target thickness: %.1lf mg/cm2\n",TTgt);
+	printf("Foil:\t Material: %s\tthickness: %.2lf mg/cm2\tA/Z: %.3f\n",MFoil.data(),TFoil,AoZFoil);
+	printf("Target:\t Material: %s\tthickness: %.1lf mg/cm2\n",MTgt.data(),TTgt);
 	printf("Size of beamspot: %.1lf mm\n",Bs);
 	printf("Distance target-YY: %.1lf mm\n",DYY);
+	printf("Distance target-upstream YY: %.1lf mm\n",DYYU);
 	printf("Thickness YY1: %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\n",TYY[0],TYY[1],TYY[2],TYY[3],TYY[4],TYY[5],TYY[6],TYY[7]);
+	printf("Thickness upstream YY1: %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\t %.1lf um\n",TYYU[0],TYYU[1],TYYU[2],TYYU[3],TYYU[4],TYYU[5],TYYU[6],TYYU[7]);
 	printf("Distance target-S3: %.1lf mm\n",DS3);
+	printf("Distance target-upstream S3: %.1lf mm\n",DS3U);
 	printf("Thickness 1st S3: %.1lf um\n",TS3[0]);
 	printf("Thickness 2nd S3: %.1lf um\n",TS3[1]);
+	printf("Thickness upstream S3: %.1lf um\n",TS3U);
 	printf("Using heat shield: %s\n",Shield ? "Yes" : "No");
 	printf("Using target mask: %s\n",Mask ? "Yes" : "No");
 	printf("********************************\n\n");
@@ -154,11 +194,15 @@ void geoParams::Clear(){
 
 	DYY=0.; 
 	DS3=0.; 
+	DYYU=0.; 
+	DS3U=0.; 
+	TS3U=0.; 
 	Bs=0.; 
 	TFoil=0.; 
 	TTgt=0.; 
 	Mask=kTRUE; 
 	Shield=kTRUE; 
 	for(Int_t i=0; i<8; i++) { TYY[i] = 0.; }
+	for(Int_t i=0; i<8; i++) { TYYU[i] = 0.; }
 	for(Int_t i=0; i<2; i++) { TS3[i] = 0.; }
 }

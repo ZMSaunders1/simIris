@@ -16,9 +16,9 @@
 
 reacParams reacPrm;
 geoParams geoPrm;
-YYHit yd;
+YYHit yd, yu;
 CsIHit csi;
-S3Hit sd1, sd2;
+S3Hit sd1, sd2, su;
 PTrack blP, tlP;
 PTrack blPdec, tlPdec1, tlPdec2;
 IDet det;
@@ -62,9 +62,11 @@ void clearEvt()
 	tlPdec2.Clear();
 	SSBdE=0.;
 	yd.Clear();
+	yu.Clear();
 	csi.Clear();
 	sd1.Clear();
 	sd2.Clear();
+	su.Clear();
 	det.Clear();
 	LorVb.Clear();
 	LorVB.Clear();
@@ -145,9 +147,11 @@ int main(int argc, char *argv[])
 
 	Double_t ICdE;	
 	YYHit *ipyd = &yd; 
+	YYHit *ipyu = &yu; 
 	CsIHit *ipcsi = &csi; 
 	S3Hit *ipsd1 = &sd1; 
 	S3Hit *ipsd2 = &sd2; 
+	S3Hit *ipsu = &su; 
 	PTrack *iptlP = &tlP;
 	PTrack *ipblP = &blP;
 	PTrack *ipblPdec = &blPdec;
@@ -281,9 +285,11 @@ int main(int argc, char *argv[])
 	Iris->Branch("ICdE",&ICdE,"ICdE/D"); 
 	Iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
 	Iris->Branch("yd.",&ipyd,32000,99); 
+	Iris->Branch("yu.",&ipyu,32000,99); 
 	Iris->Branch("csi.",&ipcsi,32000,99); 
 	Iris->Branch("sd1.",&ipsd1,32000,99); 
 	Iris->Branch("sd2.",&ipsd2,32000,99); 
+	Iris->Branch("su.",&ipsu,32000,99); 
 	Iris->Branch("det",&ipdet,32000,99); 
 
 	std::string dedxstr = dedxpath;
@@ -297,6 +303,7 @@ int main(int argc, char *argv[])
 	}
 
 	Double_t FoilTh=geoPrm.TFoil; //mu*g/cm^3*0.1
+	Double_t FoilAoZ=geoPrm.AoZFoil; //mu*g/cm^3*0.1
 	Double_t targetTh=geoPrm.TTgt; //mu*g/cm^3*0.1
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
 	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr 
@@ -307,8 +314,10 @@ int main(int argc, char *argv[])
 	//blP.nuc = B;
 
 	yd.Init(geoPrm.TYY);
+	yu.Init(geoPrm.TYYU);
 	sd1.Init(0,geoPrm.TS3[0]);
 	sd2.Init(1,geoPrm.TS3[1]);
+	su.Init(0,geoPrm.TS3U);
 
 	Bool_t LEHit, HEHit;
 
@@ -337,12 +346,12 @@ int main(int argc, char *argv[])
    	EA -= eloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
 	E_before_Ag = EA;
 	if(!isSHTReac){
-		E_center_Ag = EA - eloss(A,47./108.,EA,FoilTh/2.,A.EL.eFoil, A.EL.dedxFoil);
-		EA -= eloss(A,47./108.,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
+		E_center_Ag = EA - eloss(A,FoilAoZ,EA,FoilTh/2.,A.EL.eFoil, A.EL.dedxFoil);
+		EA -= eloss(A,FoilAoZ,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
    		E_before_Tgt = EA;
 	}
 	else{
-		EA -= eloss(A,47./108.,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
+		EA -= eloss(A,FoilAoZ,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
    		E_after_Ag = EA;
    		E_before_Tgt = EA;
    		E_center_Tgt = EA - eloss(A,1.,EA,targetTh/2.,A.EL.eTgt, A.EL.dedxTgt);
@@ -381,6 +390,8 @@ int main(int argc, char *argv[])
 	printf("CsI detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYY+11.6,csi.ThetaMin(geoPrm.DYY+11.6),csi.ThetaMax(geoPrm.DYY+11.6)); 
 	printf("First S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3,sd1.ThetaMin(geoPrm.DS3),sd1.ThetaMax(geoPrm.DS3)); 
 	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3+14.8,sd2.ThetaMin(geoPrm.DS3+14.8),sd2.ThetaMax(geoPrm.DS3+14.8)); 
+	printf("Upstream YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYYU,yu.ThetaMin(geoPrm.DYYU),yu.ThetaMax(geoPrm.DYYU)); 
+	printf("Upstream S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3U,su.ThetaMin(geoPrm.DS3U),su.ThetaMax(geoPrm.DS3U)); 
 	Double_t masses[4] = { mb, mB, mc, md};
 	
 	Double_t tht=0.; 
@@ -418,12 +429,12 @@ int main(int argc, char *argv[])
 		if(!isSHTReac){
 			reacZ = FoilTh/2.;
 			//reacZ = rndm->Uniform(0,FoilTh);
-   			EA = E_before_Ag - eloss(A,47./108.,E_before_Ag,reacZ,A.EL.eFoil, A.EL.dedxFoil);
+   			EA = E_before_Ag - eloss(A,1./FoilAoZ,E_before_Ag,reacZ,A.EL.eFoil, A.EL.dedxFoil);
 		}
 		else{	
 			//reacZ = rndm->Uniform(0,targetTh);
 			reacZ = targetTh/2.;
-   			EA = E_before_Tgt - eloss(A,1.,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
+   			EA = E_before_Tgt - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
  		}
 		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 		PA = sqrt(EA*EA+2*EA*mA);
@@ -554,13 +565,13 @@ int main(int argc, char *argv[])
 		reacPos.SetXYZ(reacX,reacY,reacZ);
 
 		if(!isSHTReac){ 
-			tlP.AgdE = eloss(b,47./108.,tlP.E,(FoilTh-reacZ)/Cos(tlP.T),b.EL.eFoil,b.EL.dedxFoil);	
-			tlP.TrgtdE = eloss(b,1.,tlP.E-tlP.AgdE,targetTh/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
+			tlP.AgdE = eloss(b,1./FoilAoZ,tlP.E,(FoilTh-reacZ)/Cos(tlP.T),b.EL.eFoil,b.EL.dedxFoil);	
+			tlP.TrgtdE = eloss(b,a.Z/a.A,tlP.E-tlP.AgdE,targetTh/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
 			tlP.Ebt = tlP.E-tlP.AgdE-tlP.TrgtdE;
 		}
 		else{
 		   	tlP.AgdE = 0.;	
-			tlP.TrgtdE = eloss(b,1.,tlP.E,(targetTh-reacZ)/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
+			tlP.TrgtdE = eloss(b,a.Z/a.A,tlP.E,(targetTh-reacZ)/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
 			tlP.Ebt = tlP.E-tlP.TrgtdE;
 		}
 		
@@ -568,30 +579,30 @@ int main(int argc, char *argv[])
 		
 		if(!seqdec){
 			if(!isSHTReac){ 
-				blP.AgdE = eloss(B,47./108.,blP.E,(FoilTh-reacZ)/Cos(blP.T),B.EL.eFoil,B.EL.dedxFoil);	
-				blP.TrgtdE = eloss(B,1.,blP.E-blP.AgdE,targetTh/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
+				blP.AgdE = eloss(B,1./FoilAoZ,blP.E,(FoilTh-reacZ)/Cos(blP.T),B.EL.eFoil,B.EL.dedxFoil);	
+				blP.TrgtdE = eloss(B,a.Z/a.A,blP.E-blP.AgdE,targetTh/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
 			}
 			else {
 		   		blP.AgdE = 0.;	
-				blP.TrgtdE = eloss(B,1.,blP.E,(targetTh-reacZ)/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
+				blP.TrgtdE = eloss(B,a.Z/a.A,blP.E,(targetTh-reacZ)/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
 			}
 			blP.Ebt = blP.E-blP.AgdE-blP.TrgtdE;
 			HEHit = detHits(blP, B, reacPos,geoPrm.Mask,geoPrm.Shield);
 		}
 		else{ 
 		   	blPdec.AgdE = 0.;	
-			blPdec.TrgtdE = eloss(decB,1.,blPdec.E,(targetTh-reacZ)/Cos(blPdec.T),decB.EL.eTgt,decB.EL.dedxTgt);	
+			blPdec.TrgtdE = eloss(decB,a.Z/a.A,blPdec.E,(targetTh-reacZ)/Cos(blPdec.T),decB.EL.eTgt,decB.EL.dedxTgt);	
 			blPdec.Ebt = blPdec.E-blPdec.TrgtdE;
 			HEHit = detHits(blPdec, decB, reacPos,geoPrm.Mask,geoPrm.Shield);	
 			if(decc.Z>0){
 		   		tlPdec1.AgdE = 0.;	
-				tlPdec1.TrgtdE = eloss(decc,1.,tlPdec1.E,(targetTh-reacZ)/Cos(tlPdec1.T),decc.EL.eTgt,decc.EL.dedxTgt);	
+				tlPdec1.TrgtdE = eloss(decc,a.Z/a.A,tlPdec1.E,(targetTh-reacZ)/Cos(tlPdec1.T),decc.EL.eTgt,decc.EL.dedxTgt);	
 				tlPdec1.Ebt = tlPdec1.E-tlPdec1.TrgtdE;
 				detHits(tlPdec1, decc, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}	
 			if(seqdecN>2&&decd.Z>0){
 		   		tlPdec2.AgdE = 0.;	
-				tlPdec2.TrgtdE = eloss(decd,1.,tlPdec2.E,(targetTh-reacZ)/Cos(tlPdec2.T),decd.EL.eTgt,decd.EL.dedxTgt);	
+				tlPdec2.TrgtdE = eloss(decd,a.Z/a.A,tlPdec2.E,(targetTh-reacZ)/Cos(tlPdec2.T),decd.EL.eTgt,decd.EL.dedxTgt);	
 				tlPdec2.Ebt = tlPdec2.E-tlPdec2.TrgtdE;
 				detHits(tlPdec2, decd, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}
@@ -675,6 +686,9 @@ int main(int argc, char *argv[])
 
 	Iris->AutoSave();
 	f->Close();
+	rndm->Delete();
+	//Iris->Delete();
+	//f->Delete();
 	LEeff=Double_t(LEHitcntr)/Double_t(nsim)*100.;
 	HEeff=Double_t(HEHitcntr)/Double_t(nsim)*100.;
 	printf("Acceptance for target-like particles: %.1f\n",LEeff);

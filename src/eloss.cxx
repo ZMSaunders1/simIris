@@ -63,6 +63,7 @@ Double_t eloss(nucleus P, Double_t TZoverA, Double_t ein, Double_t th , Double_t
 		}
 		en = en - de; // energy remaining after dx
 	}
+	rndm->Delete();
 	return ein-en;
 }
 

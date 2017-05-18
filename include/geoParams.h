@@ -15,11 +15,16 @@ class geoParams : public TObject {
 		
 		Double_t Bs; 
 		Double_t TFoil; 
+		Double_t AoZFoil; 
 		Double_t TTgt; 
 		Double_t DYY; 
 		Double_t TYY[8]; 
+		Double_t DYYU; 
+		Double_t TYYU[8]; 
 		Double_t DS3; 
 		Double_t TS3[2];
+		Double_t DS3U; 
+		Double_t TS3U;
 		std::string MFoil;
 		std::string MTgt;	
 		Bool_t Mask;
