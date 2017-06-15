@@ -63,11 +63,17 @@ void reacParams::ReadParams(char* line)
 	if (strcmp(line,"d")==0){
 	   d=strval;
 	}
-	if (strcmp(line,"R")==0){
-	   R=fval;
+	if (strcmp(line,"R1")==0){
+	   R1=fval;
 	}
-	if (strcmp(line,"W")==0){
-	   W=fval;
+	if (strcmp(line,"R2")==0){
+	   R2=fval;
+	}
+	if (strcmp(line,"W1")==0){
+	   W1=fval;
+	}
+	if (strcmp(line,"W2")==0){
+	   W2=fval;
 	}
 	if (strcmp(line,"E")==0){
 	   E=fval;
@@ -113,16 +119,16 @@ void reacParams::Print(){
 	printf("\n********************************\n");
 	switch(N){
 		case 2:
-			printf("%s(%s,%s)%s(%.1lf) @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,E,W);
+			printf("%s(%s,%s(%.1lf))%s(%.1lf) @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),R2,B.data(),R1,E,W1);
 			break;
 		case 3:
-			printf("%s(%s,%s)%s(%.1lf)+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),E,W);
+			printf("%s(%s,%s)%s(%.1lf)+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),E,W1);
 			break;
 		case 4:
-			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,W);
+			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),E,W1);
 			break;
 		default:
-			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R,c.data(),d.data(),E,W);
+			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),E,W1);
 			break;
 	}
 	if(SHT) printf("Reaction in solid Hydrogen/Deuterium Target.");
@@ -139,8 +145,10 @@ void reacParams::Clear(){
 	d.clear();
 
 	E=0.;
-	R=0.;
-	W=0.;
+	R1=0.;
+	R2=0.;
+	W1=0.;
+	W2=0.;
 
 	N=0;
 	SHT=0;

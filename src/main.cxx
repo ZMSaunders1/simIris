@@ -34,14 +34,18 @@ Double_t mA=0.;
 Double_t ma=0.;	
 Double_t mB=0.;	
 Double_t mBR=0.;	
+Double_t mbR=0.;	
 Double_t mb=0.;	
 Double_t mc=0.;
 Double_t md=0.;
 
 Double_t Qgen=sqrt(-1.);
 Double_t Qdet=sqrt(-1.);
+Double_t Qdet_sd=sqrt(-1.);
 Double_t EB_det = sqrt(-1.);
+Double_t EB_det_sd = sqrt(-1.);
 Double_t PB_det = sqrt(-1.);
+Double_t PB_det_sd = sqrt(-1.);
 Double_t beamE=0.;
 Double_t beamBeta=0.;
 Double_t beamGamma=0.;
@@ -52,9 +56,11 @@ Double_t SSBdE=0.;
 void clearEvt()
 {
 	//TargdE[0]=0.; TargdE[1]=0.;
-	Qgen=sqrt(-1.); Qdet=sqrt(-1.);
+	Qgen=sqrt(-1.); Qdet=sqrt(-1.); Qdet_sd=sqrt(-1.);
 	EB_det=sqrt(-1.); PB_det=sqrt(-1.);
+	EB_det_sd=sqrt(-1.); PB_det_sd=sqrt(-1.);
 	mBR=0.;
+	mbR=0.;
 	tlP.Clear();
 	blP.Clear();
 	blPdec.Clear();
@@ -176,9 +182,10 @@ int main(int argc, char *argv[])
 
 	mA = A.mass/1000.;	
 	ma = a.mass/1000.;	
-	mB = B.mass/1000.+reacPrm.R/1000.;	
+	mB = B.mass/1000.+reacPrm.R1/1000.;	
 	mBR = mB;	
-	mb = b.mass/1000.;	
+	mb = b.mass/1000.+reacPrm.R2/1000.;	
+	mbR = mb;	
 	mc = c.mass/1000.;
 	md = d.mass/1000.;
 
@@ -206,9 +213,9 @@ int main(int argc, char *argv[])
 		S_low=B.S2p;
 		pick=4;
 	}
-	printf("\nResonance Energy: %.2lf\tlowest threshold: %.2lf\n",reacPrm.R,S_low);
+	printf("\nResonance Energy: %.2lf\tlowest threshold: %.2lf\n",reacPrm.R1,S_low);
 
-	if(S_low<reacPrm.R){
+	if(S_low<reacPrm.R1){
 		switch(pick){
 			case 1 : 
 				seqdec = kTRUE;
@@ -279,6 +286,7 @@ int main(int argc, char *argv[])
 	Iris->Branch("wght",&wght,"wght/D"); 
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
+	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D"); 
 	//Iris->Branch("EB_det",&EB_det,"EB_det/D"); 
 	//Iris->Branch("PB_det",&PB_det,"PB_det/D"); 
 	//Iris->Branch("mBR",&mBR,"mBR/D"); 
@@ -335,7 +343,7 @@ int main(int argc, char *argv[])
 	TLorentzVector target, beam, Sys;
 	TVector3 boostvect;
 
-	Double_t wght_max,width;
+	Double_t wght_max,width1,width2;
 	Bool_t allowed;
 
 	// Calculate energy loss up to center of the target
@@ -419,8 +427,9 @@ int main(int argc, char *argv[])
 
 	wght_max=PS0.GetWtMax();
 	printf("%lf\t%lf\n",wght_max,xsec_max);
-	width = reacPrm.W/1000.;
-	printf("%lf\t%lf\n",mB,width);
+	width1 = reacPrm.W1/1000.;
+	width2 = reacPrm.W2/1000.;
+	printf("%lf\t%lf\t%lf\n",mB,width1,width2);
 
 	Int_t whilecount;
 	// Start of event loop
@@ -453,7 +462,9 @@ int main(int argc, char *argv[])
 
 		wght = 0.;
 		clearEvt();
-		mBR = rndm->BreitWigner(mB,width);
+		mbR = rndm->BreitWigner(mB,width1);
+		masses[0] =mbR;
+		mBR = rndm->BreitWigner(mB,width2);
 		masses[1] =mBR;
 		PS0.SetDecay(Sys, reacPrm.N, masses); //recalculate with resonance energy
 		wght_max=PS0.GetWtMax();
@@ -616,26 +627,58 @@ int main(int argc, char *argv[])
 		}
 		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
 		sortEnergies(); // sort detector hits by energy
-
+	
 		//Calculating "measured" Q-Value
 		if(LEHit && yd.dE.size()>0 && csi.dE.size()>0){
 			if(csi.dE[0]>0. && yd.dE[0]>0.){
 			   	LEHitcntr++;
 				Double_t Eb = csi.dE[0];
-				Eb= Eb+elossFi(Eb,0.1*1.4*6./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eMy,b.EL.dedxMy); //Mylar
-	      		Eb= Eb+elossFi(Eb,0.1*2.702*0.3/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eAl,b.EL.dedxAl); //0.3 u Al
-	      		Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
+				Double_t cosTheta = Cos(yd.fThetaCalc[0]*DegToRad());
+				Eb= Eb+elossFi(Eb,0.1*1.4*6./cosTheta,b.EL.eMy,b.EL.dedxMy); //Mylar
+	      		Eb= Eb+elossFi(Eb,0.1*2.702*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //0.3 u Al
+	      		Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/cosTheta,b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
 				Eb+= yd.dE[0]; //use measured Yd // change june28
-	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
-	    		Eb= Eb+elossFi(Eb,targetTh/2./Cos(yd.fThetaCalc[0]*DegToRad()),b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
+	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
+	    		Eb= Eb+elossFi(Eb,targetTh/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
 				Eb= Eb/1000.;
 
 				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
 				EB_det = EA+mA+ma-Eb-mb;
-				PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cos(yd.fThetaCalc[0]*DegToRad()));
+				PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cosTheta);
 				Qdet = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
 				Qdet =Qdet*1000.;
+			}
+		}
+		
+		//Calculating "measured" Q-Value
+		if(sd1.dE.size()>0 && sd2.dE.size()>0){
+			if(sd1.dE[0]>0. && sd2.dE[0]>0.){
+				Double_t Eb = sd2.dE[0];
+				Double_t cosTheta = Cos(sd1.fThetaCalc[0]*DegToRad());
+				//Sd2 ring side
+				Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,b.EL.eB,b.EL.dedxB); //boron junction implant
+				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
+				Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
+				Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
+				//Sd1 ring side
+				Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
+				Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
+				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
+				Eb+= sd1.dE[0]; //use measured Sd // change june28
+				//Sd1 sector side
+				Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP); //phosphorus implant                                                                                   
+				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //metal
+
+				Eb= Eb+elossFi(Eb,targetTh/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
+		
+				Eb= Eb/1000.;
+
+				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
+				EB_det_sd = EA+mA+ma-Eb-mb;
+				PB_det_sd = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cosTheta);
+				Qdet_sd = mA+ma-mb-sqrt(EB_det_sd*EB_det_sd-PB_det_sd*PB_det_sd);
+				Qdet_sd =Qdet_sd*1000.;
 			}
 		}
 

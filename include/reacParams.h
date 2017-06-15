@@ -24,8 +24,10 @@ class reacParams : public TObject {
 		std::string d;
 
 		Double_t E; // Beam energy
-		Double_t R; // Resonance energy
-		Double_t W; // Resonance width
+		Double_t R1; // Resonance energy
+		Double_t R2; // Resonance energy
+		Double_t W1; // Resonance width
+		Double_t W2; // Resonance width
 		
 		Bool_t SHT; // Reaction in solid Hydrogen/Deuterium target?
 		
