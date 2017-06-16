@@ -429,7 +429,7 @@ int main(int argc, char *argv[])
 	printf("%lf\t%lf\n",wght_max,xsec_max);
 	width1 = reacPrm.W1/1000.;
 	width2 = reacPrm.W2/1000.;
-	printf("%lf\t%lf\t%lf\n",mB,width1,width2);
+	printf("%lf\t%lf\t%lf\t%lf\n",mB,width1,mb,width2);
 
 	Int_t whilecount;
 	// Start of event loop
@@ -462,10 +462,10 @@ int main(int argc, char *argv[])
 
 		wght = 0.;
 		clearEvt();
-		mbR = rndm->BreitWigner(mB,width1);
-		masses[0] =mbR;
-		mBR = rndm->BreitWigner(mB,width2);
+		mBR = rndm->BreitWigner(mB,width1);
 		masses[1] =mBR;
+		mbR = rndm->BreitWigner(mb,width2);
+		masses[0] =mbR;
 		PS0.SetDecay(Sys, reacPrm.N, masses); //recalculate with resonance energy
 		wght_max=PS0.GetWtMax();
 	
