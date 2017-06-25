@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
 	Double_t FoilAoZ=geoPrm.AoZFoil; //mu*g/cm^3*0.1
 	Double_t targetTh=geoPrm.TTgt; //mu*g/cm^3*0.1
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
-	const Double_t ICLength=22.9*0.062; //cm*mg/cm^3 at 19.5 Torr 
+	Double_t ICLength=22.9*0.00318*geoPrm.ICPressure; //cm*mg/cm^3 
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	

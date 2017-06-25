@@ -14,6 +14,7 @@ class geoParams : public TObject {
 		virtual ~geoParams() {} //! 
 		
 		Double_t Bs; 
+		Double_t ICPressure; 
 		Double_t TFoil; 
 		Double_t AoZFoil; 
 		Double_t TTgt; 

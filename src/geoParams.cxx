@@ -46,6 +46,9 @@ void geoParams::ReadParams(char* line)
 	if (strcmp(line,"Bs")==0){
 	   Bs=fval;
 	}
+	if (strcmp(line,"ICPressure")==0){
+	   ICPressure=fval;
+	}
 	if (strcmp(line,"TFoil")==0){
 	   TFoil=fval;
 	}
@@ -173,6 +176,7 @@ void geoParams::Load(std::string filename){
 void geoParams::Print(){
 
 	printf("********************************\n\n");
+	printf("IC:\t Pressure: %.2lf Torr\n",ICPressure);
 	printf("Foil:\t Material: %s\tthickness: %.2lf mg/cm2\tA/Z: %.3f\n",MFoil.data(),TFoil,AoZFoil);
 	printf("Target:\t Material: %s\tthickness: %.1lf mg/cm2\n",MTgt.data(),TTgt);
 	printf("Size of beamspot: %.1lf mm\n",Bs);
