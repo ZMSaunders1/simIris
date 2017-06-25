@@ -204,6 +204,7 @@ void geoParams::Clear(){
 	Bs=0.; 
 	TFoil=0.; 
 	TTgt=0.; 
+	ICPressure=0.; 
 	Mask=kTRUE; 
 	Shield=kTRUE; 
 	for(Int_t i=0; i<8; i++) { TYY[i] = 0.; }
