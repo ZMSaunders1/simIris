@@ -116,7 +116,7 @@ void reacParams::Load(std::string filename){
 }
 
 void reacParams::Print(){
-	printf("\n********************************\n");
+	printf("\n************************************************\n");
 	switch(N){
 		case 2:
 			printf("%s(%s,%s(%.1lf))%s(%.1lf) @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),R2,B.data(),R1,E,W1);
@@ -131,8 +131,9 @@ void reacParams::Print(){
 			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),E,W1);
 			break;
 	}
-	if(SHT) printf("Reaction in solid Hydrogen/Deuterium Target.");
-	else printf("Reaction in foil.");
+	if(SHT) printf("Reaction in solid Hydrogen/Deuterium Target.\n");
+	else printf("Reaction in foil.\n");
+	printf("\n************************************************\n\n");
 }
 
 void reacParams::Clear(){

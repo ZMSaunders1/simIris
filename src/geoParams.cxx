@@ -133,6 +133,9 @@ void geoParams::ReadParams(char* line)
 	if (strcmp(line,"SHIELD")==0){
 	   Shield=(fval==1.);
 	}
+	if (strcmp(line,"ORIENTATION")==0){
+	   Orientation=(fval==1.);
+	}
 	if (strcmp(line,"FOIL")==0){
 	   MFoil=strval;	
 	}
@@ -178,7 +181,7 @@ void geoParams::Print(){
 	printf("********************************\n\n");
 	printf("IC:\t Pressure: %.2lf Torr\n",ICPressure);
 	printf("Foil:\t Material: %s\tthickness: %.2lf mg/cm2\tA/Z: %.3f\n",MFoil.data(),TFoil,AoZFoil);
-	printf("Target:\t Material: %s\tthickness: %.1lf mg/cm2\n",MTgt.data(),TTgt);
+	printf("Target:\t Material: %s\tthickness: %.1lf mg/cm2\tA/Z: %.3f\n",MTgt.data(),TTgt,AoZTgt);
 	printf("Size of beamspot: %.1lf mm\n",Bs);
 	printf("Distance target-YY: %.1lf mm\n",DYY);
 	printf("Distance target-upstream YY: %.1lf mm\n",DYYU);
@@ -191,6 +194,7 @@ void geoParams::Print(){
 	printf("Thickness upstream S3: %.1lf um\n",TS3U);
 	printf("Using heat shield: %s\n",Shield ? "Yes" : "No");
 	printf("Using target mask: %s\n",Mask ? "Yes" : "No");
+	printf("Target %s from foil.\n",Orientation ? "upstream" : "downstream");
 	printf("********************************\n\n");
 }
 
@@ -203,7 +207,9 @@ void geoParams::Clear(){
 	TS3U=0.; 
 	Bs=0.; 
 	TFoil=0.; 
+	AoZFoil=0.; 
 	TTgt=0.; 
+	AoZTgt=0.; 
 	ICPressure=0.; 
 	Mask=kTRUE; 
 	Shield=kTRUE; 

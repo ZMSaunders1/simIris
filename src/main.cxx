@@ -138,12 +138,6 @@ int main(int argc, char *argv[])
 	
 	isSHTReac=reacPrm.SHT;
 	
-	if(have_geometry==kTRUE){
-		printf("Loading parameters from file %s.\n",geoParamsname);
-		geoPrm.Load(geoParamsname);
-	}
-	geoPrm.Print();
-
 	TRandom3 *rndm = new TRandom3(0);
 	Int_t Evnt=0; 
 	Double_t chck=0.;
@@ -264,7 +258,17 @@ int main(int argc, char *argv[])
 		masses2[0] = mBdec;
 		masses2[1] = mcdec;
 		masses2[2] = mddec;
+	}	
+	
+	
+	if(have_geometry==kTRUE){
+		printf("Loading parameters from file %s.\n",geoParamsname);
+		geoPrm.Load(geoParamsname);
 	}
+	geoPrm.AoZTgt = a.A/a.Z;
+	geoPrm.Print();
+
+
 // *******************************************************************
 	// Set up output file and tree
 	TFile *f = new TFile(outputname,"RECREATE");
@@ -310,9 +314,9 @@ int main(int argc, char *argv[])
 	   	if(seqdecN>2&&decd.Z>0) decd.EL.loadOutgoingELoss(dedxstr,decd.name.data(),geoPrm.MFoil,geoPrm.MTgt,decd.mass);
 	}
 
-	Double_t FoilTh=geoPrm.TFoil; //mu*g/cm^3*0.1
-	Double_t FoilAoZ=geoPrm.AoZFoil; //mu*g/cm^3*0.1
-	Double_t targetTh=geoPrm.TTgt; //mu*g/cm^3*0.1
+	// Double_t FoilTh=geoPrm.TFoil; //mu*g/cm^3*0.1
+	// Double_t FoilAoZ=geoPrm.AoZFoil; //mu*g/cm^3*0.1
+	// Double_t targetTh=geoPrm.TTgt; //mu*g/cm^3*0.1
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
 	Double_t ICLength=22.9*0.00318*geoPrm.ICPressure; //cm*mg/cm^3 
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
@@ -333,12 +337,14 @@ int main(int argc, char *argv[])
 	Int_t HEHitcntr=0;
 
 	Double_t LEeff, HEeff;
+	Double_t E_after_IC=0.;
+	Double_t E_before_SSB=0.;
 	Double_t E_before_Tgt=0.;
 	Double_t E_center_Tgt=0.;
 	Double_t E_after_Tgt=0.;
-	Double_t E_before_Ag=0.;
-	Double_t E_center_Ag=0.;
-	Double_t E_after_Ag=0.;
+	Double_t E_before_Foil=0.;
+	Double_t E_center_Foil=0.;
+	Double_t E_after_Foil=0.;
 
 	TLorentzVector target, beam, Sys;
 	TVector3 boostvect;
@@ -352,21 +358,54 @@ int main(int argc, char *argv[])
    	ICdE = eloss(A,0.586,EA,ICLength,A.EL.eC4H10, A.EL.dedxC4H10);
    	EA -= ICdE;
    	EA -= eloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
-	E_before_Ag = EA;
+	E_after_IC = EA;
+	
 	if(!isSHTReac){
-		E_center_Ag = EA - eloss(A,FoilAoZ,EA,FoilTh/2.,A.EL.eFoil, A.EL.dedxFoil);
-		EA -= eloss(A,FoilAoZ,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
+		if(geoPrm.Orientation==1){
+			E_before_Tgt = EA;
+   			EA -= eloss(A,1.,EA,geoPrm.TTgt/2.,A.EL.eTgt, A.EL.dedxTgt);
+			E_center_Tgt = EA;
+   			EA -= eloss(A,1.,EA,geoPrm.TTgt/2.,A.EL.eTgt, A.EL.dedxTgt);
+			E_after_Tgt = EA;
+		}
+		
+		E_before_Foil = EA;
+		E_center_Foil = EA - eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+		EA -= eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
    		E_before_Tgt = EA;
+   		E_after_Foil = EA;
+		if(geoPrm.Orientation==1) E_before_SSB = E_after_Foil;
+		
+		if(geoPrm.Orientation==0){
+			E_before_Tgt = E_after_Foil;
+   			E_center_Tgt = E_after_Foil - eloss(A,1.,E_after_Foil,geoPrm.TTgt/2.,A.EL.eTgt, A.EL.dedxTgt);
+   			E_after_Tgt = E_after_Foil-eloss(A,1.,E_after_Foil,geoPrm.TTgt,A.EL.eTgt, A.EL.dedxTgt);
+			E_before_SSB = E_after_Tgt;
+		}
 	}
 	else{
-		EA -= eloss(A,FoilAoZ,EA,FoilTh,A.EL.eFoil, A.EL.dedxFoil);
-   		E_after_Ag = EA;
-   		E_before_Tgt = EA;
-   		E_center_Tgt = EA - eloss(A,1.,EA,targetTh/2.,A.EL.eTgt, A.EL.dedxTgt);
-   		E_after_Tgt = EA-eloss(A,1.,EA,targetTh,A.EL.eTgt, A.EL.dedxTgt);
+		if(geoPrm.Orientation==0){
+			E_before_Foil = EA;
+			EA -= eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+   			E_center_Foil = EA;
+			EA -= eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+   			E_after_Foil = EA;
+		}
+   		
+		E_before_Tgt = EA;
+   		E_center_Tgt = EA - eloss(A,1.,EA,geoPrm.TTgt/2.,A.EL.eTgt, A.EL.dedxTgt);
+   		E_after_Tgt = EA-eloss(A,1.,EA,geoPrm.TTgt,A.EL.eTgt, A.EL.dedxTgt);
+		if(geoPrm.Orientation==0) E_before_SSB = E_after_Tgt;
 		
-		reacZ = targetTh/2.;
+		reacZ = geoPrm.TTgt/2.;
    		EA -= eloss(A,1.,EA,reacZ,A.EL.eTgt, A.EL.dedxTgt);
+	
+		if(geoPrm.Orientation==1){
+			E_before_Foil = E_after_Tgt;
+			E_center_Foil = E_after_Tgt - eloss(A,geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+			E_after_Foil = E_after_Tgt - eloss(A,geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
+			E_before_SSB = E_after_Foil;
+		}
 	}
 	
 	EA = EA/1000.; // convert to GeV for TGenPhaseSpace
@@ -379,27 +418,24 @@ int main(int argc, char *argv[])
 	beamGamma = Sys.Gamma();
 	beamEcm = EA*ma*1000./(mA+ma);
 
-	if(!isSHTReac){
-		printf("\n\nEnergy before of silver foil: %.2lf MeV\n", E_before_Ag);
-		printf("\n\nEnergy at center of silver foil: %.2lf MeV\n", E_center_Ag);
-		printf("\n\nEnergy after silver foil: %.2lf MeV\n", E_before_Tgt);
-	}
-	else{
-		printf("\n\nEnergy before target: %.2lf MeV\n", E_before_Tgt);
-		printf("\n\nEnergy at center of target: %.2lf MeV\n", E_center_Tgt);
-		printf("\n\nEnergy at behind target: %.2lf MeV\n", E_after_Tgt);
+	printf("\nEnergy after IC window: %.2lf MeV\n", E_after_IC);
+	printf("Energy before foil: %.2lf MeV\n", E_before_Foil);
+	printf("Energy at center of foil: %.2lf MeV\n", E_center_Foil);
+	printf("Energy after foil: %.2lf MeV\n", E_after_Foil);
+	printf("Energy before target: %.2lf MeV\n", E_before_Tgt);
+	printf("Energy at center of target: %.2lf MeV\n", E_center_Tgt);
+	printf("Energy at behind target: %.2lf MeV\n", E_after_Tgt);
 	
-		printf("\nBeta at center of target: %.3lf \n", beamBeta);
-		printf("\nGamma at center of target: %.3lf \n", beamGamma);
-		printf("\nCM Energy at center of target: %.2lf MeV\n\n", beamEcm);
-	}
+	printf("\nBeta at center of target: %.3lf \n", beamBeta);
+	printf("Gamma at center of target: %.3lf \n", beamGamma);
+	printf("CM Energy at center of target: %.2lf MeV\n\n", beamEcm);
 
 	printf("YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYY,yd.ThetaMin(geoPrm.DYY),yd.ThetaMax(geoPrm.DYY)); 
 	printf("CsI detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYY+11.6,csi.ThetaMin(geoPrm.DYY+11.6),csi.ThetaMax(geoPrm.DYY+11.6)); 
 	printf("First S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3,sd1.ThetaMin(geoPrm.DS3),sd1.ThetaMax(geoPrm.DS3)); 
 	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3+14.8,sd2.ThetaMin(geoPrm.DS3+14.8),sd2.ThetaMax(geoPrm.DS3+14.8)); 
 	printf("Upstream YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYYU,yu.ThetaMin(geoPrm.DYYU),yu.ThetaMax(geoPrm.DYYU)); 
-	printf("Upstream S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3U,su.ThetaMin(geoPrm.DS3U),su.ThetaMax(geoPrm.DS3U)); 
+	printf("Upstream S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n\n",geoPrm.DS3U,su.ThetaMin(geoPrm.DS3U),su.ThetaMax(geoPrm.DS3U)); 
 	Double_t masses[4] = { mb, mB, mc, md};
 	
 	Double_t tht=0.; 
@@ -436,13 +472,13 @@ int main(int argc, char *argv[])
 	while(Evnt<nsim) 
 	{
 		if(!isSHTReac){
-			reacZ = FoilTh/2.;
-			//reacZ = rndm->Uniform(0,FoilTh);
-   			EA = E_before_Ag - eloss(A,1./FoilAoZ,E_before_Ag,reacZ,A.EL.eFoil, A.EL.dedxFoil);
+			reacZ = geoPrm.TFoil/2.;
+			//reacZ = rndm->Uniform(0,geoPrm.TFoil);
+   			EA = E_before_Foil - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,reacZ,A.EL.eFoil, A.EL.dedxFoil);
 		}
 		else{	
-			//reacZ = rndm->Uniform(0,targetTh);
-			reacZ = targetTh/2.;
+			//reacZ = rndm->Uniform(0,geoPrm.TTgt);
+			reacZ = geoPrm.TTgt/2.;
    			EA = E_before_Tgt - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
  		}
 		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
@@ -574,58 +610,31 @@ int main(int argc, char *argv[])
 		reacX = BeamSpot*rndm->Gaus();
 		reacY = BeamSpot*rndm->Gaus();
 		reacPos.SetXYZ(reacX,reacY,reacZ);
-
-		if(!isSHTReac){ 
-			tlP.AgdE = eloss(b,1./FoilAoZ,tlP.E,(FoilTh-reacZ)/Cos(tlP.T),b.EL.eFoil,b.EL.dedxFoil);	
-			tlP.TrgtdE = eloss(b,a.Z/a.A,tlP.E-tlP.AgdE,targetTh/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
-			tlP.Ebt = tlP.E-tlP.AgdE-tlP.TrgtdE;
-		}
-		else{
-		   	tlP.AgdE = 0.;	
-			tlP.TrgtdE = eloss(b,a.Z/a.A,tlP.E,(targetTh-reacZ)/Cos(tlP.T),b.EL.eTgt,b.EL.dedxTgt);	
-			tlP.Ebt = tlP.E-tlP.TrgtdE;
-		}
 		
+		tlP = TgtELoss(tlP, b, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
 		LEHit = detHits(tlP, b, reacPos,geoPrm.Mask,geoPrm.Shield);
 		
 		if(!seqdec){
-			if(!isSHTReac){ 
-				blP.AgdE = eloss(B,1./FoilAoZ,blP.E,(FoilTh-reacZ)/Cos(blP.T),B.EL.eFoil,B.EL.dedxFoil);	
-				blP.TrgtdE = eloss(B,a.Z/a.A,blP.E-blP.AgdE,targetTh/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
-			}
-			else {
-		   		blP.AgdE = 0.;	
-				blP.TrgtdE = eloss(B,a.Z/a.A,blP.E,(targetTh-reacZ)/Cos(blP.T),B.EL.eTgt,B.EL.dedxTgt);	
-			}
-			blP.Ebt = blP.E-blP.AgdE-blP.TrgtdE;
+			blP = TgtELoss(blP, B, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
 			HEHit = detHits(blP, B, reacPos,geoPrm.Mask,geoPrm.Shield);
 		}
 		else{ 
-		   	blPdec.AgdE = 0.;	
-			blPdec.TrgtdE = eloss(decB,a.Z/a.A,blPdec.E,(targetTh-reacZ)/Cos(blPdec.T),decB.EL.eTgt,decB.EL.dedxTgt);	
-			blPdec.Ebt = blPdec.E-blPdec.TrgtdE;
+			blPdec = TgtELoss(blPdec, decB, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
 			HEHit = detHits(blPdec, decB, reacPos,geoPrm.Mask,geoPrm.Shield);	
 			if(decc.Z>0){
-		   		tlPdec1.AgdE = 0.;	
-				tlPdec1.TrgtdE = eloss(decc,a.Z/a.A,tlPdec1.E,(targetTh-reacZ)/Cos(tlPdec1.T),decc.EL.eTgt,decc.EL.dedxTgt);	
-				tlPdec1.Ebt = tlPdec1.E-tlPdec1.TrgtdE;
+				tlPdec1 = TgtELoss(tlPdec1, decc, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
 				detHits(tlPdec1, decc, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}	
 			if(seqdecN>2&&decd.Z>0){
-		   		tlPdec2.AgdE = 0.;	
-				tlPdec2.TrgtdE = eloss(decd,a.Z/a.A,tlPdec2.E,(targetTh-reacZ)/Cos(tlPdec2.T),decd.EL.eTgt,decd.EL.dedxTgt);	
-				tlPdec2.Ebt = tlPdec2.E-tlPdec2.TrgtdE;
+				tlPdec2 = TgtELoss(tlPdec2, decd, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
 				detHits(tlPdec2, decd, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}
 		}
-		if(!isSHTReac){
-			//E_before_SSB = E_before_Tgt - eloss(A,1.,E_after_Ag,targetTh,A.EL.eTgt,A.EL.dedxTgt);
-			SSBdE = eloss(A,14./28.,E_after_Ag,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
-		}
-		else{ 
-			SSBdE = eloss(A,14./28.,E_after_Tgt,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
-		}
+			
+		// Calculate energy loss in SSB
+		SSBdE = eloss(A,14./28.,E_before_SSB,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
 		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
+
 		sortEnergies(); // sort detector hits by energy
 	
 		//Calculating "measured" Q-Value
@@ -639,7 +648,7 @@ int main(int argc, char *argv[])
 	      		Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/cosTheta,b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
 				Eb+= yd.dE[0]; //use measured Yd // change june28
 	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
-	    		Eb= Eb+elossFi(Eb,targetTh/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
+	    		Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
 				Eb= Eb/1000.;
 
@@ -670,7 +679,7 @@ int main(int argc, char *argv[])
 				Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP); //phosphorus implant                                                                                   
 				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //metal
 
-				Eb= Eb+elossFi(Eb,targetTh/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
+				Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
 				Eb= Eb/1000.;
 

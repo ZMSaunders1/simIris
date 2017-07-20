@@ -18,6 +18,7 @@ class geoParams : public TObject {
 		Double_t TFoil; 
 		Double_t AoZFoil; 
 		Double_t TTgt; 
+		Double_t AoZTgt; 
 		Double_t DYY; 
 		Double_t TYY[8]; 
 		Double_t DYYU; 
@@ -30,6 +31,7 @@ class geoParams : public TObject {
 		std::string MTgt;	
 		Bool_t Mask;
 		Bool_t Shield;
+		Bool_t Orientation;
 
 		//virtual void ReadCalibPar(char* line);
 		virtual void ReadParams(char* line);

@@ -37,6 +37,51 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t s
 	return (mask && shield && YYHit && CsIHit);
 }
 
+// Calculate the energy loss of the scattered particles in Foil and SHT
+PTrack TgtELoss(PTrack tr, nucleus ncl, geoParams g, Double_t reacZ, Bool_t isSHTReac)
+{
+	if(!isSHTReac){ //Reaction in foil 
+		if(g.Orientation==0&&tr.T<TMath::Pi()/2.){ // foil before target, theta<90 deg
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,(g.TFoil-reacZ)/Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E-tr.FoildE,g.TTgt/Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+		}
+		if(g.Orientation==0&&tr.T>TMath::Pi()/2.){ // foil before target, theta>90 deg
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = 0.;
+		}
+		if(g.Orientation==1&&tr.T<TMath::Pi()/2.){ // foil after target, theta<90 deg
+			tr.TrgtdE = 0.;	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,(g.TFoil-reacZ)/Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+		}
+		if(g.Orientation==1&&tr.T>TMath::Pi()/2.){ // foil after target, theta>90 deg
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E-tr.FoildE,g.TTgt/Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+		}
+	}
+	else{ //Reaction in SHT
+		if(g.Orientation==0&&tr.T<TMath::Pi()/2.){ // foil before target, theta<90 deg
+	   		tr.FoildE = 0.;	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,(g.TTgt-reacZ)/Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+		}
+		if(g.Orientation==0&&tr.T>TMath::Pi()/2.){ // foil before target, theta>90 deg
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,g.TFoil/Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+		}
+		if(g.Orientation==1&&tr.T<TMath::Pi()/2.){ // foil after target, theta<90 deg
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,(g.TTgt-reacZ)/Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,g.TFoil/Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+		}
+		if(g.Orientation==1&&tr.T>TMath::Pi()/2.){ // foil after target, theta>90 deg
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+	   		tr.FoildE = 0.;	
+		}
+	}
+	
+	tr.Ebt = tr.E-tr.FoildE-tr.TrgtdE; // calculate energy of particle after foil and target
+	//printf("In: %f\tFoil: %f\tTarget: %f\tLeft: %f\n",tr.E,tr.FoildE,tr.TrgtdE,tr.Ebt);
+	return tr;
+}
+
 void sortEnergies(){
 	if(yd.mul>1) yd.SortByEnergy();
 	if(yu.mul>1) yu.SortByEnergy();
