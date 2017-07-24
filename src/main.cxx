@@ -611,22 +611,22 @@ int main(int argc, char *argv[])
 		reacY = BeamSpot*rndm->Gaus();
 		reacPos.SetXYZ(reacX,reacY,reacZ);
 		
-		tlP = TgtELoss(tlP, b, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
+		tlP = TgtELoss(tlP, b, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
 		LEHit = detHits(tlP, b, reacPos,geoPrm.Mask,geoPrm.Shield);
 		
 		if(!seqdec){
-			blP = TgtELoss(blP, B, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
+			blP = TgtELoss(blP, B, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
 			HEHit = detHits(blP, B, reacPos,geoPrm.Mask,geoPrm.Shield);
 		}
 		else{ 
-			blPdec = TgtELoss(blPdec, decB, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
+			blPdec = TgtELoss(blPdec, decB, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
 			HEHit = detHits(blPdec, decB, reacPos,geoPrm.Mask,geoPrm.Shield);	
 			if(decc.Z>0){
-				tlPdec1 = TgtELoss(tlPdec1, decc, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
+				tlPdec1 = TgtELoss(tlPdec1, decc, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
 				detHits(tlPdec1, decc, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}	
 			if(seqdecN>2&&decd.Z>0){
-				tlPdec2 = TgtELoss(tlPdec2, decd, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the scattered particles in Foil and SHT
+				tlPdec2 = TgtELoss(tlPdec2, decd, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
 				detHits(tlPdec2, decd, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}
 		}
