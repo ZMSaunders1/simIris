@@ -514,7 +514,7 @@ int main(int argc, char *argv[])
 			if(have_dwba_xsec==kTRUE){
 				LTmp = PS0.GetDecay(0);
 				LTmp->Boost(-boostvect);
-				tht = RadToDeg()*LTmp->Theta();
+				tht = TMath::RadToDeg()*LTmp->Theta();
 				xsec=eval_theta(tht,dwba_th,dwba_xsec);
 				xsec_chck = rndm->Uniform(0,xsec_max);
 				LTmp->Boost(boostvect);
@@ -542,10 +542,10 @@ int main(int argc, char *argv[])
 		blP.P=LVB->Phi();	
 		
 		// Convert angles to degrees for root file
-		tlP.Tdeg=RadToDeg()*tlP.T;
-		blP.Tdeg=RadToDeg()*blP.T;
-		tlP.Pdeg=RadToDeg()*tlP.P;
-		blP.Pdeg=RadToDeg()*blP.P;
+		tlP.Tdeg=TMath::RadToDeg()*tlP.T;
+		blP.Tdeg=TMath::RadToDeg()*blP.T;
+		tlP.Pdeg=TMath::RadToDeg()*tlP.P;
+		blP.Pdeg=TMath::RadToDeg()*blP.P;
 
 		if(seqdec)
 		{
@@ -560,19 +560,19 @@ int main(int argc, char *argv[])
 			blPdec.T=LVBdec->Theta();
 			blPdec.E=(LVBdec->E()-mBdec)*1000.;
 			blPdec.P=LVBdec->Phi();	
-			blPdec.Tdeg=RadToDeg()*blPdec.T;
-			blPdec.Pdeg=RadToDeg()*blPdec.P;
+			blPdec.Tdeg=TMath::RadToDeg()*blPdec.T;
+			blPdec.Pdeg=TMath::RadToDeg()*blPdec.P;
 			tlPdec1.T=LVcdec->Theta();
 			tlPdec1.E=(LVcdec->E()-mcdec)*1000.;
 			tlPdec1.P=LVcdec->Phi();	
-			tlPdec1.Tdeg=RadToDeg()*tlPdec1.T;
-			tlPdec1.Pdeg=RadToDeg()*tlPdec1.P;
+			tlPdec1.Tdeg=TMath::RadToDeg()*tlPdec1.T;
+			tlPdec1.Pdeg=TMath::RadToDeg()*tlPdec1.P;
 			if(seqdecN>2){
 				tlPdec2.T=LVcdec->Theta();
 				tlPdec2.E=(LVcdec->E()-mddec)*1000.;
 				tlPdec2.P=LVcdec->Phi();	
-				tlPdec2.Tdeg=RadToDeg()*tlPdec2.T;
-				tlPdec2.Pdeg=RadToDeg()*tlPdec2.P;
+				tlPdec2.Tdeg=TMath::RadToDeg()*tlPdec2.T;
+				tlPdec2.Pdeg=TMath::RadToDeg()*tlPdec2.P;
 			}
 		}
 		else if(reacPrm.N>3) // 4body
@@ -588,10 +588,10 @@ int main(int argc, char *argv[])
 			tlPdec2.P=LVddec->Phi();	
 			
 			// Convert angles to degrees for root file
-			tlPdec1.Tdeg=RadToDeg()*tlPdec1.T;
-			tlPdec2.Tdeg=RadToDeg()*tlPdec2.T;
-			tlPdec1.Pdeg=RadToDeg()*tlPdec1.P;
-			tlPdec2.Pdeg=RadToDeg()*tlPdec2.P;
+			tlPdec1.Tdeg=TMath::RadToDeg()*tlPdec1.T;
+			tlPdec2.Tdeg=TMath::RadToDeg()*tlPdec2.T;
+			tlPdec1.Pdeg=TMath::RadToDeg()*tlPdec1.P;
+			tlPdec2.Pdeg=TMath::RadToDeg()*tlPdec2.P;
 		}
 		else if(reacPrm.N>2) // 3body
 		{
@@ -602,8 +602,8 @@ int main(int argc, char *argv[])
 			tlPdec1.P=LVcdec->Phi();	
 			
 			// Convert angles to degrees for root file
-			tlPdec1.Tdeg=RadToDeg()*tlPdec1.T;
-			tlPdec1.Pdeg=RadToDeg()*tlPdec1.P;
+			tlPdec1.Tdeg=TMath::RadToDeg()*tlPdec1.T;
+			tlPdec1.Pdeg=TMath::RadToDeg()*tlPdec1.P;
 		}
 
 		// Position on target	
@@ -642,7 +642,7 @@ int main(int argc, char *argv[])
 			if(csi.dE[0]>0. && yd.dE[0]>0.){
 			   	LEHitcntr++;
 				Double_t Eb = csi.dE[0];
-				Double_t cosTheta = Cos(yd.fThetaCalc[0]*DegToRad());
+				Double_t cosTheta = TMath::Cos(yd.fThetaCalc[0]*TMath::DegToRad());
 				Eb= Eb+elossFi(Eb,0.1*1.4*6./cosTheta,b.EL.eMy,b.EL.dedxMy); //Mylar
 	      		Eb= Eb+elossFi(Eb,0.1*2.702*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //0.3 u Al
 	      		Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/cosTheta,b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
@@ -664,7 +664,7 @@ int main(int argc, char *argv[])
 		if(sd1.dE.size()>0 && sd2.dE.size()>0){
 			if(sd1.dE[0]>0. && sd2.dE[0]>0.){
 				Double_t Eb = sd2.dE[0];
-				Double_t cosTheta = Cos(sd1.fThetaCalc[0]*DegToRad());
+				Double_t cosTheta = TMath::Cos(sd1.fThetaCalc[0]*TMath::DegToRad());
 				//Sd2 ring side
 				Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,b.EL.eB,b.EL.dedxB); //boron junction implant
 				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
@@ -698,21 +698,21 @@ int main(int argc, char *argv[])
 		blP.Ecm = (LVB->E()-mB)*ma*1000./(mA+ma);
 		LVb->Boost(-boostvect);
 		LVB->Boost(-boostvect);
-		tlP.Tcm = RadToDeg()*(Pi()-LVb->Theta());
-		blP.Tcm = RadToDeg()*LVB->Theta();
+		tlP.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVb->Theta());
+		blP.Tcm = TMath::RadToDeg()*LVB->Theta();
 		
 		if(seqdec)
 		{
 			blPdec.Ecm = (LVBdec->E()-mBdec)*ma*1000./(mA+ma);
 			LVBdec->Boost(-boostvect);
-			blPdec.Tcm = RadToDeg()*LVBdec->Theta();
+			blPdec.Tcm = TMath::RadToDeg()*LVBdec->Theta();
 			tlPdec1.Ecm = (LVcdec->E()-mcdec)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
-			tlPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+			tlPdec1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
 			if(seqdecN>2){
 				tlPdec2.Ecm = (LVddec->E()-mddec)*ma*1000./(mA+ma);
 				LVddec->Boost(-boostvect);
-				tlPdec2.Tcm = RadToDeg()*LVddec->Theta();
+				tlPdec2.Tcm = TMath::RadToDeg()*LVddec->Theta();
 			}
 		}
 		else if(reacPrm.N>3) // 4body
@@ -721,14 +721,14 @@ int main(int argc, char *argv[])
 			tlPdec2.Ecm = (LVddec->E()-md)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
 			LVddec->Boost(-boostvect);
-			tlPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
-			tlPdec2.Tcm = RadToDeg()*LVddec->Theta();
+			tlPdec1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
+			tlPdec2.Tcm = TMath::RadToDeg()*LVddec->Theta();
 		}
 		else if(reacPrm.N>2) // 3body
 		{
 			tlPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
-			tlPdec1.Tcm = RadToDeg()*(Pi()-LVcdec->Theta());
+			tlPdec1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
 		}
 		setIDet(ICdE,SSBdE);
 		printf("Writing %s: %.6d of %.6d events processed..\r",outputname,Evnt,nsim);

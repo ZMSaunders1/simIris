@@ -42,37 +42,37 @@ PTrack TgtELoss(PTrack tr, nucleus ncl, geoParams g, Double_t reacZ, Bool_t isSH
 {
 	if(!isSHTReac){ //Reaction in foil 
 		if(g.Orientation==0&&tr.T<TMath::Pi()/2.){ // foil before target, theta<90 deg
-			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,(g.TFoil-reacZ)/Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
-			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E-tr.FoildE,g.TTgt/Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,(g.TFoil-reacZ)/TMath::Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E-tr.FoildE,g.TTgt/TMath::Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
 		}
 		if(g.Orientation==0&&tr.T>TMath::Pi()/2.){ // foil before target, theta>90 deg
-			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,reacZ/TMath::Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
 			tr.TrgtdE = 0.;
 		}
 		if(g.Orientation==1&&tr.T<TMath::Pi()/2.){ // foil after target, theta<90 deg
 			tr.TrgtdE = 0.;	
-			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,(g.TFoil-reacZ)/Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,(g.TFoil-reacZ)/TMath::Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
 		}
 		if(g.Orientation==1&&tr.T>TMath::Pi()/2.){ // foil after target, theta>90 deg
-			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
-			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E-tr.FoildE,g.TTgt/Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E,reacZ/TMath::Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E-tr.FoildE,g.TTgt/TMath::Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
 		}
 	}
 	else{ //Reaction in SHT
 		if(g.Orientation==0&&tr.T<TMath::Pi()/2.){ // foil before target, theta<90 deg
 	   		tr.FoildE = 0.;	
-			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,(g.TTgt-reacZ)/Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,(g.TTgt-reacZ)/TMath::Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
 		}
 		if(g.Orientation==0&&tr.T>TMath::Pi()/2.){ // foil before target, theta>90 deg
-			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
-			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,g.TFoil/Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,reacZ/TMath::Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,g.TFoil/TMath::Cos(TMath::Pi()-tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
 		}
 		if(g.Orientation==1&&tr.T<TMath::Pi()/2.){ // foil after target, theta<90 deg
-			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,(g.TTgt-reacZ)/Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
-			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,g.TFoil/Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,(g.TTgt-reacZ)/TMath::Cos(tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.FoildE = eloss(ncl,1./g.AoZFoil,tr.E-tr.TrgtdE,g.TFoil/TMath::Cos(tr.T),ncl.EL.eFoil,ncl.EL.dedxFoil);	
 		}
 		if(g.Orientation==1&&tr.T>TMath::Pi()/2.){ // foil after target, theta>90 deg
-			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,reacZ/Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
+			tr.TrgtdE = eloss(ncl,1./g.AoZTgt,tr.E,reacZ/TMath::Cos(TMath::Pi()-tr.T),ncl.EL.eTgt,ncl.EL.dedxTgt);	
 	   		tr.FoildE = 0.;	
 		}
 	}

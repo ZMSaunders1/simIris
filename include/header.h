@@ -10,8 +10,6 @@
 #include "S3Hit.h"
 #include "IDet.h"
 
-using namespace TMath;
-
 extern reacParams reacPrm;
 extern geoParams geoPrm;
 extern YYHit yd;
