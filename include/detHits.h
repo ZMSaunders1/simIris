@@ -105,6 +105,18 @@ void setIDet(Double_t ICdE, Double_t SSBdE)
 		}
 	}
 
+	if(yu.mul>0)
+	{
+  		det.TYuMul = yu.mul;
+		for(Int_t i=0; i<det.TYuMul; i++){
+			det.TYuEnergy.push_back(yu.dE[i]);
+  			det.TYuTheta.push_back(yu.fThetaRand[i]);// Yu theta angle                                                                       
+			det.TYuChannel.push_back(yu.Seg[i]*16+yu.Ring[i]);
+			det.TYuNo.push_back(yu.Seg[i]);
+			det.TYuRing.push_back(yu.Ring[i]);
+		}
+	}
+
 	if(csi.mul>0)
 	{
 		det.TCsI1Mul = csi.mul;
@@ -153,6 +165,22 @@ void setIDet(Double_t ICdE, Double_t SSBdE)
   			det.TSd2sEnergy.push_back(sd2.dE[i]);
 			det.TSd2sChannel.push_back(sd2.Seg[i]);
   			det.TSd2Phi.push_back(sd2.fPhiRand[i]);
+		}
+	}
+	
+	if(su.mul>0)
+	{
+		det.TSurMul=su.mul;
+		for(Int_t i=0; i<det.TSd1rMul; i++){
+  			det.TSurEnergy.push_back(su.dE[i]);
+			det.TSurChannel.push_back(su.Ring[i]);
+  			det.TSuTheta.push_back(su.fThetaRand[i]);
+		}
+		det.TSusMul=su.mul;
+		for(Int_t i=0; i<det.TSd1sMul; i++){
+  			det.TSusEnergy.push_back(su.dE[i]);
+			det.TSusChannel.push_back(su.Seg[i]);
+  			det.TSuPhi.push_back(su.fPhiRand[i]);
 		}
 	}
 }

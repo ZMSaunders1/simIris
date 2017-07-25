@@ -419,13 +419,20 @@ int main(int argc, char *argv[])
 	beamEcm = EA*ma*1000./(mA+ma);
 
 	printf("\nEnergy after IC window: %.2lf MeV\n", E_after_IC);
+	if(geoPrm.Orientation==1){
+		printf("Energy before target: %.2lf MeV\n", E_before_Tgt);
+		printf("Energy at center of target: %.2lf MeV\n", E_center_Tgt);
+		printf("Energy at behind target: %.2lf MeV\n", E_after_Tgt);
+	}
 	printf("Energy before foil: %.2lf MeV\n", E_before_Foil);
 	printf("Energy at center of foil: %.2lf MeV\n", E_center_Foil);
 	printf("Energy after foil: %.2lf MeV\n", E_after_Foil);
-	printf("Energy before target: %.2lf MeV\n", E_before_Tgt);
-	printf("Energy at center of target: %.2lf MeV\n", E_center_Tgt);
-	printf("Energy at behind target: %.2lf MeV\n", E_after_Tgt);
-	
+	if(geoPrm.Orientation==0){
+		printf("Energy before target: %.2lf MeV\n", E_before_Tgt);
+		printf("Energy at center of target: %.2lf MeV\n", E_center_Tgt);
+		printf("Energy at behind target: %.2lf MeV\n", E_after_Tgt);
+	}
+
 	printf("\nBeta at center of target: %.3lf \n", beamBeta);
 	printf("Gamma at center of target: %.3lf \n", beamGamma);
 	printf("CM Energy at center of target: %.2lf MeV\n\n", beamEcm);
