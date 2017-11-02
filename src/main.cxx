@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
 	Bool_t have_dwba_xsec=kFALSE;
 	char *endptr;
 	Int_t nsim = 1E3;
+	Int_t Run = 0;
 	char *reacParamsname =NULL;
 	char *geoParamsname =NULL;
 	char *dedxpath =NULL;
@@ -124,6 +125,9 @@ int main(int argc, char *argv[])
 			}
 			else if(strncmp(argv[i],"--events=",9)==0){
 	  			nsim = strtol(argv[i]+9,&endptr,10);//converting string to number
+			}
+			else if(strncmp(argv[i],"--run=",6)==0){
+	  			Run = strtol(argv[i]+6,&endptr,10);//converting string to number
 			}
 		}
 	}
@@ -168,11 +172,21 @@ int main(int argc, char *argv[])
 	Double_t reacX, reacY, reacZ;
 
 	A.getInfo(binpath, reacPrm.A);
+	A.Print();
 	a.getInfo(binpath, reacPrm.a);
+	a.Print();
 	B.getInfo(binpath, reacPrm.B);
+	B.Print();
 	b.getInfo(binpath, reacPrm.b);
-	c.getInfo(binpath, reacPrm.c);
-	d.getInfo(binpath, reacPrm.d);
+	b.Print();
+	if(reacPrm.N>2){
+		c.getInfo(binpath, reacPrm.c);
+		c.Print();
+	}
+	if(reacPrm.N>3){
+		d.getInfo(binpath, reacPrm.d);
+		d.Print();
+	}
 
 	mA = A.mass/1000.;	
 	ma = a.mass/1000.;	
@@ -216,8 +230,10 @@ int main(int argc, char *argv[])
 				printf("\nSequential 1n- decay!\n\n"); 
 				seqdecN =2;
 				decB.getInfo(binpath, B.N-1,B.Z);
+				decB.Print();
 				mBdec=decB.mass/1000.;
 				decc.getInfo(binpath, "n");
+				decc.Print();
 				mcdec=decc.mass/1000.;
 				break;
 			case 2 : 
@@ -225,8 +241,10 @@ int main(int argc, char *argv[])
 				printf("\nSequential 1p- decay!\n\n"); 
 				seqdecN =2;
 				decB.getInfo(binpath, B.N,B.Z-1);
+				decB.Print();
 				mBdec=decB.mass/1000.;
 				decc.getInfo(binpath, "p");
+				decc.Print();
 				mcdec=decc.mass/1000.;
 				break;
 			case 3 : 
@@ -234,10 +252,13 @@ int main(int argc, char *argv[])
 				printf("\nSequential 2n- decay!\n\n"); 
 				seqdecN =3;
 				decB.getInfo(binpath, B.N-2,B.Z);
+				decB.Print();
 				mBdec=decB.mass/1000.;
 				decc.getInfo(binpath, "n");
+				decc.Print();
 				mcdec=decc.mass/1000.;
 				decd.getInfo(binpath, "n");
+				decd.Print();
 				mddec=decd.mass/1000.;
 				break;
 			case 4 : 
@@ -245,10 +266,13 @@ int main(int argc, char *argv[])
 				printf("\nSequential 2p- decay!\n\n"); 
 				seqdecN =3;
 				decB.getInfo(binpath, B.N,B.Z-2);
+				decB.Print();
 				mBdec=decB.mass/1000.;
 				decc.getInfo(binpath, "p");
+				decc.Print();
 				mcdec=decc.mass/1000.;
 				decd.getInfo(binpath, "p");
+				decd.Print();
 				mddec=decd.mass/1000.;
 				break;
 			default : 
@@ -275,6 +299,7 @@ int main(int argc, char *argv[])
 	TTree *Iris = new TTree("Iris","Iris simulation");
 	
 	Iris->Branch("Evnt",&Evnt,"Evnt/I"); 
+	Iris->Branch("Run",&Run,"Run/I"); 
 	Iris->Branch("beamE",&beamE,"beamE/D"); 
 	Iris->Branch("beamBeta",&beamBeta,"beamBeta/D"); 
 	Iris->Branch("beamGamma",&beamGamma,"beamGamma/D"); 
@@ -370,8 +395,8 @@ int main(int argc, char *argv[])
 		}
 		
 		E_before_Foil = EA;
-		E_center_Foil = EA - eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
-		EA -= eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
+		E_center_Foil = EA - eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+		EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
    		E_before_Tgt = EA;
    		E_after_Foil = EA;
 		if(geoPrm.Orientation==1) E_before_SSB = E_after_Foil;
@@ -386,9 +411,9 @@ int main(int argc, char *argv[])
 	else{
 		if(geoPrm.Orientation==0){
 			E_before_Foil = EA;
-			EA -= eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+			EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
    			E_center_Foil = EA;
-			EA -= eloss(A,geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+			EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
    			E_after_Foil = EA;
 		}
    		
@@ -402,8 +427,8 @@ int main(int argc, char *argv[])
 	
 		if(geoPrm.Orientation==1){
 			E_before_Foil = E_after_Tgt;
-			E_center_Foil = E_after_Tgt - eloss(A,geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
-			E_after_Foil = E_after_Tgt - eloss(A,geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
+			E_center_Foil = E_after_Tgt - eloss(A,1./geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
+			E_after_Foil = E_after_Tgt - eloss(A,1./geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
 			E_before_SSB = E_after_Foil;
 		}
 	}
@@ -652,7 +677,7 @@ int main(int argc, char *argv[])
 				Double_t cosTheta = TMath::Cos(yd.fThetaCalc[0]*TMath::DegToRad());
 				Eb= Eb+elossFi(Eb,0.1*1.4*6./cosTheta,b.EL.eMy,b.EL.dedxMy); //Mylar
 	      		Eb= Eb+elossFi(Eb,0.1*2.702*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //0.3 u Al
-	      		Eb= Eb+elossFi(Eb,0.1*1.88219*0.1/cosTheta,b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
+	      		Eb= Eb+elossFi(Eb,0.1*1.822*0.1/cosTheta,b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
 				Eb+= yd.dE[0]; //use measured Yd // change june28
 	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
 	    		Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget

@@ -133,7 +133,7 @@ void setIDet(Double_t ICdE, Double_t SSBdE)
 		}
 	}
 
-	det.SSB=SSBdE;
+	det.TSSBEnergy=SSBdE;
    	det.TICEnergy.push_back(ICdE);
 	det.TICChannel.push_back(15);
 

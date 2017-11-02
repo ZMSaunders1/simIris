@@ -89,7 +89,7 @@ void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 		if(A==inputA&&cEl==inpEl) {
 			mass=mass1;
 			name=cA+cEl;
-			printf("\tN=%d\tZ=%d\tA=%d\t%s\t%.3lf\t%.3lf\t%.3f\n",N,Z,A,cEl.data(),mass1,mass2,ME/1000.);
+			//printf("\tN=%d\tZ=%d\tA=%d\t%s\t%.3lf\t%.3lf\t%.3f\n",N,Z,A,cEl.data(),mass1,mass2,ME/1000.);
 			break;
 		}
 	}
@@ -125,7 +125,7 @@ void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 		if(A1==inputA&&cEl1==inpEl) {
 			S2n = S2n/1000.;
 			S2p = S2p/1000.;
-			printf("\tS(2p)=%.3lf\tS(2n)=%.3lf\n",S2p,S2n);
+			//printf("\tS(2p)=%.3lf\tS(2n)=%.3lf\n",S2p,S2n);
 			break;
 		}
 	}
@@ -161,7 +161,7 @@ void nucleus::ReadFile(std::string binpath, Int_t inputA, std::string inpEl)
 		if(A2==inputA&&cEl2==inpEl) {
 			Sn = Sn/1000.;
 			Sp = Sp/1000.;
-			printf("\tS(p) =%.3lf\tS(n) =%.3lf\n",Sp,Sn);
+			//printf("\tS(p) =%.3lf\tS(n) =%.3lf\n",Sp,Sn);
 			break;
 		}
 	}
@@ -217,7 +217,7 @@ void nucleus::getInfo(std::string binpath, Int_t inputN, Int_t inputZ)
 //	std::string inpEl(inputEl);
 //	inpEl.erase( std::remove_if( inpEl.begin(), inpEl.end(), ::isspace ), inpEl.end() );
 
-	printf("%d%s\t===================================================================\n",inputA,cEl.data());
+	//printf("%d%s\t===================================================================\n",inputA,cEl.data());
 	ReadFile(binpath,inputA,cEl);
 	
 	return;
@@ -227,19 +227,30 @@ void nucleus::getInfo(std::string binpath, std::string input)
 {
 	char inputEl[2] = "";
 	Int_t inputA = 0;
+	Bool_t is2n = kFALSE;
 
 	if(input=="p") input="1H";
 	else if(input=="d") input="2H";
 	else if(input=="t") input="3H";
 	else if(input=="n") input="1n";
+	else if(input=="2n"){ 
+		input="1n";
+		is2n=kTRUE;
+	}
 
 	sscanf(input.data(),"%d%s",&inputA,inputEl);
 	
 	std::string inpEl(inputEl);
 	inpEl.erase( std::remove_if( inpEl.begin(), inpEl.end(), ::isspace ), inpEl.end() );
 
-	printf("%d%s\t===================================================================\n",inputA,inpEl.data());
+	//printf("%d%s\t===================================================================\n",inputA,inpEl.data());
 	ReadFile(binpath, inputA,inpEl);
+	if(is2n){
+	   	name = "2n";
+	   	mass = 2*mass;
+		A = 2*A;
+		N = 2*N;
+	}
 	
 	return;
 }
@@ -248,6 +259,6 @@ void nucleus::Print()
 {	
 	printf("====\t%s\t====\n",name.data());
 	printf("N=%d\tZ=%d\tA=%d\tmass=%lf\n",N,Z,A,mass);
-	printf("S(p)=%lf\tS(n)=%lf\tS(2p)=%lf\tS(2n)=%lf\n",Sp,Sn,S2p,S2n);
+	printf("S(p)=%lf\tS(n)=%lf\tS(2p)=%lf\tS(2n)=%lf\n\n",Sp,Sn,S2p,S2n);
 	return;
 }

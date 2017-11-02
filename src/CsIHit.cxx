@@ -71,13 +71,14 @@ Bool_t CsIHit::Hit(Double_t theta, Double_t phi, Double_t CsIDistance, TVector3 
 	Bool_t hitTheta = 0;
 	Bool_t hitPhi = 0;
 	Bool_t hitBool = 0; // return value
-	Double_t phiGap = 4.25*TMath::DegToRad(); //phi gap between CsI1s in rad 
-	Double_t phiShift = -1.75*TMath::DegToRad();//shift from the vertical direction for the first CsI1
-	Double_t phiRel;//Relative phi after phishift
-	Double_t phiRange = TMath::Pi()/8-phiGap; //phi range for each CsI 
+	Double_t phiGap = 4.25*TMath::DegToRad(); // phi gap between CsI1s in rad 
+	Double_t phiShift = -103.*TMath::DegToRad(); // shift from the vertical direction for the first YY1
+	Double_t phiRel; // Relative phi after phishift
+	Double_t phiRange = TMath::Pi()/8-phiGap; // phi range for each CsI 
 
 	phiRel = phi+phiShift;
 	if (phiRel>TMath::Pi())  phiRel = phiRel - 2*TMath::Pi();
+	if (phiRel<-TMath::Pi())  phiRel = phiRel + 2*TMath::Pi();
 	
 	// geometric efficiency
 	fX0 = CsIDistance*tan(theta)*cos(phi);
@@ -85,7 +86,7 @@ Bool_t CsIHit::Hit(Double_t theta, Double_t phi, Double_t CsIDistance, TVector3 
 	
 	TVector3 partVec(fX0,fY0,CsIDistance);
 	
-	partVec = partVec + targetPos; //taking into account the beam position at the target
+	partVec = partVec + targetPos; // taking into account the beam position at the target
 	
 	fX0 = partVec.X();
 	fY0 = partVec.Y();
@@ -94,42 +95,33 @@ Bool_t CsIHit::Hit(Double_t theta, Double_t phi, Double_t CsIDistance, TVector3 
 	phi = partVec.Phi();
 	
 	hitTheta = ((CsIDistance*tan(theta)>RIn) && (CsIDistance*tan(theta)<ROut));
-	//hitPhi = kTRUE;
-	//Seg0 = int((phiRel+TMath::Pi())/(TMath::Pi()/4));
-  	Seg0 = int((TMath::Pi()-phiRel)*8./TMath::Pi());
-	//hitPhi = fabs(phiRel +TMath::Pi() - Seg0*TMath::Pi()/4-TMath::Pi()/8) < phiRange/2;
-	hitPhi = fabs(TMath::Pi() - phiRel - Seg0*TMath::Pi()/8.) < phiRange;
+	Seg0 = int((phiRel+TMath::Pi())/(TMath::Pi()/8));
+	hitPhi = fabs(phiRel +TMath::Pi() - Seg0*TMath::Pi()/8.-TMath::Pi()/16.) < phiRange/2.;
   	hitBool = (hitPhi && hitTheta); 
 	
 	if (hitBool){
 		mul++;
-		// hit0 = 1;
 	  	fX0 = fX0;
 		fY0 = fY0;	
- 		fPhiCalc0 = 180.-((Seg0+0.5)*22.5+11.25+phiShift*TMath::RadToDeg());
- 		if (fPhiCalc0<-180.) fPhiCalc0 = fPhiCalc0+360.;
+ 		Seg0 = 7-Seg0;
+		if(Seg0<0) Seg0 = Seg0 + 16;
+ 		fPhiCalc0 = -phiShift*TMath::RadToDeg()-((Seg0+0.5)*22.5);
+ 		if (fPhiCalc0<-180.)	fPhiCalc0 = fPhiCalc0+360.;
+ 		if (fPhiCalc0>180.)	fPhiCalc0 = fPhiCalc0-360.;
+
       	Double_t random = 0.99*fRandom.Rndm();
- 		fPhiRand0 = 180.-((Seg0+random)*22.5+11.25+phiShift*TMath::RadToDeg());
+ 		fPhiRand0 = -phiShift*TMath::RadToDeg()-((Seg0+random)*22.5);
  		if (fPhiRand0<-180.) fPhiRand0 = fPhiRand0+360.;
-		Seg0 = Seg0 + 12;
-		if(Seg0>15) Seg0 = Seg0 - 16;
-    	fX.push_back(fX0);
+ 		if (fPhiRand0>180.) fPhiRand0 = fPhiRand0-360.;
+    	
+		fX.push_back(fX0);
 		fY.push_back(fY0);
 		fZ.push_back(fZ0);
 		fPhiCalc.push_back(fPhiCalc0);
 		fPhiRand.push_back(fPhiRand0);
-		//hit.push_back;
 		Seg.push_back(Seg0);
 	}
-  	// else{
-	// 	hit[mul] = 0;
-	// 	fX[mul] = sqrt(-1);
-	// 	fY[mul] = sqrt(-1);
-	// 	fZ[mul] = sqrt(-1);
-	// 	fPhiCalc[mul] = sqrt(-1);
-	// 	Seg[mul] = sqrt(-1);
-	// }
- 	
+  		
 	return hitBool;
 }
 
