@@ -71,7 +71,7 @@ Bool_t CsIHit::Hit(Double_t theta, Double_t phi, Double_t CsIDistance, TVector3 
 	Bool_t hitTheta = 0;
 	Bool_t hitPhi = 0;
 	Bool_t hitBool = 0; // return value
-	Double_t phiGap = 4.25*TMath::DegToRad(); // phi gap between CsI1s in rad 
+	Double_t phiGap = 0.1*TMath::DegToRad(); // phi gap between CsI1s in rad 
 	Double_t phiShift = -103.*TMath::DegToRad(); // shift from the vertical direction for the first YY1
 	Double_t phiRel; // Relative phi after phishift
 	Double_t phiRange = TMath::Pi()/8-phiGap; // phi range for each CsI 

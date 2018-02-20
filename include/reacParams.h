@@ -28,6 +28,7 @@ class reacParams : public TObject {
 		Double_t R2; // Resonance energy
 		Double_t W1; // Resonance width
 		Double_t W2; // Resonance width
+		Double_t SHAPE; // Resonance shape 0=Breit-Wigner, 1=Gaussian, 2=Square
 		
 		Bool_t SHT; // Reaction in solid Hydrogen/Deuterium target?
 		

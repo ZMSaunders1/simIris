@@ -504,13 +504,13 @@ int main(int argc, char *argv[])
 	while(Evnt<nsim) 
 	{
 		if(!isSHTReac){
-			reacZ = geoPrm.TFoil/2.;
-			//reacZ = rndm->Uniform(0,geoPrm.TFoil);
+			//reacZ = geoPrm.TFoil/2.;
+			reacZ = rndm->Uniform(0,geoPrm.TFoil);
    			EA = E_before_Foil - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,reacZ,A.EL.eFoil, A.EL.dedxFoil);
 		}
 		else{	
-			//reacZ = rndm->Uniform(0,geoPrm.TTgt);
-			reacZ = geoPrm.TTgt/2.;
+			reacZ = rndm->Uniform(0,geoPrm.TTgt);
+			//reacZ = geoPrm.TTgt/2.;
    			EA = E_before_Tgt - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
  		}
 		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
@@ -530,9 +530,15 @@ int main(int argc, char *argv[])
 
 		wght = 0.;
 		clearEvt();
-		mBR = rndm->BreitWigner(mB,width1);
+		if(reacPrm.SHAPE==0) mBR = rndm->BreitWigner(mB,width1);
+		else if(reacPrm.SHAPE==1) mBR = rndm->Gaus(mB,width1);
+		else if(reacPrm.SHAPE==2) mBR = rndm->Uniform(mB-width1,mB+width1);
+		else mBR = rndm->BreitWigner(mB,width1);
 		masses[1] =mBR;
-		mbR = rndm->BreitWigner(mb,width2);
+		if(reacPrm.SHAPE==0) mbR = rndm->BreitWigner(mb,width2);
+		else if(reacPrm.SHAPE==1) mbR = rndm->Gaus(mb,width2);
+		else if(reacPrm.SHAPE==2) mbR = rndm->Uniform(mb-width2,mb+width2);
+		else mbR = rndm->BreitWigner(mb,width2);
 		masses[0] =mbR;
 		PS0.SetDecay(Sys, reacPrm.N, masses); //recalculate with resonance energy
 		wght_max=PS0.GetWtMax();

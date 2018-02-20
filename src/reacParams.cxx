@@ -75,6 +75,9 @@ void reacParams::ReadParams(char* line)
 	if (strcmp(line,"W2")==0){
 	   W2=fval;
 	}
+	if (strcmp(line,"SHAPE")==0){
+	   SHAPE=fval;
+	}
 	if (strcmp(line,"E")==0){
 	   E=fval;
 	}
@@ -150,6 +153,7 @@ void reacParams::Clear(){
 	R2=0.;
 	W1=0.;
 	W2=0.;
+	SHAPE=0;
 
 	N=0;
 	SHT=0;
