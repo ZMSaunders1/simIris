@@ -20,7 +20,8 @@ YYHit yd, yu;
 CsIHit csi;
 S3Hit sd1, sd2, su;
 PTrack blP, tlP;
-PTrack blPdec, tlPdec1, tlPdec2;
+PTrack blDecP, tlDecP1, tlDecP2;
+PTrack buP1, buP2, buP3, buP4;
 IDet det;
 
 TGenPhaseSpace PS0, PS1;
@@ -29,6 +30,10 @@ TLorentzVector LorVB;
 TLorentzVector LorVBdec;
 TLorentzVector LorVcdec;
 TLorentzVector LorVddec;
+TLorentzVector LorVcbu;
+TLorentzVector LorVdbu;
+TLorentzVector LorVebu;
+TLorentzVector LorVfbu;
 
 Double_t mA=0.;	
 Double_t ma=0.;	
@@ -38,6 +43,8 @@ Double_t mbR=0.;
 Double_t mb=0.;	
 Double_t mc=0.;
 Double_t md=0.;
+Double_t me=0.;
+Double_t mf=0.;
 
 Double_t Qgen=sqrt(-1.);
 Double_t Qdet=sqrt(-1.);
@@ -63,9 +70,13 @@ void clearEvt()
 	mbR=0.;
 	tlP.Clear();
 	blP.Clear();
-	blPdec.Clear();
-	tlPdec1.Clear();
-	tlPdec2.Clear();
+	blDecP.Clear();
+	tlDecP1.Clear();
+	tlDecP2.Clear();
+	buP1.Clear();
+	buP2.Clear();
+	buP3.Clear();
+	buP4.Clear();
 	SSBdE=0.;
 	yd.Clear();
 	yu.Clear();
@@ -79,6 +90,10 @@ void clearEvt()
 	LorVBdec.Clear();
 	LorVcdec.Clear();
 	LorVddec.Clear();
+	LorVcbu.Clear();
+	LorVdbu.Clear();
+	LorVebu.Clear();
+	LorVfbu.Clear();
 	PS0.Clear();
 	PS1.Clear();
 	
@@ -90,6 +105,7 @@ int main(int argc, char *argv[])
 	Bool_t have_reaction=kFALSE;
 	Bool_t have_geometry=kFALSE;
 	Bool_t have_dwba_xsec=kFALSE;
+	Bool_t be_silent=kFALSE;
 	char *endptr;
 	Int_t nsim = 1E3;
 	Int_t Run = 0;
@@ -129,6 +145,9 @@ int main(int argc, char *argv[])
 			else if(strncmp(argv[i],"--run=",6)==0){
 	  			Run = strtol(argv[i]+6,&endptr,10);//converting string to number
 			}
+			else if(strncmp(argv[i],"--silent",8)==0){
+				be_silent=kTRUE;
+			}
 		}
 	}
 	TStopwatch timer;
@@ -158,17 +177,25 @@ int main(int argc, char *argv[])
 	S3Hit *ipsu = &su; 
 	PTrack *iptlP = &tlP;
 	PTrack *ipblP = &blP;
-	PTrack *ipblPdec = &blPdec;
-	PTrack *iptlPdec1 = &tlPdec1;
-	PTrack *iptlPdec2 = &tlPdec2;
+	PTrack *ipblDecP = &blDecP;
+	PTrack *iptlDecP1 = &tlDecP1;
+	PTrack *iptlDecP2 = &tlDecP2;
+	PTrack *ipbuP1 = &buP1;
+	PTrack *ipbuP2 = &buP2;
+	PTrack *ipbuP3 = &buP3;
+	PTrack *ipbuP4 = &buP4;
 	IDet *ipdet = &det;
 	TLorentzVector *LVb = &LorVb;	
 	TLorentzVector *LVB = &LorVB;	
 	TLorentzVector *LVBdec = &LorVBdec;	
 	TLorentzVector *LVcdec = &LorVcdec;	
 	TLorentzVector *LVddec = &LorVddec;	
+	TLorentzVector *LVcbu = &LorVcbu;	
+	TLorentzVector *LVdbu = &LorVdbu;	
+	TLorentzVector *LVebu = &LorVebu;	
+	TLorentzVector *LVfbu = &LorVfbu;	
 	
-	nucleus A, a, B, b, c, d, decB,decc,decd;
+	nucleus A, a, B, b, c, d, e, f, decB,decc,decd;
 	Double_t reacX, reacY, reacZ;
 
 	A.getInfo(binpath, reacPrm.A);
@@ -187,6 +214,14 @@ int main(int argc, char *argv[])
 		d.getInfo(binpath, reacPrm.d);
 		d.Print();
 	}
+	if(reacPrm.N>4){
+		e.getInfo(binpath, reacPrm.e);
+		e.Print();
+	}
+	if(reacPrm.N>5){
+		f.getInfo(binpath, reacPrm.f);
+		f.Print();
+	}
 
 	mA = A.mass/1000.;	
 	ma = a.mass/1000.;	
@@ -196,6 +231,8 @@ int main(int argc, char *argv[])
 	mbR = mb;	
 	mc = c.mass/1000.;
 	md = d.mass/1000.;
+	me = e.mass/1000.;
+	mf = f.mass/1000.;
 
 // Check for sequential decays ****************************************
 	Bool_t seqdec=kFALSE;
@@ -295,7 +332,7 @@ int main(int argc, char *argv[])
 
 // *******************************************************************
 	// Set up output file and tree
-	TFile *f = new TFile(outputname,"RECREATE");
+	TFile *file = new TFile(outputname,"RECREATE");
 	TTree *Iris = new TTree("Iris","Iris simulation");
 	
 	Iris->Branch("Evnt",&Evnt,"Evnt/I"); 
@@ -309,16 +346,17 @@ int main(int argc, char *argv[])
 	Iris->Branch("reacZ",&reacZ,"reacZ/D"); 
 	Iris->Branch("tlP.",&iptlP,32000,99); 
 	Iris->Branch("blP.",&ipblP,32000,99); 
-	Iris->Branch("blPdec.",&ipblPdec,32000,99); 
-	Iris->Branch("tlPdec1.",&iptlPdec1,32000,99); 
-	Iris->Branch("tlPdec2.",&iptlPdec2,32000,99); 
+	Iris->Branch("blDecP.",&ipblDecP,32000,99); 
+	Iris->Branch("tlDecP1.",&iptlDecP1,32000,99); 
+	Iris->Branch("tlDecP2.",&iptlDecP2,32000,99); 
+	Iris->Branch("buP1.",&ipbuP1,32000,99); 
+	Iris->Branch("buP2.",&ipbuP2,32000,99); 
+	Iris->Branch("buP3.",&ipbuP3,32000,99); 
+	Iris->Branch("buP4.",&ipbuP4,32000,99); 
 	Iris->Branch("wght",&wght,"wght/D"); 
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
 	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D"); 
-	//Iris->Branch("EB_det",&EB_det,"EB_det/D"); 
-	//Iris->Branch("PB_det",&PB_det,"PB_det/D"); 
-	//Iris->Branch("mBR",&mBR,"mBR/D"); 
 	Iris->Branch("ICdE",&ICdE,"ICdE/D"); 
 	Iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
 	Iris->Branch("yd.",&ipyd,32000,99); 
@@ -338,10 +376,11 @@ int main(int argc, char *argv[])
 	   	if(decc.Z>0) decc.EL.loadOutgoingELoss(dedxstr,decc.name.data(),geoPrm.MFoil,geoPrm.MTgt,decc.mass);
 	   	if(seqdecN>2&&decd.Z>0) decd.EL.loadOutgoingELoss(dedxstr,decd.name.data(),geoPrm.MFoil,geoPrm.MTgt,decd.mass);
 	}
+	if(reacPrm.N>2&&c.Z>0) c.EL.loadOutgoingELoss(dedxstr,c.name.data(),geoPrm.MFoil,geoPrm.MTgt,c.mass);
+	if(reacPrm.N>3&&d.Z>0) c.EL.loadOutgoingELoss(dedxstr,d.name.data(),geoPrm.MFoil,geoPrm.MTgt,d.mass);
+	if(reacPrm.N>4&&e.Z>0) c.EL.loadOutgoingELoss(dedxstr,e.name.data(),geoPrm.MFoil,geoPrm.MTgt,e.mass);
+	if(reacPrm.N>5&&f.Z>0) c.EL.loadOutgoingELoss(dedxstr,f.name.data(),geoPrm.MFoil,geoPrm.MTgt,f.mass);
 
-	// Double_t FoilTh=geoPrm.TFoil; //mu*g/cm^3*0.1
-	// Double_t FoilAoZ=geoPrm.AoZFoil; //mu*g/cm^3*0.1
-	// Double_t targetTh=geoPrm.TTgt; //mu*g/cm^3*0.1
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
 	Double_t ICLength=22.9*0.00318*geoPrm.ICPressure; //cm*mg/cm^3 
 	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
@@ -468,7 +507,8 @@ int main(int argc, char *argv[])
 	printf("Second S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DS3+14.8,sd2.ThetaMin(geoPrm.DS3+14.8),sd2.ThetaMax(geoPrm.DS3+14.8)); 
 	printf("Upstream YY1 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n",geoPrm.DYYU,yu.ThetaMin(geoPrm.DYYU),yu.ThetaMax(geoPrm.DYYU)); 
 	printf("Upstream S3 detector at distance of %.1lf mm from target, covering theta range from %.2lf to %.2lf\n\n",geoPrm.DS3U,su.ThetaMin(geoPrm.DS3U),su.ThetaMax(geoPrm.DS3U)); 
-	Double_t masses[4] = { mb, mB, mc, md};
+	
+	Double_t masses[6] = { mb, mB, mc, md, me, mf};
 	
 	Double_t tht=0.; 
 	Double_t xsec=0.; 
@@ -541,14 +581,14 @@ int main(int argc, char *argv[])
 		else mbR = rndm->BreitWigner(mb,width2);
 		masses[0] =mbR;
 		PS0.SetDecay(Sys, reacPrm.N, masses); //recalculate with resonance energy
-		wght_max=PS0.GetWtMax();
+		//wght_max=PS0.GetWtMax();
 	
 		TLorentzVector *LTmp;
 		whilecount=0;
 		do{	
 			wght = PS0.Generate();
 			if(wght!=wght) continue; // catch NaNs
-			chck = rndm->Uniform(0,wght_max);
+			chck = rndm->Uniform(0,1);
 			if(have_dwba_xsec==kTRUE){
 				LTmp = PS0.GetDecay(0);
 				LTmp->Boost(-boostvect);
@@ -595,54 +635,72 @@ int main(int argc, char *argv[])
 				LVcdec  = PS1.GetDecay(1);
 				if(seqdecN>2) LVddec  = PS1.GetDecay(2);
 			}while(wght2<chck2);
-			blPdec.T=LVBdec->Theta();
-			blPdec.E=(LVBdec->E()-mBdec)*1000.;
-			blPdec.P=LVBdec->Phi();	
-			blPdec.Tdeg=TMath::RadToDeg()*blPdec.T;
-			blPdec.Pdeg=TMath::RadToDeg()*blPdec.P;
-			tlPdec1.T=LVcdec->Theta();
-			tlPdec1.E=(LVcdec->E()-mcdec)*1000.;
-			tlPdec1.P=LVcdec->Phi();	
-			tlPdec1.Tdeg=TMath::RadToDeg()*tlPdec1.T;
-			tlPdec1.Pdeg=TMath::RadToDeg()*tlPdec1.P;
+			blDecP.T=LVBdec->Theta();
+			blDecP.E=(LVBdec->E()-mBdec)*1000.;
+			blDecP.P=LVBdec->Phi();	
+			blDecP.Tdeg=TMath::RadToDeg()*blDecP.T;
+			blDecP.Pdeg=TMath::RadToDeg()*blDecP.P;
+			tlDecP1.T=LVcdec->Theta();
+			tlDecP1.E=(LVcdec->E()-mcdec)*1000.;
+			tlDecP1.P=LVcdec->Phi();	
+			tlDecP1.Tdeg=TMath::RadToDeg()*tlDecP1.T;
+			tlDecP1.Pdeg=TMath::RadToDeg()*tlDecP1.P;
 			if(seqdecN>2){
-				tlPdec2.T=LVcdec->Theta();
-				tlPdec2.E=(LVcdec->E()-mddec)*1000.;
-				tlPdec2.P=LVcdec->Phi();	
-				tlPdec2.Tdeg=TMath::RadToDeg()*tlPdec2.T;
-				tlPdec2.Pdeg=TMath::RadToDeg()*tlPdec2.P;
+				tlDecP2.T=LVcdec->Theta();
+				tlDecP2.E=(LVcdec->E()-mddec)*1000.;
+				tlDecP2.P=LVcdec->Phi();	
+				tlDecP2.Tdeg=TMath::RadToDeg()*tlDecP2.T;
+				tlDecP2.Pdeg=TMath::RadToDeg()*tlDecP2.P;
 			}
 		}
-		else if(reacPrm.N>3) // 4body
+		if(reacPrm.N>2) // 3body
 		{
-			LVcdec = PS0.GetDecay(2);
-			LVddec = PS0.GetDecay(3);
+			LVcbu = PS0.GetDecay(2);
 		
-			tlPdec1.T=LVcdec->Theta();	
-			tlPdec2.T=LVddec->Theta();
-			tlPdec1.E=(LVcdec->E()-mc)*1000.; 	
-			tlPdec2.E=(LVddec->E()-md)*1000.;
-			tlPdec1.P=LVcdec->Phi();	
-			tlPdec2.P=LVddec->Phi();	
+			buP1.T=LVcbu->Theta();	
+			buP1.E=(LVcbu->E()-mc)*1000.; 	
+			buP1.P=LVcbu->Phi();	
 			
 			// Convert angles to degrees for root file
-			tlPdec1.Tdeg=TMath::RadToDeg()*tlPdec1.T;
-			tlPdec2.Tdeg=TMath::RadToDeg()*tlPdec2.T;
-			tlPdec1.Pdeg=TMath::RadToDeg()*tlPdec1.P;
-			tlPdec2.Pdeg=TMath::RadToDeg()*tlPdec2.P;
+			buP1.Tdeg=TMath::RadToDeg()*buP1.T;
+			buP1.Pdeg=TMath::RadToDeg()*buP1.P;
 		}
-		else if(reacPrm.N>2) // 3body
+		if(reacPrm.N>3) // 4body
 		{
-			LVcdec = PS0.GetDecay(2);
+			LVdbu = PS0.GetDecay(3);
 		
-			tlPdec1.T=LVcdec->Theta();	
-			tlPdec1.E=(LVcdec->E()-mc)*1000.; 	
-			tlPdec1.P=LVcdec->Phi();	
+			buP2.T=LVdbu->Theta();
+			buP2.E=(LVdbu->E()-md)*1000.;
+			buP2.P=LVdbu->Phi();	
 			
 			// Convert angles to degrees for root file
-			tlPdec1.Tdeg=TMath::RadToDeg()*tlPdec1.T;
-			tlPdec1.Pdeg=TMath::RadToDeg()*tlPdec1.P;
+			buP2.Tdeg=TMath::RadToDeg()*buP2.T;
+			buP2.Pdeg=TMath::RadToDeg()*buP2.P;
 		}
+		if(reacPrm.N>4) // 5body
+		{
+			LVdbu = PS0.GetDecay(4);
+		
+			buP3.T=LVebu->Theta();
+			buP3.E=(LVebu->E()-me)*1000.;
+			buP3.P=LVebu->Phi();	
+			
+			// Convert angles to degrees for root file
+			buP3.Tdeg=TMath::RadToDeg()*buP3.T;
+			buP3.Pdeg=TMath::RadToDeg()*buP3.P;
+		}	
+		if(reacPrm.N>5) // 6body
+		{
+			LVdbu = PS0.GetDecay(5);
+		
+			buP4.T=LVfbu->Theta();
+			buP4.E=(LVfbu->E()-mf)*1000.;
+			buP4.P=LVfbu->Phi();	
+			
+			// Convert angles to degrees for root file
+			buP4.Tdeg=TMath::RadToDeg()*buP4.T;
+			buP4.Pdeg=TMath::RadToDeg()*buP4.P;
+		}		
 
 		// Position on target	
 		reacX = BeamSpot*rndm->Gaus();
@@ -657,18 +715,33 @@ int main(int argc, char *argv[])
 			HEHit = detHits(blP, B, reacPos,geoPrm.Mask,geoPrm.Shield);
 		}
 		else{ 
-			blPdec = TgtELoss(blPdec, decB, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
-			HEHit = detHits(blPdec, decB, reacPos,geoPrm.Mask,geoPrm.Shield);	
+			blDecP = TgtELoss(blDecP, decB, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+			HEHit = detHits(blDecP, decB, reacPos,geoPrm.Mask,geoPrm.Shield);	
 			if(decc.Z>0){
-				tlPdec1 = TgtELoss(tlPdec1, decc, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
-				detHits(tlPdec1, decc, reacPos,geoPrm.Mask,geoPrm.Shield);
+				tlDecP1 = TgtELoss(tlDecP1, decc, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+				detHits(tlDecP1, decc, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}	
 			if(seqdecN>2&&decd.Z>0){
-				tlPdec2 = TgtELoss(tlPdec2, decd, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
-				detHits(tlPdec2, decd, reacPos,geoPrm.Mask,geoPrm.Shield);
+				tlDecP2 = TgtELoss(tlDecP2, decd, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+				detHits(tlDecP2, decd, reacPos,geoPrm.Mask,geoPrm.Shield);
 			}
 		}
-			
+		if(reacPrm.N>2&&c.Z>0){
+			buP1 = TgtELoss(buP1, c, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+			detHits(buP1, c, reacPos,geoPrm.Mask,geoPrm.Shield);
+		}	
+		if(reacPrm.N>3&&d.Z>0){
+			buP2 = TgtELoss(buP2, d, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+			detHits(buP2, d, reacPos,geoPrm.Mask,geoPrm.Shield);
+		}	
+		if(reacPrm.N>4&&e.Z>0){
+			buP3 = TgtELoss(buP3, e, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+			detHits(buP3, e, reacPos,geoPrm.Mask,geoPrm.Shield);
+		}
+		if(reacPrm.N>5&&f.Z>0){
+			buP4 = TgtELoss(buP4, f, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
+			detHits(buP4, f, reacPos,geoPrm.Mask,geoPrm.Shield);
+		}
 		// Calculate energy loss in SSB
 		SSBdE = eloss(A,14./28.,E_before_SSB,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
 		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
@@ -741,51 +814,62 @@ int main(int argc, char *argv[])
 		
 		if(seqdec)
 		{
-			blPdec.Ecm = (LVBdec->E()-mBdec)*ma*1000./(mA+ma);
+			blDecP.Ecm = (LVBdec->E()-mBdec)*ma*1000./(mA+ma);
 			LVBdec->Boost(-boostvect);
-			blPdec.Tcm = TMath::RadToDeg()*LVBdec->Theta();
-			tlPdec1.Ecm = (LVcdec->E()-mcdec)*ma*1000./(mA+ma);
+			blDecP.Tcm = TMath::RadToDeg()*LVBdec->Theta();
+			tlDecP1.Ecm = (LVcdec->E()-mcdec)*ma*1000./(mA+ma);
 			LVcdec->Boost(-boostvect);
-			tlPdec1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
+			tlDecP1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
 			if(seqdecN>2){
-				tlPdec2.Ecm = (LVddec->E()-mddec)*ma*1000./(mA+ma);
+				tlDecP2.Ecm = (LVddec->E()-mddec)*ma*1000./(mA+ma);
 				LVddec->Boost(-boostvect);
-				tlPdec2.Tcm = TMath::RadToDeg()*LVddec->Theta();
+				tlDecP2.Tcm = TMath::RadToDeg()*LVddec->Theta();
 			}
-		}
-		else if(reacPrm.N>3) // 4body
-		{
-			tlPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
-			tlPdec2.Ecm = (LVddec->E()-md)*ma*1000./(mA+ma);
-			LVcdec->Boost(-boostvect);
-			LVddec->Boost(-boostvect);
-			tlPdec1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
-			tlPdec2.Tcm = TMath::RadToDeg()*LVddec->Theta();
 		}
 		else if(reacPrm.N>2) // 3body
 		{
-			tlPdec1.Ecm = (LVcdec->E()-mc)*ma*1000./(mA+ma);
-			LVcdec->Boost(-boostvect);
-			tlPdec1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcdec->Theta());
+			buP1.Ecm = (LVcbu->E()-mc)*ma*1000./(mA+ma);
+			LVcbu->Boost(-boostvect);
+			buP1.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVcbu->Theta());
+		}
+		else if(reacPrm.N>3) // 4body
+		{
+			buP2.Ecm = (LVdbu->E()-md)*ma*1000./(mA+ma);
+			LVdbu->Boost(-boostvect);
+			buP2.Tcm = TMath::RadToDeg()*LVdbu->Theta();
+		}
+		else if(reacPrm.N>4) // 3body
+		{
+			buP3.Ecm = (LVcbu->E()-me)*ma*1000./(mA+ma);
+			LVebu->Boost(-boostvect);
+			buP3.Tcm = TMath::RadToDeg()*(TMath::Pi()-LVebu->Theta());
+		}
+		else if(reacPrm.N>5) // 3body
+		{
+			buP4.Ecm = (LVcbu->E()-mf)*ma*1000./(mA+ma);
+			LVfbu->Boost(-boostvect);
+			buP4.Tcm = TMath::RadToDeg()*LVfbu->Theta();
 		}
 		setIDet(ICdE,SSBdE);
-		printf("Writing %s: %.6d of %.6d events processed..\r",outputname,Evnt,nsim);
+		if(!be_silent) printf("Writing %s: %.6d of %.6d events processed. Last event: %d tries.\r",outputname,Evnt,nsim,whilecount);
 		Evnt++;
 		Iris->Fill();
 	}
 
 	Iris->AutoSave();
-	f->Close();
+	file->Close();
 	rndm->Delete();
 	//Iris->Delete();
 	//f->Delete();
 	LEeff=Double_t(LEHitcntr)/Double_t(nsim)*100.;
 	HEeff=Double_t(HEHitcntr)/Double_t(nsim)*100.;
+	printf("\n\n********************\n");
 	printf("Acceptance for target-like particles: %.1f\n",LEeff);
 	printf("Acceptance for beam-like particles: %.1f\n",HEeff);
 	Double_t time=timer.RealTime();
 	printf("\nDone. %lf s\n",time);
 	printf("\nOutput written to %s \n", outputname);
+	printf("\n\n********************\n");
 	
 	return 0;
 }

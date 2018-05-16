@@ -63,6 +63,12 @@ void reacParams::ReadParams(char* line)
 	if (strcmp(line,"d")==0){
 	   d=strval;
 	}
+	if (strcmp(line,"e")==0){
+	   e=strval;
+	}
+	if (strcmp(line,"f")==0){
+	   f=strval;
+	}
 	if (strcmp(line,"R1")==0){
 	   R1=fval;
 	}
@@ -127,8 +133,14 @@ void reacParams::Print(){
 		case 3:
 			printf("%s(%s,%s)%s(%.1lf)+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),E,W1);
 			break;
-		case 4:
+			case 4:
 			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),E,W1);
+			break;
+		case 5:
+			printf("%s(%s,%s)%s(%.1lf)+%s+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),e.data(),E,W1);
+			break;
+		case 6:
+			printf("%s(%s,%s)%s(%.1lf)+%s+%s+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),e.data(),f.data(),E,W1);
 			break;
 		default:
 			printf("%s(%s,%s)%s(%.1lf)+%s+%s @ %.1lf MeV, Width=%.2lf\n",A.data(),a.data(),b.data(),B.data(),R1,c.data(),d.data(),E,W1);
@@ -147,6 +159,8 @@ void reacParams::Clear(){
 	b.clear();
 	c.clear();
 	d.clear();
+	e.clear();
+	f.clear();
 
 	E=0.;
 	R1=0.;
