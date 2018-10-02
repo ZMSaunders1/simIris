@@ -1,5 +1,7 @@
 #include "PTrack.h"
 
+ClassImp(PTrack);
+
 PTrack::PTrack()
 {
 	//nuc.Clear();

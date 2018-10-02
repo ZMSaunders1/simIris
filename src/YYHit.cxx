@@ -3,6 +3,8 @@
 #include "TRandom3.h"
 #include "TVector3.h"
 
+ClassImp(YYHit);
+
 YYHit::YYHit()
 {
 	Thickness[0] = 104.65 * 2.3212 * 0.1; 

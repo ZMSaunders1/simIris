@@ -1,5 +1,7 @@
 #include "CsIHit.h"
 
+ClassImp(CsIHit);
+
 CsIHit::CsIHit()
 {
 	Thickness =12000.*4.51*0.1; //um*g/cm^3*0.1;

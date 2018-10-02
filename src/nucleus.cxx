@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "nucleus.h"
 
+ClassImp(nucleus);
+
 nucleus::nucleus()
 {
 	name.clear(); 

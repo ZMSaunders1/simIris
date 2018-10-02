@@ -3,6 +3,8 @@
 #include "TRandom3.h"
 #include "TVector3.h"
 
+ClassImp(S3Hit);
+
 S3Hit::S3Hit()
 {
 	Orientation = 0; // 0 = rings first, 1 = sectors first

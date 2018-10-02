@@ -11,7 +11,7 @@
 #pragma link C++ class CsIHit+;
 #pragma link C++ class S3Hit+;
 #pragma link C++ class IDet+;
-#pragma link C++ class nucleus;
+#pragma link C++ class nucleus+;
 
 #endif
 

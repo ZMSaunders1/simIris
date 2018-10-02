@@ -2,6 +2,8 @@
 #include "IDet.h"
 #include <math.h>
 
+ClassImp(IDet);
+
 IDet::IDet(){
 	IDet::Clear();
 }
