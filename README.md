@@ -1,21 +1,21 @@
-# simIris
+# simIrisy
 Simulation tool for the IRIS experiment @ TRIUMF
 
 
 ## Download and Installation ##
 	
-treeIris requires ROOT (https://root.cern.ch).
+simIris requires ROOT (https://root.cern.ch).
 
-To install treeIris use
+To install simIris use
 
 	git clone https://github.com/iris-triumf/simIris
 	cd simIris
 	make
 
 
-## Running treeIris ##
+## Running simIris ##
 
-From the main treeIris folder, you can run treeIris with
+From the main simIris folder, you can run simIris with
  
 	./bin/simIris --output=/path/to/to/your/output.file --reaction=/path/to/your/reaction.file --geo=/path/to/your/geometry.file --dedx_dir=/path/to/folder/containing/energy_loss_tables --events=number of events to be simulated [--run=run number]
 
@@ -56,3 +56,15 @@ Each parameter in both the geometry and the reaction parameter file has to be se
 ## Energy loss tables ##
 
 simIris uses SRIM  energy loss tables to calculate the energy loss of particles going through detector materials or the target. Tables in a usable format can be created using LISE++.
+
+## Output files
+
+The output root file of simIris contains a tree with the following objects:
+
+	yd, yu, sd1, sd2, su, csi: Containers for detector hits. They contain the detector thickness, and information about the simulated detector hit: multiplicity, X-, Y-, Z-position, angls, git segments, and depostited energy.
+
+	tlP, blP: Contain information about the generated particle tracks. Contains angles T(heta) and P(hi) and energies in the lab and center-of-mass system. Also saves the energy loss in the silver foil and target as well as the resulting energy behind the target (FoildE, TrgtdE, Ebt).
+
+	tlPdec1/2, blPdec1/2: Same as blP and tlP, but only used when the heavy particle at the simulated excitation energy is unbound.
+
+	det: Contains the same information as yd, yu, etc. but in the same format as data sorted with treeIris. Simulated data from simIris can therefore analysed using physIris (https://github.com/iris-triumf/physIris) the same way as real experimental data.

@@ -762,10 +762,12 @@ int main(int argc, char *argv[])
 	    		Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
 				Eb= Eb/1000.;
-
+				Double_t E_center = E_center_Tgt/1000.;
 				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
-				EB_det = EA+mA+ma-Eb-mb;
-				PB_det = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cosTheta);
+				Double_t P_center = sqrt(E_center*E_center+2*E_center*mA);
+				//EB_det = EA+mA+ma-Eb-mb;
+				EB_det = E_center+mA+ma-Eb-mb;
+				PB_det = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
 				Qdet = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
 				Qdet =Qdet*1000.;
 			}
