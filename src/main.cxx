@@ -58,6 +58,8 @@ Double_t beamBeta=0.;
 Double_t beamGamma=0.;
 Double_t beamEcm=0.;
 TVector3 reacPos;
+Double_t convertMM=0;
+Double_t adjustZpos=0;
 Double_t SSBdE=0.;
 
 void clearEvt()
@@ -702,10 +704,18 @@ int main(int argc, char *argv[])
 			buP4.Pdeg=TMath::RadToDeg()*buP4.P;
 		}		
 
-		// Position on target	
+		// XY position on target in mm	
 		reacX = BeamSpot*rndm->Gaus();
 		reacY = BeamSpot*rndm->Gaus();
-		reacPos.SetXYZ(reacX,reacY,reacZ);
+		// reacZ is in units of mg/cm^2 and needed for energy loss corrections below
+		// adjust Z position around middle of target and convert to mm
+		if(reacZ<geoPrm.TTgt/2.) adjustZpos = -reacZ;
+		else if(reacZ>geoPrm.TTgt/2.) adjustZpos = reacZ - geoPrm.TTgt/2.;
+		else if(reacZ==geoPrm.TTgt/2.) adjustZpos = 0;
+		if(geoPrm.MTgt=="D") convertMM=(1./0.201)*(10.)*(1./1000.);
+		else if(geoPrm.MTgt=="H") convertMM=(1./0.0867)*(10.)*(1./1000.);
+		else printf("ERROR: Cannot convert target thickness to mm!");
+		reacPos.SetXYZ(reacX,reacY,adjustZpos*convertMM);// all in units of mm
 		
 		tlP = TgtELoss(tlP, b, geoPrm, reacZ, isSHTReac);// Calculate the energy loss of the particle in Foil and SHT
 		LEHit = detHits(tlP, b, reacPos,geoPrm.Mask,geoPrm.Shield);
