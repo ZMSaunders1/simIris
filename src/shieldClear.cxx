@@ -12,7 +12,7 @@
 // respectively). Also, I don't think the 'clearSquare' is necessary any longer.
 // (This size is before bending the window material to the cylindrical shape.)
 //variables for the elliptic mask hole
-Bool_t shieldClear(Double_t x, Double_t y)
+Bool_t shieldClear(Double_t theta, Double_t phi)
 {
   const Double_t horSide = 2*67.4;	//horizontal side
   const Double_t verSide = 2*50.0;	//vertical side
@@ -27,7 +27,7 @@ Bool_t shieldClear(Double_t x, Double_t y)
   Bool_t clearSquare = 0;	// does the particle clear square at the edge of the shield, with the opposite edge at the centre of the curve circle?
   Double_t cyCurve = 20;	//mm  
 
-  //Double_t polRad = cylRad/(sqrt(sin(theta)*cos(phi)*sin(theta)*cos(phi)+cos(theta)*cos(theta))); //polar radius, i.e. distance from the reaction point
+  Double_t polRad = cylRad/(sqrt(sin(theta)*cos(phi)*sin(theta)*cos(phi)+cos(theta)*cos(theta))); //polar radius, i.e. distance from the reaction point
 // 	if(cos(phi)!=0) alphaR = acos(polRad*cos(theta)/cylRad)*fabs(cos(phi))/cos(phi); //alpha in cylindrical coordinates.
 //
 //	alphaR = asin(polRad*sin(theta)*cos(phi)/cylRad);	//alpha in cylindrical coordinates.
