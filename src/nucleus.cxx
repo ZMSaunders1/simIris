@@ -227,7 +227,7 @@ void nucleus::getInfo(std::string binpath, Int_t inputN, Int_t inputZ)
 
 void nucleus::getInfo(std::string binpath, std::string input)
 {
-	char inputEl[2] = "";
+	char inputEl[3] = "";
 	Int_t inputA = 0;
 	Bool_t is2n = kFALSE;
 
