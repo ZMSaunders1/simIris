@@ -10,6 +10,11 @@
 #include "TRandom3.h"
 #include "TGenPhaseSpace.h"
 #include "TStopwatch.h"
+#include "YYHit.cxx"
+#include "CsIHit.cxx"
+#include "IDet.cxx"
+#include "PTrack.cxx"
+#include "S3Hit.cxx"
 
 #include "header.h"
 #include "detHits.h"
