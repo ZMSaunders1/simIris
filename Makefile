@@ -18,14 +18,19 @@ CXXFLAGS += $(HEADER)
 CXXFLAGS      += -g -ansi -fPIC $(ROOTCFLAGS)
 endif 
 
+
 SOFLAGS = -g -shared
 LDFLAGS = -O2
+
+#use these flags for macOS
+#SOFLAGS       = -g -dynamiclib -shared
+#LDFLAGS       = -O2 -undefined dynamic_lookup
 
 all:  $(BINARYDIR)/simIris
 
 $(BINARYDIR)/simIris: $(OBJECTDIR)/simIris.o $(OBJECTDIR)/nucleus.o $(OBJECTDIR)/reacParams.o $(OBJECTDIR)/geoParams.o $(OBJECTDIR)/dedx.o $(OBJECTDIR)/dwba.o $(OBJECTDIR)/eloss.o $(OBJECTDIR)/shieldClear.o $(LIBDIR)/libSimEvent.so $(OBJECTDIR)/SimEventDict.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ $(ROOTGLIBS) -lm -lz -lutil -lnsl -lpthread -lrt
-
+#remove -lnsl and -lrt for macOS
 $(LIBDIR)/libSimEvent.so:	$(OBJECTDIR)/PTrack.o $(OBJECTDIR)/YYHit.o $(OBJECTDIR)/CsIHit.o $(OBJECTDIR)/S3Hit.o $(OBJECTDIR)/IDet.o $(OBJECTDIR)/SimEventDict.o
 	$(LD) $(SOFLAGS) $(LDFLAGS) $(ROOTGLIBS) $^ -o $@
 	@echo "$@ done"
