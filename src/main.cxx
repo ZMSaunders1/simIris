@@ -204,15 +204,28 @@ int main(int argc, char *argv[])
 	
 	nucleus A, a, B, b, c, d, e, f, decB,decc,decd;
 	Double_t reacX, reacY, reacZ;
-
-	A.getInfo(binpath, reacPrm.A);
-	A.Print();
-	a.getInfo(binpath, reacPrm.a);
-	a.Print();
-	B.getInfo(binpath, reacPrm.B);
-	B.Print();
-	b.getInfo(binpath, reacPrm.b);
-	b.Print();
+    if (isSHTReac)
+    {
+        A.getInfo(binpath, reacPrm.A);
+        A.Print();
+        a.getInfo(binpath, reacPrm.a);
+        a.Print();
+        B.getInfo(binpath, reacPrm.B);
+        B.Print();
+        b.getInfo(binpath, reacPrm.b);
+        b.Print();
+    }
+    else
+    {
+        A.getInfo(binpath, reacPrm.A);
+        A.Print();
+        a.getInfo(binpath, reacPrm.foil);
+        a.Print();
+        B.getInfo(binpath, reacPrm.B);
+        B.Print();
+        b.getInfo(binpath, reacPrm.foil);
+        b.Print();
+    }
 	if(reacPrm.N>2){
 		c.getInfo(binpath, reacPrm.c);
 		c.Print();
@@ -240,6 +253,8 @@ int main(int argc, char *argv[])
 	md = d.mass/1000.;
 	me = e.mass/1000.;
 	mf = f.mass/1000.;
+    Printf("print A mass %lf and a mass %lf \n",A.mass,a.mass);
+    Printf("print B mass %lf and b mass %lf \n",B.mass,b.mass);
 
 // Check for sequential decays ****************************************
 	Bool_t seqdec=kFALSE;
@@ -390,7 +405,7 @@ int main(int argc, char *argv[])
 
 	Double_t BeamSpot=geoPrm.Bs/2.355; // FWHM->sigma 
 	Double_t ICLength=22.9*0.00318*geoPrm.ICPressure; //cm*mg/cm^3 
-	const Double_t ICWindow1=0.03*3.44*0.1; //mu*g/cm^3*0.1
+	const Double_t ICWindow1=0.05*3.44*0.1; //mu*g/cm^3*0.1 //new IC window thickness 50nm
 	const Double_t ICWindow2=0.05*3.44*0.1; //mu*g/cm^3*0.1
 	
 	//tlP.nuc = b;
@@ -418,7 +433,7 @@ int main(int argc, char *argv[])
 	Double_t E_after_Foil=0.;
 
 	TLorentzVector target, beam, Sys;
-	TVector3 boostvect;
+	TVector3 boostvect,sdshift;
 
 	Double_t wght_max,width1,width2;
 	Bool_t allowed;
@@ -431,7 +446,7 @@ int main(int argc, char *argv[])
    	EA -= eloss(A,0.5,EA,ICWindow2,A.EL.eSi3N4, A.EL.dedxSi3N4);
 	E_after_IC = EA;
 	
-	if(!isSHTReac){
+	if(isSHTReac){
 		if(geoPrm.Orientation==1){
 			E_before_Tgt = EA;
    			EA -= eloss(A,1.,EA,geoPrm.TTgt/2.,A.EL.eTgt, A.EL.dedxTgt);
@@ -455,29 +470,21 @@ int main(int argc, char *argv[])
 		}
 	}
 	else{
-		if(geoPrm.Orientation==0){
-			E_before_Foil = EA;
+			E_before_Foil = E_after_IC;
 			EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
    			E_center_Foil = EA;
 			EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
    			E_after_Foil = EA;
-		}
+		
    		
 		E_before_Tgt = EA;
-   		E_center_Tgt = EA - eloss(A,1.,EA,geoPrm.TTgt/2.,A.EL.eTgt, A.EL.dedxTgt);
-   		E_after_Tgt = EA-eloss(A,1.,EA,geoPrm.TTgt,A.EL.eTgt, A.EL.dedxTgt);
-		if(geoPrm.Orientation==0) E_before_SSB = E_after_Tgt;
+        E_center_Tgt = EA;
+        E_after_Tgt = EA;
+        E_before_SSB = E_after_Tgt;
 		
 		reacZ = geoPrm.TTgt/2.;
-   		EA -= eloss(A,1.,EA,reacZ,A.EL.eTgt, A.EL.dedxTgt);
-	
-		if(geoPrm.Orientation==1){
-			E_before_Foil = E_after_Tgt;
-			E_center_Foil = E_after_Tgt - eloss(A,1./geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
-			E_after_Foil = E_after_Tgt - eloss(A,1./geoPrm.AoZFoil,E_after_Tgt,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
-			E_before_SSB = E_after_Foil;
 		}
-	}
+	
 	
 	EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 	Double_t PA = sqrt(EA*EA+2*EA*mA);
@@ -550,16 +557,22 @@ int main(int argc, char *argv[])
 	// Start of event loop
 	while(Evnt<nsim) 
 	{
-		if(!isSHTReac){
+		if(isSHTReac){
 			//reacZ = geoPrm.TFoil/2.;
-			reacZ = rndm->Uniform(0,geoPrm.TFoil);
-   			EA = E_before_Foil - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,reacZ,A.EL.eFoil, A.EL.dedxFoil);
-		}
-		else{	
+            
 			reacZ = rndm->Uniform(0,geoPrm.TTgt);
+            if(geoPrm.Orientation==0){EA = E_after_IC - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);}
+            EA = EA - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
+		}
+		else{
+            
+			reacZ = rndm->Uniform(0,geoPrm.TFoil);
+            EA = E_after_IC - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,reacZ,A.EL.eFoil, A.EL.dedxFoil);
 			//reacZ = geoPrm.TTgt/2.;
-   			EA = E_before_Tgt - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
+   			
  		}
+        
+        
 		EA = EA/1000.; // convert to GeV for TGenPhaseSpace
 		PA = sqrt(EA*EA+2*EA*mA);
 

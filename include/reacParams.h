@@ -24,6 +24,7 @@ class reacParams : public TObject {
 		std::string d;
 		std::string e;
 		std::string f;
+    std::string foil;
 
 		Double_t E; // Beam energy
 		Double_t R1; // Resonance energy

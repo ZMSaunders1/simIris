@@ -90,6 +90,10 @@ void reacParams::ReadParams(char* line)
 	if (strcmp(line,"SHT")==0){
 	   SHT=(fval==1.);
 	}
+    if (strcmp(line,"foil")==0){
+       foil=strval;
+    }
+    
 }
 
 void reacParams::Load(std::string filename){	
@@ -161,7 +165,9 @@ void reacParams::Clear(){
 	d.clear();
 	e.clear();
 	f.clear();
-
+    
+    foil.clear();
+    
 	E=0.;
 	R1=0.;
 	R2=0.;
@@ -171,4 +177,5 @@ void reacParams::Clear(){
 
 	N=0;
 	SHT=0;
+    
 }

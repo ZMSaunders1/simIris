@@ -3,7 +3,7 @@
 #include "TRandom3.h"
 #include "TVector3.h"
 
-ClassImp(S3Hit);
+//ClassImp(S3Hit);
 
 S3Hit::S3Hit()
 {

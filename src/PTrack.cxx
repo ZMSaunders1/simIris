@@ -1,6 +1,6 @@
 #include "PTrack.h"
 
-ClassImp(PTrack);
+//ClassImp(PTrack);
 
 PTrack::PTrack()
 {
