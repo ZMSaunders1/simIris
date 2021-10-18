@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
 	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D");
     Iris->Branch("YdCsIETot",&YdCsIETot,"YdCsIETot/D");
-    Iris->Branch("S3Tot",&S3Tot,"S3Tot");
+    Iris->Branch("S3Tot",&S3Tot,"S3Tot/D");
 	Iris->Branch("ICdE",&ICdE,"ICdE/D"); 
 	Iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
 	Iris->Branch("yd.",&ipyd,32000,99); 
@@ -811,22 +811,23 @@ int main(int argc, char *argv[])
 				Double_t Eb = sd2.dE[0];
 				Double_t cosTheta = TMath::Cos(sd1.fThetaCalc[0]*TMath::DegToRad());
 				//Sd2 ring side
+				
+				Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP);
+               	 		Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl);
+                		Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl);
+                		Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP);
+                
+                		Eb+= sd1.dE[0]; //use measured Sd // change june2
+				
+				
 				Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,b.EL.eB,b.EL.dedxB); //boron junction implant
 				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
 				Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
 				Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
-				//Sd1 ring side
-				Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
-				Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
-				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
-				Eb+= sd1.dE[0]; //use measured Sd // change june28
-				//Sd1 sector side
-				Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP); //phosphorus implant                                                                                   
-				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //metal
-
+				
 				Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
-                S3Tot = Eb;
+               			S3Tot = Eb;
 				Eb= Eb/1000.;
 
 				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
