@@ -54,6 +54,8 @@ Double_t mf=0.;
 Double_t Qgen=sqrt(-1.);
 Double_t Qdet=sqrt(-1.);
 Double_t Qdet_sd=sqrt(-1.);
+Double_t YdCsIETot=sqrt(-1.);
+Double_t S3Tot=sqrt(-1.);
 Double_t EB_det = sqrt(-1.);
 Double_t EB_det_sd = sqrt(-1.);
 Double_t PB_det = sqrt(-1.);
@@ -70,7 +72,7 @@ Double_t SSBdE=0.;
 void clearEvt()
 {
 	//TargdE[0]=0.; TargdE[1]=0.;
-	Qgen=sqrt(-1.); Qdet=sqrt(-1.); Qdet_sd=sqrt(-1.);
+    Qgen=sqrt(-1.); Qdet=sqrt(-1.); Qdet_sd=sqrt(-1.);YdCsIETot=sqrt(-1.);S3Tot=sqrt(-1.);
 	EB_det=sqrt(-1.); PB_det=sqrt(-1.);
 	EB_det_sd=sqrt(-1.); PB_det_sd=sqrt(-1.);
 	mBR=0.;
@@ -378,7 +380,9 @@ int main(int argc, char *argv[])
 	Iris->Branch("wght",&wght,"wght/D"); 
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
-	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D"); 
+	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D");
+    Iris->Branch("YdCsIETot",&YdCsIETot,"YdCsIETot/D");
+    Iris->Branch("S3Tot",&S3Tot,"S3Tot");
 	Iris->Branch("ICdE",&ICdE,"ICdE/D"); 
 	Iris->Branch("SSBdE",&SSBdE,"SSBdE/D"); 
 	Iris->Branch("yd.",&ipyd,32000,99); 
@@ -788,7 +792,7 @@ int main(int argc, char *argv[])
 				Eb+= yd.dE[0]; //use measured Yd // change june28
 	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
 	    		Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
-		
+                YdCsIETot = Eb;
 				Eb= Eb/1000.;
 				Double_t E_center = E_center_Tgt/1000.;
 				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
@@ -822,6 +826,7 @@ int main(int argc, char *argv[])
 
 				Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
+                S3Tot = Eb;
 				Eb= Eb/1000.;
 
 				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
