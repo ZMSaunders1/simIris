@@ -6,12 +6,20 @@ Simulation tool for the IRIS experiment @ TRIUMF
 	
 simIris requires ROOT (https://root.cern.ch).
 
+Make required changes into Makefile for MacOS 
+
 To install simIris use
 
 	git clone https://github.com/iris-triumf/simIris
 	cd simIris
 	make
 
+## testing the simIris ##
+The test folder contains the example of reaction file and geometry file for 12C(d,d)12C reaction channel @12 AMeV. 
+In main simiris directory type 
+	./simulate
+
+it will generate root file for 12C(d,d)12C in test folder
 
 ## Running simIris ##
 
@@ -68,3 +76,6 @@ The output root file of simIris contains a tree with the following objects:
 	tlPdec1/2, blPdec1/2: Same as blP and tlP, but only used when the heavy particle at the simulated excitation energy is unbound.
 
 	det: Contains the same information as yd, yu, etc. but in the same format as data sorted with treeIris. Simulated data from simIris can therefore analysed using physIris (https://github.com/iris-triumf/physIris) the same way as real experimental data.
+
+
+Have fun!!!

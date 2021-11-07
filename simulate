@@ -1,0 +1,1 @@
+./bin/simIris --reaction=./test/reaction.txt --geo=./test/geometry.txt --dedx_dir=./LISE_dedx --output=./test/12C_in_2H.root --events=1000
