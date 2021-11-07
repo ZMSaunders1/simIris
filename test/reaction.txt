@@ -1,0 +1,12 @@
+N=2		//no. of outgoing products
+A=12C	
+a=2H		
+B=12C		
+b=2H		
+R1=0.0		//beam like particle excitation energy	
+W1=0.0		//width of resonance
+R2=0.0		//target like particle excitation energy
+W2=0.0
+E=120.0		//incoming beam energy
+SHT=1		//reaction on target 1=yes
+foil=107Ag	

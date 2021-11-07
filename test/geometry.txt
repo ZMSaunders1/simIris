@@ -1,0 +1,35 @@
+Bs=1.	//beam size		
+ICPressure=19.5 
+FOIL=Ag			
+TFoil=4.33	
+AoZFoil=2.3
+TARGET=D		
+TTgt=2.01	//target thickness in mg/cm2
+TSD1=61. 	//s3-1 thickness		
+TSD2=500.	// s3-2 thickness		
+TSU=500.		// S3 upstream	
+TYY1=104.65	// yy1 sector thickness	
+TYY2=101.15		
+TYY3=106.13		
+TYY4=101.75		
+TYY5=100.05		
+TYY6=105.65		
+TYY7=102.48		
+TYY8=105.84		
+TYU1=500.0		
+TYU2=500.0		
+TYU3=500.0		
+TYU4=500.0		
+TYU5=500.0		
+TYU6=500.0		
+TYU7=500.0		
+TYU8=500.0		
+DYY=95.		//YY1 downstream distance
+DSD=160. 	//s3 distance		
+DYU=-90.		//YY1 upstream distance
+DSU=-160.	//upstream S3 distance	
+MASK=0		//is there mask 0 = no
+SHIELD=1		//Is there shield 0 = no
+ORIENTATION=0	//0 = target downstream silver foil
+XSHIFT=-2.6	
+YSHIFT=-2.0
