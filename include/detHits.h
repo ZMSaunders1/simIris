@@ -25,9 +25,9 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t s
 	
 	if(mask && shield&&forward){
 		YYHit = yd.Hit(tr.T,tr.P,geoPrm.DYY,reacPos) ;
-		CsIHit = csi.Hit(tr.T,tr.P,geoPrm.DYY+11.6,reacPos) ;
+		if(YYHit) CsIHit = csi.Hit(tr.T,tr.P,geoPrm.DYY+11.6,reacPos) ;
 		Sd1Hit = sd1.Hit(tr.T,tr.P,geoPrm.DS3,reacPos);
-		Sd2Hit = sd2.Hit(tr.T,tr.P,geoPrm.DS3+14.8,reacPos);
+		if(Sd1Hit) Sd2Hit = sd2.Hit(tr.T,tr.P,geoPrm.DS3+14.8,reacPos);
 		if(YYHit) ETmp = yd.ELoss(ncl,ETmp,tr.T);
 		if(CsIHit) ETmp = csi.ELoss(ncl,ETmp,tr.T);
 		if(Sd1Hit) ETmp = sd1.ELoss(ncl,ETmp,tr.T);
