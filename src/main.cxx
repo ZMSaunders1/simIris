@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
 		E_before_Foil = EA;
 		E_center_Foil = EA - eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
 		EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
-   		E_before_Tgt = EA;
+   		//E_before_Tgt = EA;
    		E_after_Foil = EA;
 		if(geoPrm.Orientation==1) E_before_SSB = E_after_Foil;
 		
@@ -566,6 +566,7 @@ int main(int argc, char *argv[])
             
 			reacZ = rndm->Uniform(0,geoPrm.TTgt);
             if(geoPrm.Orientation==0){EA = E_after_IC - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);}
+		 if(geoPrm.Orientation==1){EA=E_after_IC;}
             EA = EA - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
 		}
 		else{
