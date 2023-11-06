@@ -54,8 +54,12 @@ Double_t mf=0.;
 Double_t Qgen=sqrt(-1.);
 Double_t Qdet=sqrt(-1.);
 Double_t Qdet_sd=sqrt(-1.);
+Double_t Qyu=sqrt(-1.);
+Double_t Qsu=sqrt(-1.);
 Double_t YdCsIETot=sqrt(-1.);
 Double_t S3Tot=sqrt(-1.);
+Double_t YuTot=sqrt(-1.);
+Double_t SuTot=sqrt(-1.);
 Double_t EB_det = sqrt(-1.);
 Double_t EB_det_sd = sqrt(-1.);
 Double_t PB_det = sqrt(-1.);
@@ -72,7 +76,9 @@ Double_t SSBdE=0.;
 void clearEvt()
 {
 	//TargdE[0]=0.; TargdE[1]=0.;
-    Qgen=sqrt(-1.); Qdet=sqrt(-1.); Qdet_sd=sqrt(-1.);YdCsIETot=sqrt(-1.);S3Tot=sqrt(-1.);
+    Qgen=sqrt(-1.); Qdet=sqrt(-1.); 
+	Qdet_sd=sqrt(-1.);YdCsIETot=sqrt(-1.);
+	S3Tot=sqrt(-1.),YuTot=sqrt(-1.),Qyu=sqrt(-1.),Qsu=sqrt(-1.);
 	EB_det=sqrt(-1.); PB_det=sqrt(-1.);
 	EB_det_sd=sqrt(-1.); PB_det_sd=sqrt(-1.);
 	mBR=0.;
@@ -380,6 +386,8 @@ int main(int argc, char *argv[])
 	Iris->Branch("wght",&wght,"wght/D"); 
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
+	Iris->Branch("Qyu",&Qyu,"Qyu/D"); 
+	Iris->Branch("Qsu",&Qyu,"Qsu/D"); 
 	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D");
     Iris->Branch("YdCsIETot",&YdCsIETot,"YdCsIETot/D");
     Iris->Branch("S3Tot",&S3Tot,"S3Tot/D");
@@ -462,7 +470,7 @@ int main(int argc, char *argv[])
 		E_before_Foil = EA;
 		E_center_Foil = EA - eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil/2.,A.EL.eFoil, A.EL.dedxFoil);
 		EA -= eloss(A,1./geoPrm.AoZFoil,EA,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);
-   		E_before_Tgt = EA;
+   		//E_before_Tgt = EA;
    		E_after_Foil = EA;
 		if(geoPrm.Orientation==1) E_before_SSB = E_after_Foil;
 		
@@ -566,6 +574,7 @@ int main(int argc, char *argv[])
             
 			reacZ = rndm->Uniform(0,geoPrm.TTgt);
             if(geoPrm.Orientation==0){EA = E_after_IC - eloss(A,1./geoPrm.AoZFoil,E_before_Foil,geoPrm.TFoil,A.EL.eFoil, A.EL.dedxFoil);}
+		 if(geoPrm.Orientation==1){EA=E_after_IC;}
             EA = EA - eloss(A,b.Z/b.A,E_before_Tgt,reacZ,A.EL.eTgt, A.EL.dedxTgt);
 		}
 		else{
@@ -791,6 +800,7 @@ int main(int argc, char *argv[])
 	      		Eb= Eb+elossFi(Eb,0.1*1.822*0.1/cosTheta,b.EL.eP,b.EL.dedxP); // 0.1Phosphorus
 				Eb+= yd.dE[0]; //use measured Yd // change june28
 	      		Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
+				if(geoPrm.Orientation==1){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta,b.EL.eFoil,b.EL.dedxFoil);}
 	    		Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
                 YdCsIETot = Eb;
 				Eb= Eb/1000.;
@@ -806,37 +816,85 @@ int main(int argc, char *argv[])
 		}
 		
 		//Calculating "measured" Q-Value
-		if(sd1.dE.size()>0 && sd2.dE.size()>0){
+		
+		if(HEHit && sd1.dE.size()>0 && sd2.dE.size()>0){
 			if(sd1.dE[0]>0. && sd2.dE[0]>0.){
 				Double_t Eb = sd2.dE[0];
 				Double_t cosTheta = TMath::Cos(sd1.fThetaCalc[0]*TMath::DegToRad());
 				//Sd2 ring side
 				
-				Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP);
-               	 		Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl);
-                		Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl);
-                		Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,b.EL.eP,b.EL.dedxP);
+				Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,B.EL.eP,B.EL.dedxP);
+               	Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,B.EL.eAl,B.EL.dedxAl);
+                Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,B.EL.eAl,B.EL.dedxAl);
+                Eb = Eb+elossFi(Eb,0.1*1.822*0.5/cosTheta,B.EL.eP,B.EL.dedxP);
                 
-                		Eb+= sd1.dE[0]; //use measured Sd // change june2
+                Eb+= sd1.dE[0]; //use measured Sd // change june2
 				
 				
-				Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,b.EL.eB,b.EL.dedxB); //boron junction implant
-				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
-				Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
-				Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
+				Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,B.EL.eB,B.EL.dedxB); //boron junction implant
+				Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,B.EL.eAl,B.EL.dedxAl); //first metal
+				Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,B.EL.eSiO2,B.EL.dedxSiO2); //SiO2
+				Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,B.EL.eAl,B.EL.dedxAl); //second metal
 				
-				Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); //deuteron energy  in mid target midtarget
+				if(geoPrm.Orientation==1){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta,B.EL.eFoil,B.EL.dedxFoil);}
+				Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,B.EL.eTgt,B.EL.dedxTgt); //deuteron energy  in mid target midtarget
 		
-               			S3Tot = Eb;
+               	S3Tot = Eb;
 				Eb= Eb/1000.;
 
 				Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
-				EB_det_sd = EA+mA+ma-Eb-mb;
+				EB_det_sd = EA+mA+ma-Eb-mB;
 				PB_det_sd = sqrt(PA*PA+Pb*Pb-2.*PA*Pb*cosTheta);
-				Qdet_sd = mA+ma-mb-sqrt(EB_det_sd*EB_det_sd-PB_det_sd*PB_det_sd);
+				Qdet_sd = mA+ma-mB-sqrt(EB_det_sd*EB_det_sd-PB_det_sd*PB_det_sd);
 				Qdet_sd =Qdet_sd*1000.;
 			}
 		}
+
+		if(yu.dE.size()>0 && yu.dE[0]>0){
+
+			Double_t Eb = yu.dE[0];
+			Double_t cosTheta = TMath::Cos(yu.fThetaCalc[0]*TMath::DegToRad());
+			Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
+	    	 if(geoPrm.Orientation==0){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta,b.EL.eFoil,b.EL.dedxFoil);}
+			Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); 
+			YuTot=Eb;
+			Eb= Eb/1000.;
+			Double_t E_center = E_center_Tgt/1000.;
+			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
+			Double_t P_center = sqrt(E_center*E_center+2*E_center*mA);
+				//EB_det = EA+mA+ma-Eb-mb;
+				Printf("working eveents \n");
+			EB_det = E_center+mA+ma-Eb-mb;
+			PB_det = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
+			Qyu = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+			Qyu =Qyu*1000.;
+
+		}
+		if(LEHit && su.dE.size()>0 && su.dE[0]){
+
+			Double_t Eb = su.dE[0];
+			Double_t cosTheta = TMath::Cos(yu.fThetaCalc[0]*TMath::DegToRad());
+			Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,b.EL.eB,b.EL.dedxB); //boron junction implant
+			Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
+			Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
+			Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
+				
+	    	if(geoPrm.Orientation==0){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta,b.EL.eFoil,b.EL.dedxFoil);}
+			Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); 
+			SuTot=Eb;
+			Eb= Eb/1000.;
+			Double_t E_center = E_center_Tgt/1000.;
+			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
+			Double_t P_center = sqrt(E_center*E_center+2*E_center*mA);
+				//EB_det = EA+mA+ma-Eb-mb;
+			EB_det = E_center+mA+ma-Eb-mb;
+			PB_det = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
+			Qsu = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+			Qsu =Qsu*1000.;
+
+		}
+
+
 
 		if(HEHit && sd1.dE.size()>0 && sd2.dE.size()>0.){
 			if(sd1.dE[0]>0. && sd2.dE[0]>0.) HEHitcntr++;
