@@ -787,7 +787,7 @@ int main(int argc, char *argv[])
 		SSBdE = eloss(A,14./28.,E_before_SSB,500.*2.3212*0.1,B.EL.eSi,B.EL.dedxSi);
 		SSBdE =rndm->Gaus(SSBdE,0.05*SSBdE);
 
-		sortEnergies(); // sort detector hits by energy
+		//sortEnergies(); // sort detector hits by energy ! particle correlation breaks for multiple particles hit in the same detector for the same event
 	
 		//Calculating "measured" Q-Value
 		if(LEHit && yd.dE.size()>0 && csi.dE.size()>0){
