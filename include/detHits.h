@@ -164,13 +164,13 @@ void setIDet(Double_t ICdE, Double_t SSBdE)
 	if(su.mul>0)
 	{
 		det.TSurMul=su.mul;
-		for(Int_t i=0; i<det.TSd1rMul; i++){
+		for(Int_t i=0; i<det.TSurMul; i++){
   			det.TSurEnergy.push_back(su.dE[i]);
 			det.TSurChannel.push_back(su.Ring[i]);
   			det.TSuTheta.push_back(su.fThetaRand[i]);
 		}
 		det.TSusMul=su.mul;
-		for(Int_t i=0; i<det.TSd1sMul; i++){
+		for(Int_t i=0; i<det.TSusMul; i++){
   			det.TSusEnergy.push_back(su.dE[i]);
 			det.TSusChannel.push_back(su.Seg[i]);
   			det.TSuPhi.push_back(su.fPhiRand[i]);
