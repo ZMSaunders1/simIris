@@ -43,11 +43,11 @@ Double_t eloss(nucleus P, Double_t TZoverA, Double_t ein, Double_t th , Double_t
 	
 	TRandom3 *rndm = new TRandom3(0);
 	//Energy loss calculation including energy Straggling
-	Double_t dx =th/100.; //in mg/cm2
+	Double_t dx =th/1000.; //in mg/cm2
 	Bohr = TMath::Sqrt(0.157 * dx * P.Z*P.Z *TZoverA)/1000.;
 	Double_t de = 0; //energy loss
 	Double_t en= ein; //the energy variable
-	for (int i=0; i<100; i++){
+	for (int i=0; i<1000; i++){
 	  	de = (dx * eval(en,x,y));//energy loss in dx
 		if(de>en){
 		   	en=0.;	

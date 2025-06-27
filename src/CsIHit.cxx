@@ -127,20 +127,25 @@ Bool_t CsIHit::Hit(Double_t theta, Double_t phi, Double_t CsIDistance, TVector3 
 	return hitBool;
 }
 
-Double_t CsIHit::ELoss(nucleus ncl, Double_t E, Double_t T)
+Double_t CsIHit::ELoss(nucleus ncl, Double_t E, Double_t Theta)
 {
-  	Double_t dE0, dE_ideal0;
+	Double_t T = (Theta<TMath::Pi()/2.) ? Theta : TMath::Pi()-Theta;
+	Double_t dE0, dE_ideal0;
 	//if(mul>0 && hit0==1){
 		TRandom3 *rndm = new TRandom3(0);
+
 		E -= eloss(ncl,15./31.,E,0.1*1.8219*0.1/cos(T),ncl.EL.eP, ncl.EL.dedxP);
 		E -= eloss(ncl,13./27.,E,0.3*2.702*0.1/cos(T),ncl.EL.eAl, ncl.EL.dedxAl);
 		E -= eloss(ncl,100./192.,E,6.*1.4*0.1/cos(T),ncl.EL.eMy, ncl.EL.dedxMy);
 		dE0 = eloss(ncl,108./260.,E,Thickness/cos(T),ncl.EL.eCsI, ncl.EL.dedxCsI);
 		E -= dE0;
+
+
 		if(dE0<0.) dE0 = -dE0;
 		dE_ideal0 = dE0;
 		if(dE0!=0.) dE0 = rndm->Gaus(dE0,0.018*dE0*sqrt(14.1/dE0)); // resolution changed 3.1 % -> 1.8 %, May 2 2017
 		if(dE0<0.) dE0 = 0.;
+
 		dE.push_back(dE0);
 		dE_ideal.push_back(dE_ideal0);
 		rndm->Delete();
