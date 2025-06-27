@@ -64,6 +64,10 @@ Double_t EB_det = sqrt(-1.);
 Double_t EB_det_sd = sqrt(-1.);
 Double_t PB_det = sqrt(-1.);
 Double_t PB_det_sd = sqrt(-1.);
+Double_t EB_det_yu = sqrt(-1.);
+Double_t EB_det_su = sqrt(-1.);
+Double_t PB_det_yu = sqrt(-1.);
+Double_t PB_det_su = sqrt(-1.);
 Double_t beamE=0.;
 Double_t beamBeta=0.;
 Double_t beamGamma=0.;
@@ -76,11 +80,13 @@ Double_t SSBdE=0.;
 void clearEvt()
 {
 	//TargdE[0]=0.; TargdE[1]=0.;
-    Qgen=sqrt(-1.); Qdet=sqrt(-1.); 
+    Qgen=sqrt(-1.); Qdet=sqrt(-1.);
 	Qdet_sd=sqrt(-1.);YdCsIETot=sqrt(-1.);
-	S3Tot=sqrt(-1.),YuTot=sqrt(-1.),Qyu=sqrt(-1.),Qsu=sqrt(-1.);
+	S3Tot=sqrt(-1.); YuTot=sqrt(-1.); Qyu=sqrt(-1.); Qsu=sqrt(-1.);
 	EB_det=sqrt(-1.); PB_det=sqrt(-1.);
 	EB_det_sd=sqrt(-1.); PB_det_sd=sqrt(-1.);
+	EB_det_yu=sqrt(-1.); PB_det_yu=sqrt(-1.);
+	EB_det_su=sqrt(-1.); PB_det_su=sqrt(-1.);
 	mBR=0.;
 	mbR=0.;
 	tlP.Clear();
@@ -387,7 +393,7 @@ int main(int argc, char *argv[])
 	Iris->Branch("Qgen",&Qgen,"Qgen/D"); 
 	Iris->Branch("Qdet",&Qdet,"Qdet/D"); 
 	Iris->Branch("Qyu",&Qyu,"Qyu/D"); 
-	Iris->Branch("Qsu",&Qyu,"Qsu/D"); 
+	Iris->Branch("Qsu",&Qsu,"Qsu/D"); 
 	Iris->Branch("Qdet_sd",&Qdet_sd,"Qdet_sd/D");
     Iris->Branch("YdCsIETot",&YdCsIETot,"YdCsIETot/D");
     Iris->Branch("S3Tot",&S3Tot,"S3Tot/D");
@@ -427,7 +433,7 @@ int main(int argc, char *argv[])
 	yu.Init(geoPrm.TYYU);
 	sd1.Init(0,geoPrm.TS3[0]);
 	sd2.Init(1,geoPrm.TS3[1]);
-	su.Init(0,geoPrm.TS3U);
+	su.Init(1,geoPrm.TS3U);
 
 	Bool_t LEHit, HEHit;
 
@@ -817,7 +823,7 @@ int main(int argc, char *argv[])
 		
 		//Calculating "measured" Q-Value
 		
-		if(HEHit && sd1.dE.size()>0 && sd2.dE.size()>0){
+		if(sd1.dE.size()>0 && sd2.dE.size()>0){
 			if(sd1.dE[0]>0. && sd2.dE[0]>0.){
 				Double_t Eb = sd2.dE[0];
 				Double_t cosTheta = TMath::Cos(sd1.fThetaCalc[0]*TMath::DegToRad());
@@ -851,45 +857,47 @@ int main(int argc, char *argv[])
 		}
 
 		if(yu.dE.size()>0 && yu.dE[0]>0){
-
 			Double_t Eb = yu.dE[0];
+			Double_t cosTheta2 = TMath::Cos((180-yu.fThetaCalc[0])*TMath::DegToRad());
 			Double_t cosTheta = TMath::Cos(yu.fThetaCalc[0]*TMath::DegToRad());
-			Eb= Eb+elossFi(Eb,0.1*2.32*0.35/cosTheta,b.EL.eSi,b.EL.dedxSi); //0.3 u Al + 1 um B equivalent in 0.35 um Si
-	    	 if(geoPrm.Orientation==0){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta,b.EL.eFoil,b.EL.dedxFoil);}
-			Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); 
+	
+            Eb= Eb+elossFi(Eb,0.1*2.35*0.05/cosTheta2,b.EL.eB,b.EL.dedxB); //B
+            Eb= Eb+elossFi(Eb,0.1*2.70*0.1/cosTheta2,b.EL.eAl,b.EL.dedxAl); //Al    
+            
+	    	if(geoPrm.Orientation==0){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta2,b.EL.eFoil,b.EL.dedxFoil);}
+
+		    Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta2,b.EL.eTgt,b.EL.dedxTgt); 
 			YuTot=Eb;
 			Eb= Eb/1000.;
 			Double_t E_center = E_center_Tgt/1000.;
 			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
 			Double_t P_center = sqrt(E_center*E_center+2*E_center*mA);
 				//EB_det = EA+mA+ma-Eb-mb;
-				Printf("working eveents \n");
-			EB_det = E_center+mA+ma-Eb-mb;
-			PB_det = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
-			Qyu = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+			EB_det_yu = E_center+mA+ma-Eb-mb;
+			PB_det_yu = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
+			Qyu = mA+ma-mb-sqrt(EB_det_yu*EB_det_yu-PB_det_yu*PB_det_yu);
 			Qyu =Qyu*1000.;
 
 		}
-		if(LEHit && su.dE.size()>0 && su.dE[0]){
-
+		if(su.dE.size()>0 && su.dE[0]){
 			Double_t Eb = su.dE[0];
-			Double_t cosTheta = TMath::Cos(yu.fThetaCalc[0]*TMath::DegToRad());
-			Eb = Eb+elossFi(Eb,0.1*2.35*0.5/cosTheta,b.EL.eB,b.EL.dedxB); //boron junction implant
-			Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta,b.EL.eAl,b.EL.dedxAl); //first metal
-			Eb = Eb+elossFi(Eb,0.1*2.65*2.5/cosTheta,b.EL.eSiO2,b.EL.dedxSiO2); //SiO2
-			Eb = Eb+elossFi(Eb,0.1*2.7*1.5/cosTheta,b.EL.eAl,b.EL.dedxAl); //second metal
+			Double_t cosTheta2 = TMath::Cos((180-su.fThetaCalc[0])*TMath::DegToRad());
+			Double_t cosTheta = TMath::Cos(su.fThetaCalc[0]*TMath::DegToRad());
+
+			Eb = Eb+elossFi(Eb,0.1*2.65*0.5/cosTheta2,b.EL.eP,b.EL.dedxP); //P
+			Eb = Eb+elossFi(Eb,0.1*2.7*0.3/cosTheta2,b.EL.eAl,b.EL.dedxAl); //Al
 				
-	    	if(geoPrm.Orientation==0){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta,b.EL.eFoil,b.EL.dedxFoil);}
-			Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta,b.EL.eTgt,b.EL.dedxTgt); 
+	    	if(geoPrm.Orientation==0){ Eb=Eb+elossFi(Eb,geoPrm.TFoil/cosTheta2,b.EL.eFoil,b.EL.dedxFoil);}
+			Eb= Eb+elossFi(Eb,geoPrm.TTgt/2./cosTheta2,b.EL.eTgt,b.EL.dedxTgt); 
 			SuTot=Eb;
 			Eb= Eb/1000.;
 			Double_t E_center = E_center_Tgt/1000.;
 			Double_t Pb = sqrt(Eb*Eb+2.*Eb*mb);	
 			Double_t P_center = sqrt(E_center*E_center+2*E_center*mA);
 				//EB_det = EA+mA+ma-Eb-mb;
-			EB_det = E_center+mA+ma-Eb-mb;
-			PB_det = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
-			Qsu = mA+ma-mb-sqrt(EB_det*EB_det-PB_det*PB_det);
+			EB_det_su = E_center+mA+ma-Eb-mb;
+			PB_det_su = sqrt(P_center*P_center+Pb*Pb-2.*P_center*Pb*cosTheta);
+			Qsu = mA+ma-mb-sqrt(EB_det_su*EB_det_su-PB_det_su*PB_det_su);
 			Qsu =Qsu*1000.;
 
 		}
