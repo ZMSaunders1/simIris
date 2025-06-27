@@ -4,6 +4,7 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t s
 {
 	Bool_t mask = maskClear(tr.T,tr.P) || !maskIn;
 	Bool_t shield = shieldClear(tr.T,tr.P) || !shieldIn;
+	Bool_t upShield = shieldClear(TMath::Pi() - tr.T,tr.P) || !shieldIn;
 	Bool_t forward = (tr.T<TMath::Pi()/2.);
 	Bool_t backward = (tr.T>TMath::Pi()/2.);
 	Bool_t YYHit = 0;
@@ -16,7 +17,7 @@ Bool_t detHits(PTrack tr, nucleus ncl, TVector3 reacPos, Bool_t maskIn, Bool_t s
 	Double_t ETmp = tr.Ebt;
 	Double_t ETmpU = tr.Ebt;
 
-	if(backward){
+	if(backward && upShield){
 		YuHit = yu.Hit(tr.T,tr.P,geoPrm.DYYU,reacPos) ;
 		SuHit = su.Hit(tr.T,tr.P,geoPrm.DS3U,reacPos);
 		if(YuHit) ETmpU = yu.ELoss(ncl,ETmpU,tr.T);
