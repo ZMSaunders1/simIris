@@ -164,9 +164,9 @@ Double_t YYHit::ELoss(nucleus ncl, Double_t E, Double_t Theta)
 	Double_t T = (Theta<TMath::Pi()/2.) ? Theta : TMath::Pi()-Theta;
   	Double_t dE0, dE_ideal0;
 	TRandom3 *rndm = new TRandom3(0);
-	
+
 	E -= eloss(ncl,13./27.,E,0.1*2.702*0.1/cos(T),ncl.EL.eAl, ncl.EL.dedxAl);
-  	E -= eloss(ncl,5./10.,E,0.05*2.3502*0.1/cos(T),ncl.EL.eB, ncl.EL.dedxB);
+  	E -= eloss(ncl,5./10.,E,0.05*2.3502*0.05/cos(T),ncl.EL.eB, ncl.EL.dedxB);
   	dE0 = eloss(ncl,14./28.,E,Thickness[Seg.at(Seg.size()-1)]/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
   	dE_ideal0 = eloss(ncl,14./28.,E,Avg_Thickness/cos(T),ncl.EL.eSi, ncl.EL.dedxSi);
 	E = E-dE0;
